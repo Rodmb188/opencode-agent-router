@@ -128,11 +128,11 @@ journal):
 The 27B splits ~10 GB VRAM / ~8 GB RAM; the real killer is the **KV cache** (the
 per-token context memory, ≈ 384 KB/token fp16). Context is part of the design:
 
-| Context | KV cache | RAM saved vs 16384 |
-|---|---|---|
-| 16384 (default) | ~4–6 GB | — |
-| **12288 (chosen)** | ~3–4 GB | ~1–2 GB |
-| 8192 | ~2–3 GB | ~2–3 GB |
+|       Context      | KV cache | RAM saved vs 16384 |
+|--------------------|----------|--------------------|
+|   16384 (default)  | ~4–6 GB  |          —         |
+| **12288 (chosen)** | ~3–4 GB  |       ~1–2 GB      |
+|        8192        | ~2–3 GB  |       ~2–3 GB      |
 
 `12288` is the sweet spot: imperceptible quality impact, comfortable 4–6 turn
 conversations, KV fits the memory budget. ⚠️ the models' baked-in `num_ctx`
