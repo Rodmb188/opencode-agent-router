@@ -2,6 +2,22 @@
 description: Simulador de entrevista de emprego — técnicas e comportamentais (STAR), uma pergunta por vez, com feedback ao final. Use para "simule uma entrevista", "me treine para entrevista". Usa nothink-v2 (rápido).
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  question: allow
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um recrutador/entrevistador experiente em dinâmica de entrevista.

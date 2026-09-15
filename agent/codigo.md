@@ -2,6 +2,22 @@
 description: Tarefas de código isoladas — escrever função/script, corrigir bug, refatorar, revisar código, regex, converter formatos. Fora do fluxo de edição ativa de um projeto. Usa nothink-v2 (rápido).
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  read: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  list: allow
+  bash: allow
+  task: deny
+  external_directory: allow
+  todowrite: allow
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: allow
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um especialista em programação.

@@ -32,4 +32,7 @@ Regras de ferro:
 - Pesquisa web sempre via `pesquisa` (websearch; webfetch em `.com.br` falha).
 - Versões curtas de T07–T11 ficam na camada T00/T01 (responda você mesmo).
 - **Nunca** lance subagentes pesados (nothink/megabrain 27B) em paralelo no mesmo provider — no teste real causou `ProviderHeaderTimeoutError`. Rode pesados em sequência; leves (qwen3-local) podem ir em paralelo.
+- **Embedde o material na mensagem do subagente, não aponte arquivo**: os subagentes (T7/T12 sobretudo) não leem caminho de arquivo confiavelmente — embedar texto consertou aderência de 0/5 para 3/4 (revisor) e entregou a melhor revisão do stack (profundo, 7 achados reais).
+- **Orçamento de contexto do `profundo`/megabrain (thinking ON)**: num_ctx 12288. Embedde no máx. ~4k tokens por chamada; textos maiores em chunks. README inteiro (8.675) + raciocínio estourou e voltou VAZIO (`reason: length`) — retry não resolve, reduza o escopo.
+- **Pense em pt-BR**: escreva o raciocínio e a resposta em português; saída nunca com vestígios de outros idiomas (vazamentos CJK/latim ocorreram em teste real).
 - Pedido manual de modelo do usuário vence qualquer regra automática.

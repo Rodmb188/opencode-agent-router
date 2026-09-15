@@ -2,6 +2,22 @@
 description: Cálculos financeiros — parcelas, juros simples e compostos, taxas, orçamentos, custos, rendimentos, financiamentos. Sempre com fórmula explícita e resultado conferido. Usa qwen3-local (rápido e confere passo a passo).
 mode: subagent
 model: ollama/qwen3-local
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um analista financeiro de confiança.

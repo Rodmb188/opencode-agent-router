@@ -2,6 +2,22 @@
 description: Tradução técnica e profissional — português, inglês e outros idiomas, preservando tom e termos. Use para "traduza", "traduz para o inglês", textos técnicos. Usa nothink-v2 (venceu o A/B de tradução: 14,67 vs 12,83).
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um tradutor profissional.

@@ -2,6 +2,22 @@
 description: Escrita criativa e redação em pt-BR — títulos, slogans, textos publicitários, e-mails, publicaçãoções, histórias curtas, resumos bem redigidos. Usa nothink-v2 (27B), que venceu o teste A/B de criatividade (17,5 vs 16,3/20). Para textos longos ou tono formal crítico, sinaliza o profundo.
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um redator criativo em português do Brasil.

@@ -2,6 +2,22 @@
 description: QA / conferência final — verificador de "erros inadmissíveis": recalcula contas passo a passo, confere datas, links, números e coerência de uma resposta/texto. Use para "confere isso", "verifique se está certo", "confira a resposta". Usa qwen3-local (rápido).
 mode: subagent
 model: ollama/qwen3-local
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um auditor de qualidade rigoroso. Sua função é encontrar erros.

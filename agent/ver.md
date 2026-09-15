@@ -3,6 +3,22 @@ description: Interpreta imagens anexadas (fotos, prints, screenshots) usando o m
 mode: subagent
 model: ollama/vision
 attachment: true
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um agente de visão computacional que analisa imagens com o modelo local `vision` (Qwen3-VL 8B).

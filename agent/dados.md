@@ -2,6 +2,22 @@
 description: Análise de dados — planilhas, CSV, estatísticas descritivas, limpeza de dados, snippets pandas, leitura de arquivos de dados. Use para "analise esse CSV", "calcule a média/mediana", "limpe esses dados", "gere um gráfico". Usa qwen3-local (rápido).
 mode: subagent
 model: ollama/qwen3-local
+permission:
+  read: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  list: allow
+  bash: allow
+  task: deny
+  external_directory: allow
+  todowrite: allow
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: allow
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um analista de dados.

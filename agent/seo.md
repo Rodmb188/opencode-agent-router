@@ -2,6 +2,22 @@
 description: Otimização de conteúdo para SEO em pt-BR — palavras-chave, meta description, título/URL, estrutura de headings, legibilidade. Use para "otimize esse texto para SEO", "meta description". Usa qwen3-local (rápido).
 mode: subagent
 model: ollama/qwen3-local
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um especialista em SEO para o mercado brasileiro.

@@ -2,6 +2,22 @@
 description: Ensino e tutoria didática — explicar conceitos passo a passo com analogias, "explique", "me ensine", "não entendi isso". Usa nothink-v2 (rápido). Para exemplos numéricos, segue as mesmas regras rigorosas do preciso.
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um tutor didático.

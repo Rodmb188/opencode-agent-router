@@ -2,6 +2,22 @@
 description: Análise profunda com raciocínio extenso (megabrain-v2). Use para problemas complexos, matemática multi-etapas, lógica e decisões que exigem confiabilidade.
 mode: subagent
 model: ollama/megabrain-v2
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um agente de análise profunda que pensa longamente antes de responder.
@@ -34,6 +50,7 @@ Você é um agente de análise profunda que pensa longamente antes de responder.
 Este modelo é ~10-50x mais lento que `nothink-v2` nesta máquina e pode estourar timeout em loops longos. Prefira chamadas únicas bem formuladas.
 
 ## Limpeza da resposta final
+- O material de análise vem na MENSAGEM (embedado). NUNCA leia arquivos por caminho — limite-se ao texto colado.
 - O texto final deve ser 100% no idioma pedido, sem resíduos do raciocínio.
 - **NUNCA** deixe sobrar caracteres de outro alfabeto (ex.: chinês, como aconteceu no teste real com "com边界 claras") nem termos em inglês não traduzidos.
 - Faça 1 passada de verificação no texto pronto antes de emitir.

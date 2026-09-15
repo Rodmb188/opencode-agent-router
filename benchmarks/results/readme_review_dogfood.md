@@ -186,3 +186,53 @@ math §).
    `models/README.md` and the journal). Embedding is now the **recommended
    delivery for T12** critical review, and the README no longer contradicts
    itself on models, batteries, or layout.
+
+---
+
+## 10. Root cause of the "empty profundo" + tool permission lockdown
+
+### 10a. Because: the empty was context overflow, not timeout
+
+DB evidence for attempt 9a (README fully embedded, `megabrain-v2`, thinking ON):
+
+```
+step-finish { reason: "length", tokens: { total: 12288, input: 8675, output: 3613 } }
+```
+
+`input 8675 + output 3613 = 12288 = num_ctx`. The model burned the whole window inside
+reasoning and terminated with `reason: length` BEFORE emitting any final text → 0 bytes.
+Attempt 9b worked only because its prompt was tiny (76 tokens) and reused the cache:
+`cache.read: 8671`. So "retry" was luck, not a strategy. **The fix is preventive math**:
+megabrain at 12288 ctx needs input ≲ 4k tokens (reasoning reserves the rest).
+
+### 10b. Action: tool `permission` lockdown (embed-only agents)
+
+All 18 agents now carry an explicit `permission:` block. Text-based agents (T02–T12
+vocals, QA, vision, tutoring, writing, planning, SEO, translation) are **`read/edit/bash/
+web/task: deny`** — because the quality experiments proved the working input form is
+*embedded text in the message*, not file reads. Only four keep real tools:
+
+| Agent | Tools allowed |
+|---|---|
+| `pesquisa` | `webfetch`, `websearch`, `skill` |
+| `codigo` | `read`, `edit`, `glob`, `grep`, `list`, `bash`, `external_directory`, `todowrite`, `lsp` |
+| `dados` | same as `codigo` |
+| `importador` | same as `codigo` |
+| `sysadmin` | `read`, `edit`, `glob`, `grep`, `list`, `bash`, `external_directory`, `todowrite`, `lsp` |
+
+`task` is `deny` everywhere (subagents must never spawn sub-subagents; matches
+`subagent_depth: 1`). `entrevistador` alone allows `question` (interactive).
+
+### 10c. Roteador rule 9 rewritten
+
+Old: "empty = failure, retry 1× with smaller scope". New: empty is context overflow →
+**cap embedded input at ~4k tokens for `profundo`**, chunk longer texts, never rely on
+retry as the fix. (Rule 9 + protocol now mandate embedding text in the task message;
+matched by AGENTS.md iron rules.)
+
+### 10d. Why this closes the loop with the experiments
+
+- Attempts 1–4 failed reading a file path → embedding fixed adherence (sec. 8).
+- Attempt 9a failed from oversized embedding → chunking/budget fixes it (sec. 10a).
+- Both failure classes are now handled at the *router* level (input form + size), which
+  is the only stable fix — consistent with the envelope conclusion in sec. 5.

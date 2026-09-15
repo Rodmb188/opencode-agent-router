@@ -46,10 +46,17 @@ ajustadas aqui e valem para todo o opencode.
 6. **Instrução do usuário manual vence**: se o usuário escolher explicitamente um modelo ("/model", "use o megabrain"), respeite e não reclassifique.
 7. Em dúvida entre níveis, escolha o mais rápido (não delegue).
 8. **NUNCA lance subagentes pesados paralelos (nothink/megabrain 27B) no mesmo provider**: no teste real, 6 em paralelo causaram `ProviderHeaderTimeoutError` (300000ms) por thrash de swap. Rode subagentes pesados em SEQUÊNCIA. Subagentes leves (qwen3-local) podem ir em paralelo sem problema.
-9. **Resultado vazio = falha**: se o subagente terminar sem conteúdo útil, repita 1x com escopo menor antes de aceitar.
+9. **Resultado vazio NÃO é timeout — é estouro de contexto.** Quando `profundo`/`megabrain-v2` (thinking ON)
+   recebe muito texto embedado + raciocínio longo, o step termina com `reason: length` (total = num_ctx 12288)
+   ANTES de emitir a resposta → resultado vazio. Medido no teste real: README inteiro (8.675 tokens de input) +
+   raciocínio (3.613) = vazio; retry com prompt curto + cache funcionou. Então:
+   - **A correção é preventiva, não retry**: embede no máx. ~4k tokens de material por chamada do profundo.
+   - Texto maior: divida em chunks e faça 2+ chamadas, ou use o `sumarizador`/`revisor` primeiro.
+   - Se ainda vier vazio, o problema é formulário (embeded muito grande) — reduza o escopo, não apenas repita.
 
 ## Protocolo de delegação
 
 1. Se T02–T19, chame a ferramenta `task` com `subagent_type` = `preciso` | `financeiro` | `pesquisa` | `ver` | `redator` | `revisor` | `codigo` | `tutor` | `sumarizador` | `tradutor` | `profundo` | `dados` | `sysadmin` | `entrevistador` | `planner` | `seo` | `qa` | `importador`, repassando o pedido COMPLETO do usuário (sem resumir).
-2. Receba o resultado, confira se responde ao pedido e apresente ao usuário em pt-BR, em 1 linha que o agente certo foi usado.
-3. Se o agente devolver erro/timeout, repita 1x com formulário mais simples ou responda você mesmo com ressalva de incerteza.
+2. **EMBEDE o material na mensagem**: se a tarefa envolve texto/documento, cole o conteúdo junto com o pedido (não aponte apenas o caminho). Regra de ouro do teste real: subagentes T7/T12 falham consistentemente quando recebem só um arquivo/caminho; embedar conserta. No `profundo`, embede no máx. ~4k tokens (veja regra 9). Textos longos: chunk.
+3. Receba o resultado, confira se responde ao pedido e apresente ao usuário em pt-BR, em 1 linha que o agente certo foi usado.
+4. Se o agente devolver erro/timeout, repita 1x com formulário mais simples ou responda você mesmo com ressalva de incerteza.

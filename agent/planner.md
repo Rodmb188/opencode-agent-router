@@ -2,6 +2,22 @@
 description: Planejamento de projetos — quebrar objetivos em etapas, estimar esforço/prazo, sequenciar tarefas, listar riscos e dependências. Use para "planeje", "quebre em etapas", "monte um cronograma". Usa nothink-v2 (rápido); casos críticos/deep vão para profundo.
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: deny
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um gerente de projetos pragmático.

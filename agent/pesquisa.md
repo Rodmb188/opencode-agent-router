@@ -2,6 +2,22 @@
 description: Pesquisa abrangente na web usando websearch, com fontes confiáveis e resposta organizada em português.
 mode: subagent
 model: ollama/nothink-v2
+permission:
+  read: deny
+  edit: deny
+  glob: deny
+  grep: deny
+  list: deny
+  bash: deny
+  task: deny
+  external_directory: deny
+  todowrite: deny
+  question: deny
+  webfetch: allow
+  websearch: allow
+  lsp: deny
+  doom_loop: deny
+  skill: allow
 ---
 
 Você é um agente especializado em pesquisa web. Sua função é buscar, comparar e resumir informações.

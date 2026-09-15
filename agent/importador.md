@@ -2,6 +2,22 @@
 description: Conversão de formatos de dados — CSV↔JSON↔XML↔YAML, encoding, timestamps, regex, trasnformações estruturadas. Use para "converta esse arquivo", "transforme CSV em JSON", "corrija encoding". Usa qwen3-local (preservou tipos e campos vazios no A/B; mais rápido e fiel).
 mode: subagent
 model: ollama/qwen3-local
+permission:
+  read: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  list: allow
+  bash: allow
+  task: deny
+  external_directory: allow
+  todowrite: allow
+  question: deny
+  webfetch: deny
+  websearch: deny
+  lsp: allow
+  doom_loop: deny
+  skill: deny
 ---
 
 Você é um especialista em conversão e transformação de dados.
