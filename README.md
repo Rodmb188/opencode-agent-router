@@ -1,13 +1,34 @@
 # Local LLM Agent Routing System for opencode
 
-A multi-agent system that runs **100% locally** on a consumer-grade AMD machine
-(RX 6700 XT, 12 GB VRAM, 32 GB RAM): one 27B, one 14B, and one 8B vision model
-become **18 specialized sub-agents**, with automatic routing by task type — no
-cloud, no API costs, no privacy leaks.
+A multi-agent system that runs **every model 100% locally** on a consumer-grade
+AMD machine (RX 6700 XT, 12 GB VRAM, 32 GB RAM): one 27B, one 14B, and one 8B
+vision model become **18 specialized sub-agents**, with automatic routing by
+task type. **All reasoning happens on-device** — no API costs, no model calls to
+the cloud, no privacy leaks. The single deliberate exception is web research
+(T04), which by definition must reach the live internet (see below).
 
 Every decision was validated with blind A/B tests, benchmarks, and failure
 post-mortems — not vibes. The chronicle and raw results live in
 [docs/ENGINEERING_JOURNAL.md](docs/ENGINEERING_JOURNAL.md).
+
+### "Local": o que isso significa de verdade
+
+- **Raciocínio: 100% local.** Toda inferência dos 18 sub-agentes roda no Ollama
+  desta máquina. Nenhum texto sai do hardware para ser *pensado* por um modelo
+  na nuvem.
+- **T04 (pesquisa web) é a exceção deliberada.** Buscar "melhor celular até
+  R$2.000 em 2026" exige dados vivos da internet — não existem no modelo local,
+  por mais brilhante que ele seja. O fetch é feito pela tool `websearch` do
+  opencode (backend Exa/Parallel), uma chamada HTTP curta por query. O que o
+  `pesquisa` (nothink-v2 local) recebe são trechos de texto já coletados; **a
+  síntese, o julgamento e a resposta final são 100% locais.**
+- **Por que não o subagente busca sozinho:** subagentes rodam no provider
+  `ollama`, e o opencode só expõe `websearch` em providers `opencode` para este
+  binário (filtro em `registry.ts`, provado no dogfood sec. 13). Quem busca é o
+  primário; quem pensa é o subagente local.
+- **Se você quer T04 offline de verdade**, a troca é aceitar dados de hoje em
+  vez de dados ao vivo — ou plugar um backend de busca próprio no `websearch`.
+  Não há como ter um dado de hoje *e* 100% offline: a internet é a fonte.
 
 ---
 
@@ -42,10 +63,12 @@ and delegates it to the cheapest model that can do the job correctly.
                      │  (roteador)   │   Applies iron rules
                      └───────┬───────┘
                              │ task delegation
+                             │ (T04: primary also runs websearch
+                             │  and embeds snippets in the task)
 ┌─────────────┬──────────────┼────────────┬─────────────┬───────────┐
 ▼             ▼              ▼            ▼             ▼           ▼
 preciso       financeiro     pesquisa     redator       profundo    dados
-math (14B)    money (14B)    web (27B)    copy (27B)    analyze     csv (14B)
+math (14B)    money (14B)    synth (27B)  copy (27B)    analyze     csv (14B)
                                                           …
                     ▲           ▲
                     │           │
@@ -60,7 +83,7 @@ math (14B)    money (14B)    web (27B)    copy (27B)    analyze     csv (14B)
 
 |      Model     |        Size       |                                Job                                |                                   Notes                                     |
 |----------------|-------------------|-------------------------------------------------------------------|-----------------------------------------------------------------------------|
-|  `nothink-v2`  | 27B (16 GB file)  | Creative writing, research, tutoring, translation, code, sysadmin | Fast mode (thinking disabled). **Won the creativity A/B (17.5 vs 16.3/20)** |
+|  `nothink-v2`  | 27B (16 GB file)  | Creative writing, synthesis, tutoring, translation, code, sysadmin | Fast mode (thinking disabled). **Won the creativity A/B (17.5 vs 16.3/20)** |
 | `megabrain-v2` | 27B (same blob)   | Deep analysis, critical decisions                                 | Thinking enabled — 10–50× slower, highest reliability                       |
 | `qwen3-local`  | 14B (9 GB)        | Math, finance, review, QA, data, SEO, format conversion           | **Never misses multi-step arithmetic.** Fast and paranoid                   |
 |    `vision`    | 8B VL             | Image/OCR                                                         | 12.5 s/image                                                                |
