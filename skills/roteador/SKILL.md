@@ -12,8 +12,8 @@ ajustadas aqui e valem para todo o opencode.
 
 | Nível | Categoria | Sinais na pergunta | Modelo/Agente | Latência |
 |---|---|---|---|---|
-| **T0** | Trivial / continuidade | "ok", "continua", agradecimento, conversa leve, resposta à pergunta do próprio assistente | modelo principal (`nothink-v2`) | instantâneo — **nunca delegar** |
-| **T1** | Geral / rápido | perguntas de cultura, tradução curta, resumo curto, opinião, código simples no chat, formatação | modelo principal | ~2–10s — **nunca delegar** |
+| **T00** | Trivial / continuidade | "ok", "continua", agradecimento, conversa leve, resposta à pergunta do próprio assistente | modelo principal (`nothink-v2`) | instantâneo — **nunca delegar** |
+| **T01** | Geral / rápido | perguntas de cultura, tradução curta, resumo curto, opinião, código simples no chat, formatação | modelo principal | ~2–10s — **nunca delegar** |
 | **T02** | Cálculo e lógica multi-etapas | idade, dobro, porcentagem "%", desconto, equação, raiz, média, "quantos", troco, conversões | agente `preciso` (qwen3-local) | ~5–10s |
 | **T03** | Contas financeiras | parcelas, juros, taxa, financiamento, orçamento, custo, rendimento, CET | agente `financeiro` (qwen3-local) | ~5–15s |
 | **T04** | Pesquisa web | "pesquisar", "buscar", "qual o melhor", "quanto custa", produto (celular, notebook...), preços, benchmarks, notícias, atualidades, tutoriais, "R$", orçamento, comparações | agente `pesquisa` (nothink-v2 + websearch) | ~30–90s |
@@ -35,14 +35,14 @@ ajustadas aqui e valem para todo o opencode.
 
 ## Regras obrigatórias (baseadas em testes reais)
 
-1. **T0/T1: nunca delegar.** Delegar coisas banais é desperdício grosseiro de latência. Entregue direto.
+1. **T00/T01: nunca delegar.** Delegar coisas banais é desperdício grosseiro de latência. Entregue direto.
 2. **Matemática no modo principal é PROIBIDA para multi-etapas**: o `nothink-v2` (think off) erra
    consistentemente aritmética encadeada (respostas tipo "34" em vez de "44"), mesmo quando mandado verificar.
    Qualquer conta com mais de 1 operação → nível T02 (`preciso`) ou T03 (`financeiro`).
 3. **`megabrain`/`profundo` apenas em T12** — nunca para cálculo rápido. Para cálculo, `qwen3-local`
    resolve passo a passo e conferindo (mais rápido E mais correto que o modo rápido do 27B).
 4. **Pesquisa web sempre via agente `pesquisa`** (usa `websearch`; `webfetch` em sites .com.br falha).
-5. **Versões curtas dos níveis T07–T11** (ex.: "traduza essa frase", "resuma 1 parágrafo") ficam na camada T0/T1; só delega quando a tarefa for substancial ("revise este e-mail de 2 páginas", "resuma o artigo de 10 páginas").
+5. **Versões curtas dos níveis T07–T11** (ex.: "traduza essa frase", "resuma 1 parágrafo") ficam na camada T00/T01; só delega quando a tarefa for substancial ("revise este e-mail de 2 páginas", "resuma o artigo de 10 páginas").
 6. **Instrução do usuário manual vence**: se o usuário escolher explicitamente um modelo ("/model", "use o megabrain"), respeite e não reclassifique.
 7. Em dúvida entre níveis, escolha o mais rápido (não delegue).
 8. **NUNCA lance subagentes pesados paralelos (nothink/megabrain 27B) no mesmo provider**: no teste real, 6 em paralelo causaram `ProviderHeaderTimeoutError` (300000ms) por thrash de swap. Rode subagentes pesados em SEQUÊNCIA. Subagentes leves (qwen3-local) podem ir em paralelo sem problema.

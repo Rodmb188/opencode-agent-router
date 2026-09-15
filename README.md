@@ -25,7 +25,7 @@ Running a single large model locally is easy. Running it **well** is hard:
 - **Memory is the real constraint.** 27B models at full context thrash in swap on
   32 GB RAM. The system is *designed* around the hardware, not the other way round.
 
-The result is a **router** that classifies every request into 20 levels (T0–T19)
+The result is a **router** that classifies every request into 20 levels (T00–T19)
 and delegates it to the cheapest model that can do the job correctly.
 
 ---
@@ -38,7 +38,7 @@ and delegates it to the cheapest model that can do the job correctly.
 └────────────────────────────┬────────────────────────────────┘
                              │
                      ┌───────▼───────┐
-                     │   ROUTER      │   Classifies T0–T19
+                     │   ROUTER      │   Classifies T00–T19
                      │  (roteador)   │   Applies iron rules
                      └───────┬───────┘
                              │ task delegation
@@ -69,12 +69,12 @@ The two 27B models share the **same patched blob** — they differ only in wheth
 thinking is on or off at request time. The blob carries a low-level chat-template
 fix (see *The Jinja crash* in the journal).
 
-### The router ladder (T0–T19)
+### The router ladder (T00–T19)
 
 Every request is classified by tier. The iron rules — the non-negotiables that
 came from real failures:
 
-- **T0/T1 (trivial/general): never delegate.** Instant answers by the main model.
+- **T00/T01 (trivial/general): never delegate.** Instant answers by the main model.
 - **Multi-step math is forbidden on the main model.** The 27B fast-mode gets
   arithmetic wrong *even when instructed to verify*. Math → 14B.
 - **Never run heavy 27B sub-agents in parallel.** Six parallel agents caused
