@@ -63,7 +63,7 @@ math (14B)    money (14B)    web (27B)    copy (27B)    analyze     csv (14B)
 |  `nothink-v2`  | 27B (16 GB file)  | Creative writing, research, tutoring, translation, code, sysadmin | Fast mode (thinking disabled). **Won the creativity A/B (17.5 vs 16.3/20)** |
 | `megabrain-v2` | 27B (same blob)   | Deep analysis, critical decisions                                 | Thinking enabled — 10–50× slower, highest reliability                       |
 | `qwen3-local`  | 14B (9 GB)        | Math, finance, review, QA, data, SEO, format conversion           | **Never misses multi-step arithmetic.** Fast and paranoid                   |
-|    `vision`    | 8B VL | Image/OCR | 12.5 s/image                                                      |                                                                             |
+|    `vision`    | 8B VL             | Image/OCR                                                         | 12.5 s/image                                                                |
 
 The two 27B models share the **same patched blob** — they differ only in whether
 thinking is on or off at request time. The blob carries a low-level chat-template

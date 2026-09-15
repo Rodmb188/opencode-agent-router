@@ -220,7 +220,7 @@ language, no foreign-script artifacts).
 
 - [ ] Swap-based latency profiling before/after context tuning (quantify the
   1–2 GB win)
-- [ ] Add a 7B tier for T0/T2 to offload the 14B
+- [ ] Add a 7B tier for T0/T1 and T02 to offload the 14B
 - [ ] Automated regression battery that re-runs the A/Bs on every model change
 - [ ] CI-style "router sanity" smoke suite on live routing
 - [ ] Standalone CLI so the router works outside opencode
