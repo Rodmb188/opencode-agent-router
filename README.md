@@ -194,7 +194,7 @@ JSON config**.
 
 1. **Clone and install the config layer.**
    ```bash
-   git clone git@github.com:<you>/opencode-agent-router.git ~/.config/opencode
+   git clone git@github.com:Rodmb188/Modelo-IA-Roteador.git ~/.config/opencode
    ```
 2. **Provide the models.** You need a Qwen3-6.5/3.6-class 27B (abliterated, with
    the template fix applied per `models/README`) and a 14B, pushed into Ollama.
