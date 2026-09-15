@@ -14,7 +14,91 @@ Running a single large model locally is easy. Running it **well** is hard:
 - **Latency budgets are tiered.** You don't wait 4 minutes of deep thinking for a "what's 15% of 280?" question, and you don't accept 10-second shallow answers for an architecture decision.
 - **Memory is the real constraint.** 27B models at full context thrash in swap on 32 GB RAM. The system has to be *designed* around the hardware.
 
-The result is a **router** that classifies every request into one of 20 levels (T0–T19) and delegates it to the cheapest model that can do the job correctly.
+The result is a **router** that classifies every request into 20 levels (T0–T19) and delegates it to the cheapest model that can do the job correctly.
+
+---
+
+## Part I — Foundations: choosing and taming the local models
+
+This project started with a simple question: *what's the best free Ollama model for a machine with a 12 GB AMD GPU and 32 GB RAM?* The answer turned into a week of benchmarking, a surprise discovery about hidden thinking modes, and ultimately the design choices that make Part II (the routing system) possible.
+
+### The machine
+
+| Component | Spec |
+|---|---|
+| CPU | Intel i9-10900KF (10C / 20T) |
+| RAM | 32 GB, ~16 GB free |
+| GPU | AMD RX 6700 XT, 12 GB VRAM (Vulkan/RADV backend) |
+| OS | CachyOS (Arch-based), user-space Ollama (no sudo) |
+| Storage | ~636 GB free NVMe |
+
+### Model journey
+
+```
+Day 1  qwen2.5:14b (wrong recommendation — 2.5 was older; 3.0 existed for the same size)
+Day 1    ──→ huihui_ai/qwen3-abliterated:14b  (2.5 deleted, identical size, better benchmarks)
+Day 1    ──→ + qwen3-vl:8b              (vision/multimodal, best free option for 12 GB)
+Day 1    ──→ + richardyoung/qwen3.6-27b-abliterated  (Q4 ~16 GB — "the ceiling this machine can hold")
+```
+
+Abliterated models strip the refusal/alignment layers — required by design (uncensored use case, same quality retained).
+
+### Initial speed benchmarks (real hardware, `/api/generate`)
+
+| Model | Context | tok/s | Time / ~200 tok | GPU split | Notes |
+|---|---|---|---|---|---|
+| Qwen3 14B | 16k | 11.9 | ~17 s | 80% GPU / 20% CPU | Thinking ON |
+| Qwen3 14B | 16k (no-think) | 11.8 | ~20 s | 80% GPU | 242 tokens vs 422 |
+| Qwen3 14B | **8k (no-think)** | **23.7** | **~8 s** | **91% GPU** | 2× faster — the sweet spot |
+| Qwen3.6 27B | 16k | 4.0 | ~56 s | 53% GPU / 47% CPU | Ceiling performance |
+| Qwen3.6 27B | 16k (no-think) | 4.0 | ~80 s | 53% GPU | 312 tokens vs 2,278 |
+
+### The KV cache economics (the memory trap)
+
+Every extra token of context costs **≈ 384 KB** (fp16) of KV-cache RAM — paid per active session. The cheaper the model's parameters, the more you feel it:
+
+| Context | KV cache | Total model + cache | Fits on 12 GB GPU? |
+|---|---|---|---|
+| 4,096 | 1.5 GB | ~10.5 GB | ✅ 100% GPU, fast |
+| 16,384 | 6.3 GB | ~15.3 GB | ❌ spills to CPU/RAM |
+| 32,768 | 12.6 GB | ~21.6 GB | ❌ slow, mostly RAM |
+| 128,000 | ~50 GB | ~59 GB | ❌ impossible on 32 GB |
+
+This table is the foundation for Part II's decision to lock the 27B at `num_ctx=12288` (saving ≈ 1.5–2 GB vs 16k while retaining ~80% of multi-turn capacity).
+
+### The single biggest performance lever: `think: false`
+
+Qwen3.x models generate an internal "mental draft" of **2,000–4,000 tokens** (in mixed English/Chinese) before producing a single word of output. Disabling it costs one API parameter and saves **fifteen minutes per response**:
+
+| | With thinking | With `think: false` |
+|---|---|---|
+| Tokens consumed | 4,003 | 312 |
+| Wall time | 19 min 4 s | 3 min 39 s |
+| Output quality | Slightly more rigorous | Nearly identical |
+
+The key: opencode passes `options.body.think: false` as a top-level field to the Ollama API — the only reliable path (CLI flags and Modelfile parameters are silently ignored). This discovery made the "two-speed 27B" architecture (fast default + deep thinking on demand) viable.
+
+### Model stack that emerged from Part I
+
+| Alias | Base model | Role | Context |
+|---|---|---|---|
+| `nothink` | Qwen3.6 27B abliterated | Daily driver (fast, no thinking) | 16k |
+| `megabrain` | Same blob, thinking ON | Deep analysis, critical decisions | 16k |
+| `qwen3-local` | Qwen3 14B abliterated | Fast math, reliable review | 8k |
+| `vision` | Qwen3-VL 8B | Image/OCR | 8k |
+
+### Operational tooling built in Part I
+
+| Tool | Purpose |
+|---|---|
+| `systemd user service` | Auto-starts Ollama at boot (before login, via Linger) |
+| `OLLAMA_KEEP_ALIVE=15m` | Keeps models warm across conversations |
+| `/dummy` command | Pre-warms the model before heavy sessions |
+| Compaction tuning | `tail_turns:5`, `preserve_recent_tokens:6000`, `reserved:2048` |
+
+---
+
+> **Part II** (the rest of this README) replaces the manual "select a model from the TUI" workflow with an **automatic task router** that picks the right model at the right speed for every request — running 100% locally.
 
 ---
 
@@ -210,6 +294,17 @@ The deep-analysis model leaked a stray CJK character from its scratch reasoning 
 ---
 
 ## Results snapshot (this hardware)
+
+### Part I — model speed & behavior
+
+| Test | Model | Result |
+|---|---|---|
+| ~200-tok responses | Qwen3 14B @16k / @8k | 11.9 / **23.7 tok/s** (~17 s / ~8 s) |
+| ~200-tok responses | Qwen3.6 27B @16k | 4.0 tok/s (~56 s) |
+| Thinking on vs off (27B) | megabrain vs nothink | 4,003 vs 312 tokens · **19 min vs 3 min 39 s** |
+| Context math | KV cache / token | 384 KB (fp16) |
+
+### Part II — routing validation
 
 | Test | Model | Result |
 |---|---|---|
