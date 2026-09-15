@@ -67,16 +67,31 @@ the agent answered with a self-introduction ("Olá! Sou o megabrain-v2… Em que
 posso ajudar?") without reading the file or producing any review item. Task
 completion failed outright (no file read, no analysis).
 
-## 5. Conclusion — T7/T12 envelope
+## 4e. Attempt 6 — `profundo` sanity check (control, PASSED)
+
+To separate *broken* from *task-type envelope* (the user's explicit question),
+the same `profundo` agent received its **core task** — a deep architecture
+decision (modular monolith vs microservices), the exact class it aced in wave 3.
+Desired output: verdict + trade-off table + inversion condition + executive
+summary, pt-BR, no foreign alphabets.
+
+Result: **flawless** — structured verdict, 8-dimension trade-off table,
+inversion conditions, executive summary; 100% pt-BR, no leaks, complete. The
+subagent pipeline is functional; the five review failures are a **task-type
+envelope boundary**, not a hardware or config defect.
+
+## 5. Conclusion — T7/T12 review envelope
 
 Five subagent attempts, five distinct failures — revisor (qwen3-local 14B):
 summary / Chinese / CJK-leak / confabulated grep; profundo (megabrain-v2 27B):
-greeting without task execution. With the local stack, **rigorous critique of a
-long English document is outside the subagent envelope of BOTH tiers — prompt
-design does not recover it.** The recommended routing ("long-EN QA → T12") was
-refuted by the test: for this task type the **main model (T1) is the only
-reliable reviewer**. These failures are consistent and reproducible, and the main
-model found all real issues in the same document — decisive evidence, not noise.
+greeting without task execution; **yet profundo fully succeeds on its native
+task class (attempt 6)**. Verdict: with the local stack, **rigorous critique of a
+long English document is outside the subagent envelope of BOTH review tiers —
+prompt design does not recover it.** The recommended routing ("long-EN QA →
+T12") was refuted for *this task type*: the **main model (T1) is the only
+reliable reviewer**. But T12 remains excellent for its intended use — deep
+analysis. These are envelope boundaries, consistently reproducible, not broken
+agents.
 
 ## 5b. Actions taken
 
@@ -93,5 +108,6 @@ model found all real issues in the same document — decisive evidence, not nois
 - [x] `revisor` attempts 1–4: four distinct failures, series registered
 - [x] `profundo` attempt 5: greeting-only, no task execution, registered
 - [x] `revisor.md` hardened (hygiene rules)
-- [x] Conclusion: long-English-doc QA → **T1 only** (T7 and T12 both fail on this hardware)
+- [x] `profundo` attempt 6 sanity check (native task): **PASSED** — envelope, not breakage
+- [x] Conclusion: long-English-doc QA → **T1 only** (T7 and T12 fail it, but T12 stays for deep analysis)
 - [x] README split into stable layout + `docs/ENGINEERING_JOURNAL.md`
