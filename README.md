@@ -50,8 +50,10 @@ Abliterated models strip the refusal/alignment layers — required by design (un
 | Qwen3 14B | 16k | 11.9 | ~17 s | 80% GPU / 20% CPU | Thinking ON |
 | Qwen3 14B | 16k (no-think) | 11.8 | ~20 s | 80% GPU | 242 tokens vs 422 |
 | Qwen3 14B | **8k (no-think)** | **23.7** | **~8 s** | **91% GPU** | 2× faster — the sweet spot |
-| Qwen3.6 27B | 16k | 4.0 | ~56 s | 53% GPU / 47% CPU | Ceiling performance |
-| Qwen3.6 27B | 16k (no-think) | 4.0 | ~80 s | 53% GPU | 312 tokens vs 2,278 |
+| Qwen3.6 27B | 16k | 4.0 | ~56 s¹ | 53% GPU / 47% CPU | Ceiling performance |
+| Qwen3.6 27B | 16k (no-think) | 4.0 | ~80 s¹ | 53% GPU | 312 tokens vs 2,278 |
+
+> ¹ The fast rows are a *capped* ~200-token measurement for comparing speed regimes. With thinking ON the model spends 2,000–4,000 tokens reasoning first — the honest end-to-end figure is **568 s / ~9.5 min** for 2,278 tokens (see *think: false* below).
 
 ### The KV cache economics (the memory trap)
 
@@ -79,6 +81,8 @@ Qwen3.x models generate an internal "mental draft" of **2,000–4,000 tokens** (
 The key: opencode passes `options.body.think: false` as a top-level field to the Ollama API — the only reliable path (CLI flags and Modelfile parameters are silently ignored). This discovery made the "two-speed 27B" architecture (fast default + deep thinking on demand) viable.
 
 ### Model stack that emerged from Part I
+
+> At this point the models were named `nothink` / `megabrain` / `qwen3-local` / `vision`. Part II renamed the 27B pair to `nothink-v2` / `megabrain-v2` and shifted their context 16k → 12288 (see *Memory engineering*).
 
 | Alias | Base model | Role | Context |
 |---|---|---|---|
@@ -114,11 +118,11 @@ The key: opencode passes `options.body.think: false` as a top-level field to the
                      │  (roteador)    │   Applies iron rules
                      └───────┬───────┘
                              │ task delegation
-        ┌────────────┬───────┼───────┬────────────┬────────────┐
+┌────────────┬───────┼───────┬────────────┬────────────┐
         ▼            ▼       ▼       ▼            ▼            ▼
-   precisely/    financeiro  pesquisa  redator   profundo    dados
+   preciso     financeiro  pesquisa  redator   profundo    dados
    math (14B)    money (14B) web (27B)  copy (27B) analyze     csv (14B)
-                                                         …
+                                                          …
                        ▲           ▲
                        │           │
                ┌───────┴───┐   ┌───▼──────────┐
@@ -326,7 +330,7 @@ The deep-analysis model leaked a stray CJK character from its scratch reasoning 
 - **Qwen3-family GGUF** models (abliterated), quantized Q4
 - **Python** — benchmark harnesses
 - **zram/zstd** — compressed swap planning
-- AMD RX 6700 XT · ROCm, 20-core CPU, 32 GB RAM
+- AMD RX 6700 XT · **Vulkan/RADV**, 20-core CPU, 32 GB RAM
 
 ## Future work
 
