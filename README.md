@@ -38,32 +38,32 @@ and delegates it to the cheapest model that can do the job correctly.
 └────────────────────────────┬────────────────────────────────┘
                              │
                      ┌───────▼───────┐
-                     │   ROUTER       │   Classifies T0–T19
-                     │  (roteador)    │   Applies iron rules
+                     │   ROUTER      │   Classifies T0–T19
+                     │  (roteador)   │   Applies iron rules
                      └───────┬───────┘
                              │ task delegation
-┌────────────┬───────┼───────┬────────────┬────────────┐
-        ▼            ▼       ▼       ▼            ▼            ▼
-   preciso     financeiro  pesquisa  redator   profundo    dados
-   math (14B)    money (14B) web (27B)  copy (27B) analyze     csv (14B)
+┌─────────────┬──────────────┼────────────┬─────────────┬───────────┐
+▼             ▼              ▼            ▼             ▼           ▼
+preciso       financeiro     pesquisa     redator       profundo    dados
+math (14B)    money (14B)    web (27B)    copy (27B)    analyze     csv (14B)
                                                           …
-                       ▲           ▲
-                       │           │
-               ┌───────┴───┐   ┌───▼──────────┐
-               │ Ollama    │   │ Local models │
-               │ server    │   │ 27B + 14B + 8B│
-               │ 11434     │   │ vision       │
-               └───────────┘   └──────────────┘
+                    ▲           ▲
+                    │           │
+               ┌────┴───┐   ┌───▼────────────┐
+               │ Ollama │   │ Local models   │
+               │ server │   │ 27B + 14B + 8B │
+               │ 11434  │   │ vision         │
+               └────────┘   └────────────────┘
 ```
 
 ### The model zoo
 
-| Model | Size | Job | Notes |
-|---|---|---|---|
-| `nothink-v2` | 27B (16 GB file) | Creative writing, research, tutoring, translation, code, sysadmin | Fast mode (thinking disabled). **Won the creativity A/B (17.5 vs 16.3/20)** |
-| `megabrain-v2` | 27B (same blob) | Deep analysis, critical decisions | Thinking enabled — 10–50× slower, highest reliability |
-| `qwen3-local` | 14B (9 GB) | Math, finance, review, QA, data, SEO, format conversion | **Never misses multi-step arithmetic.** Fast and paranoid |
-| `vision` | 8B VL | Image/OCR | 12.5 s/image |
+|      Model     |        Size       |                                Job                                |                                   Notes                                     |
+|----------------|-------------------|-------------------------------------------------------------------|-----------------------------------------------------------------------------|
+|  `nothink-v2`  | 27B (16 GB file)  | Creative writing, research, tutoring, translation, code, sysadmin | Fast mode (thinking disabled). **Won the creativity A/B (17.5 vs 16.3/20)** |
+| `megabrain-v2` | 27B (same blob)   | Deep analysis, critical decisions                                 | Thinking enabled — 10–50× slower, highest reliability                       |
+| `qwen3-local`  | 14B (9 GB)        | Math, finance, review, QA, data, SEO, format conversion           | **Never misses multi-step arithmetic.** Fast and paranoid                   |
+|    `vision`    | 8B VL | Image/OCR | 12.5 s/image                                                      |                                                                             |
 
 The two 27B models share the **same patched blob** — they differ only in whether
 thinking is on or off at request time. The blob carries a low-level chat-template
@@ -84,26 +84,26 @@ came from real failures:
   with an explicit disclaimer.
 - **Explicit user model choice always wins.**
 
-| Tier | Category | Agent (model) |
-|---|---|---|
-| T2 | Math / logic | `preciso` (qwen3-local) |
-| T3 | Finance (interest, installments) | `financeiro` (qwen3-local) |
-| T4 | Web research (products, prices, news) | `pesquisa` (nothink-v2) |
-| T5 | Images / OCR | `ver` (vision) |
-| T6 | Creative writing | `redator` (nothink-v2) |
-| T7 | Text review / QA | `revisor` (qwen3-local) |
-| T8 | Isolated code | `codigo` (nothink-v2) |
-| T9 | Teaching / tutoring | `tutor` (nothink-v2) |
-| T10 | Long-text summary | `sumarizador` (nothink-v2) |
-| T11 | Translation | `tradutor` (nothink-v2) |
-| T12 | Deep analysis | `profundo` (megabrain-v2) |
-| T13 | Data analysis (CSV...) | `dados` (qwen3-local) |
-| T14 | Sysadmin / automation | `sysadmin` (nothink-v2) |
-| T15 | Interview simulation | `entrevistador` (nothink-v2) |
-| T16 | Project planning | `planner` (nothink-v2) |
-| T17 | SEO pt-BR | `seo` (qwen3-local) |
-| T18 | Final QA / verification | `qa` (qwen3-local) |
-| T19 | Format conversion (CSV↔JSON...) | `importador` (qwen3-local) |
+|  Tier |                Category               |         Agent (model)        |
+|-------|---------------------------------------|------------------------------|
+|  T02  | Math / logic                          | `preciso` (qwen3-local)      |
+|  T03  | Finance (interest, installments)      | `financeiro` (qwen3-local)   |
+|  T04  | Web research (products, prices, news) | `pesquisa` (nothink-v2)      |
+|  T05  | Images / OCR                          | `ver` (vision)               |
+|  T06  | Creative writing                      | `redator` (nothink-v2)       |
+|  T07  | Text review / QA                      | `revisor` (qwen3-local)      |
+|  T08  | Isolated code                         | `codigo` (nothink-v2)        |
+|  T09  | Teaching / tutoring                   | `tutor` (nothink-v2)         |
+|  T10  | Long-text summary                     | `sumarizador` (nothink-v2)   |
+|  T11  | Translation                           | `tradutor` (nothink-v2)      |
+|  T12  | Deep analysis                         | `profundo` (megabrain-v2)    |
+|  T13  | Data analysis (CSV...)                | `dados` (qwen3-local)        |
+|  T14  | Sysadmin / automation                 | `sysadmin` (nothink-v2)      |
+|  T15  | Interview simulation                  | `entrevistador` (nothink-v2) |
+|  T16  | Project planning                      | `planner` (nothink-v2)       |
+|  T17  | SEO pt-BR                             | `seo` (qwen3-local)          |
+|  T18  | Final QA / verification               | `qa` (qwen3-local)           |
+|  T19  | Format conversion (CSV↔JSON...)       | `importador` (qwen3-local)   |
 
 ---
 
