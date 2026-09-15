@@ -1,0 +1,2 @@
+FROM nothink-v2:latest
+PARAMETER stop <|im_end|>

@@ -1,0 +1,72 @@
+{
+  "matematica": {
+    "status": "OK",
+    "time": 22.12790083885193,
+    "content": "391"
+  },
+  "logica": {
+    "status": "OK",
+    "time": 5.990855693817139,
+    "content": "sim"
+  },
+  "raciocinio": {
+    "status": "OK",
+    "time": 7.384637117385864,
+    "content": "44"
+  },
+  "codigo": {
+    "status": "OK",
+    "time": 10.011978149414062,
+    "content": "```python\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n```"
+  },
+  "codigo bug": {
+    "status": "OK",
+    "time": 5.823244571685791,
+    "content": "```python\ndef soma(a, b): return a + b\n```"
+  },
+  "seguir instrucoes": {
+    "status": "OK",
+    "time": 2.2153313159942627,
+    "content": "banana"
+  },
+  "formato": {
+    "status": "OK",
+    "time": 4.357490539550781,
+    "content": "Apple  \nBanana  \nOrange"
+  },
+  "conhecimento": {
+    "status": "OK",
+    "time": 2.359154224395752,
+    "content": "Machado de Assis"
+  },
+  "criatividade": {
+    "status": "OK",
+    "time": 7.351167440414429,
+    "content": "Gato Astronauta Viaja para o Espaço"
+  },
+  "traducao": {
+    "status": "OK",
+    "time": 7.610029697418213,
+    "content": "The black cat slept on the roof."
+  },
+  "sumario": {
+    "status": "OK",
+    "time": 9.35903787612915,
+    "content": "O Brasil, localizado na América do Sul, tem como capital Brasília e fala português."
+  },
+  "multistep": {
+    "status": "OK",
+    "time": 4.133488416671753,
+    "content": "1, 2, 3.  \nContei **3 números**."
+  },
+  "negacao": {
+    "status": "OK",
+    "time": 12.598016500473022,
+    "content": "nao"
+  },
+  "ambiguidade": {
+    "status": "OK",
+    "time": 6.0060155391693115,
+    "content": "Joao tinha o binoculo, pois ele o usou para ver Maria no parque."
+  }
+}

@@ -1,0 +1,4 @@
+FROM /home/rodmb188/.ollama/models/blobs/sha256-01ebd385d925cc38f8adadbea2e1e8a08f34ab75c43940f9beceb4112f05303a
+TEMPLATE {{ .Prompt }}
+PARAMETER stop <|im_end|>
+PARAMETER num_ctx 12288

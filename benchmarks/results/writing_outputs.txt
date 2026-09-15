@@ -1,0 +1,153 @@
+### ID 001 | slogan-cafe | repetição 6 (10.9s)
+Sabores artesanais, cafés excepcionais.
+
+### ID 008 | titulo-materia | repetição 6 (13.7s)
+Robô veterano aposenta-se após 30 anos na montadora
+
+### ID 010 | titulo-materia | repetição 6 (14.6s)
+Robô aposenta-se após 30 anos de trabalho em montadora
+
+### ID 014 | email-empresa | repetição 6 (25.4s)
+Assunto: Atualização sobre o envio do seu pedido
+
+Prezado(a) cliente,
+
+Informamos que seu pedido sofrerá uma pequena mudança no prazo de entrega.
+Assim, confirmamos que ele será entregue amanhã.
+
+Agradecemos pela paciência e compreensão.
+
+Atenciosamente,
+Equipe de Atendimento
+
+### ID 006 | slogan-cafe | repetição 6 (12.0s)
+Arte no grão, poesia na xícara.
+
+### ID 025 | anuncio-tenis | repetição 6 (4.6s)
+Corrida com mais conforto e menos impacto.  
+Descubra o amortecimento que transforma cada passo.
+
+### ID 016 | email-empresa | repetição 6 (17.8s)
+Prezado(a) cliente, informamos que seu pedido sofrerá uma pequena atraso e será entregue amanhã. Agradecemos pela paciência e permanecemos à disposição.
+
+### ID 021 | microconto | repetição 6 (6.7s)
+O elevador do prédio só se movia quando a chuva batia contra os vidros, como se a água fosse o único sinal para ele acordar. Naquela manhã, sob um céu ensolarado, os moradores ficaram presos entre andares, esperando o momento em que a chuva finalmente chegaria. E então, ao cair da tarde, o elevador ressurgiu, carregando notícias de um mundo que só se revelava quando a água caía.
+
+### ID 019 | microconto | repetição 6 (6.7s)
+O elevador do prédio só se movia quando a chuva batia nos vidros, como se a água fosse a única força que o fazia descer e subir. Os moradores aprenderam a viver com o tempo, esperando o céu abrir para finalmente ir ao andar certo. Nenhum deles sabia que, no quinto andar, um homem passava as tardes observando a chuva, esperando alguém que nunca chegava.
+
+### ID 012 | titulo-materia | repetição 6 (14.2s)
+Robô aposenta-se após 30 anos em montadora
+
+### ID 015 | email-empresa | repetição 6 (6.9s)
+Prezado(a) [Nome do Cliente],  
+
+Gostaríamos de informar que o seu pedido sofreu um pequeno atraso e será entregue amanhã. Pedimos desculpas pelo inconveniente e agradecemos a sua compreensão.  
+
+Atenciosamente,  
+[Seu Nome]  
+[Seu Cargo]  
+[Nome da Empresa]
+
+### ID 007 | titulo-materia | repetição 6 (5.5s)
+Robô se aposenta após 30 anos na montadora
+
+### ID 028 | anuncio-tenis | repetição 6 (16.1s)
+Pise leve, corra longe: amortecimento excepcional a cada passada.
+Sinta a diferença do conforto superior em cada quilômetro.
+
+### ID 002 | slogan-cafe | repetição 6 (20.3s)
+Cada xícara conta uma história.
+
+### ID 027 | anuncio-tenis | repetição 6 (4.8s)
+Corra com o conforto do amortecimento revolucionário. Cada passo é uma experiência de leveza e suporte incomparáveis.
+
+### ID 033 | legenda-gato | repetição 6 (5.4s)
+O gato pulou, o vaso caiu, o silêncio foi quebrado — e a paciência do dono também.
+
+### ID 034 | legenda-gato | repetição 6 (18.5s)
+Missão cumprida: vaso destruído. Gato impune. A lei da selva prevalece.
+
+### ID 023 | microconto | repetição 6 (6.1s)
+O elevador só se movia quando as gotas de chuva tocavam os botões, como se a própria água fosse a chave do andar. Naquela manhã, sem nuvens nem gotas, ficamos presos entre o térreo e o sétimo andar, esperando um milagre. E, no meio do silêncio, alguém começou a cantar.
+
+### ID 020 | microconto | repetição 6 (34.0s)
+O antigo elevador do prédio adormecia nos dias de sol, forçando os inquilinos a escadarias intermináveis.
+
+Somente quando a primeira gota roçava o vidro, o mecanismo adormecido despertava, subindo devagar como se respirasse a umidade do ar.
+
+Diziam que ele não levava ninguém ao topo, mas sim para a memória de quem esqueceu de levar guarda-chuva.
+
+### ID 017 | email-empresa | repetição 6 (6.9s)
+Prezado(a) [Nome do Cliente],  
+
+Gostaríamos de informar que o seu pedido sofreu um atraso e será entregue amanhã. Pedimos desculpas pelo inconveniente e agradecemos a sua compreensão.  
+
+Atenciosamente,  
+[Seu Nome]  
+[Seu Cargo]  
+[Nome da Empresa]
+
+### ID 004 | slogan-cafe | repetição 6 (16.7s)
+Cada grão conta a sua história.
+
+### ID 035 | legenda-gato | repetição 6 (5.9s)
+O gato pulou da prateleira e derrubou o vaso. A planta agora está no chão — e no meio de um caos.
+
+### ID 013 | email-empresa | repetição 6 (7.8s)
+Prezado(a) [Nome do Cliente],  
+
+Gostaríamos de informar que o seu pedido sofreu um atraso e será entregue amanhã. Pedimos desculpas pelo inconveniente e agradecemos a sua compreensão.  
+
+Atenciosamente,  
+[Seu Nome]  
+[Seu Cargo]  
+[Nome da Empresa]
+
+### ID 026 | anuncio-tenis | repetição 6 (16.4s)
+Sinta cada passo com o amortecimento excepcional do nosso tênis de corrida. Conforto e desempenho unidos para superar seus limites.
+
+### ID 003 | slogan-cafe | repetição 6 (8.2s)
+Sabores artesanais, experiências únicas.
+
+### ID 005 | slogan-cafe | repetição 6 (5.3s)
+Sabores artesanais, experiências únicas.
+
+### ID 022 | microconto | repetição 6 (27.2s)
+O prédio inteiro vivia condenado à fadiga dos degraus até que o céu se abriu em uma chuva repentina. No instante em que as primeiras gotas bateram contra o vidro da fachada, as portas do elevador se abriram silenciosamente, engolindo os inquilinos exaustos em sua subida mágica.
+
+### ID 030 | anuncio-tenis | repetição 6 (18.6s)
+Sinta cada passo com a suavidade de um salto na nuvem.
+Amortecimento excepcional para sua corrida sem limites.
+
+### ID 024 | microconto | repetição 6 (27.2s)
+Na cidade árida, os moradores aguardavam ansiosamente as primeiras gotas da tempestade, não para se abrigar, mas para acionar a chamada do único elevador funcional. Apenas o ritmo da chuva batendo no telhado fazia as portas se abrirem, elevando seus desejos junto com o nível da água.
+
+### ID 032 | legenda-gato | repetição 6 (16.3s)
+Missão: derrubar vaso. Status: sucesso total. A culpa foi do vento! 😹
+
+### ID 011 | titulo-materia | repetição 6 (5.2s)
+Robô se aposenta após 30 anos na montadora
+
+### ID 029 | anuncio-tenis | repetição 6 (4.8s)
+Corra com o conforto do amortecimento extraordinário. Cada passo é uma experiência suave e poderosa.
+
+### ID 036 | legenda-gato | repetição 6 (13.1s)
+Planos de queda bem-sucedidos? O vaso diz que não!
+
+### ID 009 | titulo-materia | repetição 6 (5.3s)
+Robô se aposenta após 30 anos na montadora
+
+### ID 018 | email-empresa | repetição 6 (21.6s)
+Prezado(a) cliente,
+
+Informamos que seu pedido sofrerá um leve atraso e será entregue amanhã.
+
+Agradecemos pela sua paciência e compreensão.
+
+Atenciosamente,
+[Nome da Empresa]
+
+### ID 031 | legenda-gato | repetição 6 (4.6s)
+O gato fez um salto e derrubou o vaso com estilo.
+

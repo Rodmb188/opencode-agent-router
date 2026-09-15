@@ -1,0 +1,3 @@
+FROM richardyoung/qwen3.6-27b-abliterated:latest
+TEMPLATE """{"content":"">{{ prompt }}{{ "</" }}"""
+PARAMETER num_ctx 16384

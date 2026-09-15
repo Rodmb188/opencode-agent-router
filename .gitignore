@@ -1,0 +1,9 @@
+# Local model blobs — do not commit
+*.gguf
+blobs/
+# OS / editor noise
+.DS_Store
+*.log
+thumbs.db
+# Ollama transient data
+.ollama/

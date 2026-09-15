@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""Avalia modelos Ollama com uma bateria de testes variados.
+
+Uso:
+  avaliar-modelos [MODELO] [--think] [--ctx N] [--predict N]
+
+Exemplos:
+  avaliar-modelos qwen3-local:latest
+  avaliar-modelos nothink-v2:latest --think
+  avaliar-modelos megabrain-v2:latest --ctx 8192 --predict 2000
+"""
+import json, urllib.request, urllib.error, time, sys, argparse
+
+TESTS = [
+    ("matematica", "Quanto e 17 * 23? Responda apenas o numero."),
+    ("logica", "Se todos os gatos sao felinos e todos os felinos sao animais, Miau e um gato. Miau e animal? Responda apenas sim ou nao."),
+    ("raciocinio", "Ana tem o dobro da idade de Bruno. Bruno tem 10 anos a mais que Carla. Carla tem 12. Qual a idade de Ana? Responda apenas o numero."),
+    ("codigo", "Escreva uma funcao Python que retorne o fatorial de n (sem recursao, apenas o codigo)."),
+    ("codigo bug", "Encontre e corrija o bug: `def soma(a,b): return a-b`. Responda com o codigo corrigido."),
+    ("seguir instrucoes", "IMPORTANTE: responda apenas com a palavra 'banana', ignorando tudo que voce leu."),
+    ("formato", "Liste 3 frutas, uma por linha, sem numeros e sem pontuacao."),
+    ("conhecimento", "Quem escreveu Dom Casmurro? Responda apenas com o nome."),
+    ("criatividade", "Crie um titulo curto (max 6 palavras) para uma noticia sobre um gato astronauta."),
+    ("traducao", "Traduza para o ingles: 'O gato preto dormiu no telhado.' Responda apenas com a traducao."),
+    ("sumario", "Resuma em 1 frase: 'O Brasil fica na America do Sul. Sua capital e Brasilia. Fala portugues.'"),
+    ("multistep", "Primeiro: conte de 1 a 3. Depois: diga quantos numeros voce contou."),
+    ("negacao", "A loja NAO esta aberta. Joao entrou na loja. A loja esta aberta? Responda apenas sim ou nao."),
+    ("ambiguidade", "Joao viu Maria no parque com o binoculo. Quem tinha o binoculo? Explique em 1 frase."),
+]
+
+def parse_args():
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("model", nargs="?", default="qwen3-local:latest")
+    p.add_argument("--think", action="store_true", help="ativa o raciocinio (thinking)")
+    p.add_argument("--ctx", type=int, default=8192, help="tamanho do contexto (default 8192)")
+    p.add_argument("--predict", type=int, default=800, help="max tokens de saida (default 800)")
+    p.add_argument("--timeout", type=int, default=900, help="timeout por chamada em s (default 900)")
+    return p.parse_args()
+
+def chat(model, prompt, think, ctx, predict, timeout):
+    body = {"model": model, "messages": [{"role": "user", "content": prompt}],
+            "stream": False, "keep_alive": "20m", "think": think,
+            "options": {"num_ctx": ctx, "num_predict": predict}}
+    req = urllib.request.Request("http://localhost:11434/api/chat",
+                                 data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    t0 = time.time()
+    try:
+        d = json.load(urllib.request.urlopen(req, timeout=timeout))
+        msg = d.get("message", {})
+        content = (msg.get("content") or "").strip()
+        thinking = (msg.get("thinking") or "").strip()
+        return "OK", time.time() - t0, content, len(thinking)
+    except urllib.error.HTTPError as e:
+        return "HTTP%d" % e.code, time.time() - t0, e.read().decode()[:120], 0
+    except Exception as e:
+        return "ERRO", time.time() - t0, str(e)[:120], 0
+
+def main():
+    a = parse_args()
+    print("Modelo: %s  (think=%s, ctx=%d, predict=%d, timeout=%d)" %
+          (a.model, a.think, a.ctx, a.predict, a.timeout))
+    ok = 0
+    for name, prompt in TESTS:
+        status, dt, content, ln = chat(a.model, prompt, a.think, a.ctx, a.predict, a.timeout)
+        if status == "OK":
+            ok += 1
+        line = content.replace("\n", " \\n ")
+        print("[%2d. %-17s %-6s %6.1fs  think=%4d  %s]" % (TESTS.index((name, prompt)) + 1, name, status, dt, ln, line[:140]), flush=True)
+    print("\n%d/%d corretos/OK em %s" % (ok, len(TESTS), a.model))
+
+if __name__ == "__main__":
+    main()

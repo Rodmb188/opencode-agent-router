@@ -1,0 +1,45 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ollama/nothink-v2",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 5,
+    "preserve_recent_tokens": 6000,
+    "reserved": 2048
+  },
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1",
+        "timeout": 1200000
+      },
+      "models": {
+        "qwen3-local": {
+          "name": "Qwen 3 14B Abliterate (sem censura)"
+        },
+        "nothink-v2": {
+          "name": "Qwen3.6 27B Abliterate v2 (template corrigido, sem pensar)",
+          "options": { "body": { "think": false } }
+        },
+        "megabrain-v2": {
+          "name": "Qwen3.6 27B Abliterate v2 (template corrigido)"
+        },
+        "nothink": {
+          "name": "Qwen3.6 27B Abliterate (sem pensar) [template antigo]",
+          "options": { "body": { "think": false } }
+        },
+        "megabrain": {
+          "name": "Qwen3.6 27B Abliterate (mega brain) [template antigo]"
+        },
+        "vision": {
+          "name": "Qwen3-VL 8B (visão)",
+          "attachment": true,
+          "options": { "body": { "think": false } }
+        }
+      }
+    }
+  }
+}

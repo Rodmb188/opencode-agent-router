@@ -1,0 +1,879 @@
+### ID 001 | tutor #0 (rep 0) | 36.7s
+PROMPT: Explique o que é inflação para uma pessoa de 14 anos. Use analogias simples e passo a passo.
+Claro! Vamos explicar o que é inflação de uma forma simples, como se você estivesse em uma aula de matemática, mas com histórias que você vai entender!
+
+---
+
+### 🧑‍🎓 Passo a passo para entender **inflação**
+
+#### **1. Imagina que você tem um cofre com moedas.**
+
+Vamos supor que você tenha um cofre cheio de moedas de 1 real. Essas moedas são como o dinheiro que você tem.
+
+---
+
+#### **2. Agora, imagine que você vai comprar um pão.**
+
+No início, um pão custa 2 reais. Você pega duas moedas de 1 real e compra o pão.
+
+Tudo bem, certo?
+
+---
+
+#### **3. Mas depois, o preço do pão aumenta.**
+
+Passa um tempo, e o pão passa a custar **3 reais**. Agora, para comprar o mesmo pão, você precisa de **três moedas de 1 real**.
+
+Isso significa que **você precisa de mais dinheiro para comprar as mesmas coisas**.
+
+---
+
+#### **4. Isso é o que a inflação faz.**
+
+A **inflação** é como se o **preço de tudo aumentasse**, e com isso, **você precisa de mais dinheiro para comprar as mesmas coisas**.
+
+---
+
+### 🧱 Analogia simples:
+
+**A inflação é como um bolo que cresce.**
+
+- No começo, o bolo é pequeno. Você usa 2 pedaços para comer.
+- Depois, o bolo cresce. Agora você precisa de **3 pedaços** para comer a mesma quantidade.
+
+Isso é **inflação**: tudo fica **mais caro**, então você precisa de **mais dinheiro** para comprar as mesmas coisas.
+
+---
+
+### 📌 Exemplo do dia a dia:
+
+- O pão, o leite, o ônibus e até o celular podem ficar mais caros.
+- Se a inflação é grande, até os pais têm que trabalhar mais para conseguir pagar tudo.
+
+---
+
+### 🎉 Resumo:
+
+> **Inflação** é quando **os preços das coisas aumentam**, então **você precisa de mais dinheiro** para comprar as mesmas coisas.
+
+Como se fosse um bolo que cresce — você precisa de mais pedaços para comer a mesma quantidade!
+
+---
+
+Se quiser, posso dar mais exemplos com coisas que você gosta! 😊
+
+### ID 002 | tutor #0 (rep 0) | 161.2s
+PROMPT: Explique o que é inflação para uma pessoa de 14 anos. Use analogias simples e passo a passo.
+Imagine que a inflação é como se a **compra de poder do dinheiro estivesse diminuindo**.
+
+Para entender isso, vamos usar uma analogia com um **vale-refeição** ou um **cupom de sorvete**.
+
+### Passo 1: A situação inicial (Sem inflação)
+Digamos que, hoje, **1 real** compra **1 sorvete**.
+Você tem 10 reais na carteira. Quantos sorvetes você pode comprar?
+👉 **10 sorvetes.**
+
+### Passo 2: O que acontece quando há inflação?
+Inflação significa que os preços dos produtos **aumentam**.
+Agora, por causa da inflação, o preço do sorvete subiu. Em vez de custar 1 real, agora custa **2 reais**.
+
+Você ainda tem os mesmos **10 reais** na carteira. Quantos sorvetes você pode comprar agora?
+👉 **5 sorvetes** (porque 10 ÷ 2 = 5).
+
+### Conclusão simples:
+- Seu dinheiro **não diminuiu** (você ainda tem 10 reais).
+- Mas o que esse dinheiro **compra** diminuiu (de 10 sorvetes para 5).
+- É como se a "força" do seu dinheiro tivesse enfraquecido.
+
+---
+
+### Por que isso acontece? (A causa)
+Pense no dinheiro como uma **bola de futebol** sendo jogada entre as pessoas.
+
+1. Se houver **poucas bolas** (dinheiro) e **muitas pessoas** querendo jogar, a bola valeria mais.
+2. Mas, se o governo ou o banco central colocarem **muitas bolas** (imprimir muito dinheiro) no campo, e o número de produtos (sorvetes, brinquedos, roupas) continuar o mesmo...
+   - As pessoas vão competir mais pelos poucos sorvetes disponíveis.
+   - Quem faz sorvete vai pensar: *"Se todo mundo tem mais dinheiro na carteira, posso cobrar mais caro"*.
+   - Então, os preços sobem.
+
+---
+
+### Analogia final: A pizza mágica
+Imagine que o dinheiro é uma **pizza** que representa todos os produtos do mundo.
+- Se a pizza tem 8 fatias, cada pessoa leva uma fatia grande.
+- Se de repente, a pizza for **cortada em 16 fatias** (mais dinheiro em circulação), cada fatia fica **mais fina**.
+- Você ainda tem uma fatia, mas ela é menor. Você come menos pizza.
+
+### Resumo para lembrar:
+> **Inflação = Preços sobem → Seu dinheiro compra menos coisas.**
+
+É normal haver um pouquinho de inflação (como 3% ou 4
+
+### ID 003 | tutor #0 (rep 1) | 22.0s
+PROMPT: Explique o que é inflação para uma pessoa de 14 anos. Use analogias simples e passo a passo.
+Claro! Vamos explicar o que é **inflação**, como se fosse para uma pessoa de 14 anos. Vamos usar uma analogia simples e passo a passo.
+
+---
+
+### 🧭 Passo 1: Imagine que você vai ao mercado comprar pão
+
+Vamos supor que você compra um pão por **R$ 2,00**.
+
+---
+
+### 🧭 Passo 2: Passei um ano e... o pão subiu de preço
+
+Agora, depois de um ano, você vai ao mercado de novo e percebe que o pão custa **R$ 2,50**.
+
+Isso significa que o **preço do pão aumentou**.
+
+---
+
+### 🧭 Passo 3: Isso é inflação (mais ou menos)
+
+A **inflação** é quando **os preços de muitas coisas aumentam** ao longo do tempo. Não só o pão, mas também:
+
+- O **lanches** na escola  
+- O **transporte** que você usa  
+- A **roupa** que você compra  
+- Até o **salário** do seu pai ou da sua mãe
+
+---
+
+### 🧭 Passo 4: Exemplo com uma moeda
+
+Imagine que você tem **R$ 100** no bolso. Com inflação, você vai conseguir comprar **menos coisas** com esse dinheiro, porque tudo está ficando mais caro.
+
+---
+
+### 🧭 Passo 5: Analogia: o dinheiro "perde valor"
+
+A inflação é como se o **dinheiro perdesse valor**. É como se você tivesse uma moeda mágica que, com o tempo, ficava mais "leve" — então, com ela, você conseguia comprar menos coisas.
+
+---
+
+### 🧭 Passo 6: Resumo simples
+
+**Inflação** é quando **os preços das coisas aumentam**, então o dinheiro que você tem **não alcança tantas coisas** quanto antes.
+
+---
+
+### 💡 Exemplo prático
+
+- No ano passado, você comprava 10 bolos com R$ 10.
+- Com inflação, esse mesmo dinheiro hoje compra **menos de 10 bolos**.
+
+---
+
+Se quiser, posso te mostrar um exemplo com **dinheiro de bolso** ou até com **jogos**! 😊
+
+### ID 004 | tutor #0 (rep 1) | 162.0s
+PROMPT: Explique o que é inflação para uma pessoa de 14 anos. Use analogias simples e passo a passo.
+Imagine que você tem uma coleção de figurinhas ou cartas de um jogo popular (como Pokémon ou Magic). No começo, cada carta vale 1 real. Com 10 reais, você compra 10 cartas. Fica feliz!
+
+Mas, depois de um tempo, o dono da banca diz: "Ah, agora cada carta custa 2 reais."
+
+Se você ainda tiver apenas 10 reais, agora só consegue comprar **5 cartas**.
+
+**Essa é a essência da inflação: as coisas ficam mais caras, e o seu dinheiro compra menos coisas do que antes.**
+
+---
+
+### Vamos entender passo a passo, com uma analogia simples:
+
+#### 🍕 Passo 1: O "Pizza Meter" (O poder do seu dinheiro)
+Pense no seu dinheiro como uma "bateria de poder de compra".
+
+- **Cenário A:** Uma fatia de pizza custa R$ 10. Com R$ 100, você compra **10 fatias**.
+- **Cenário B (com inflação):** A mesma fatia de pizza começa a custar R$ 15. Com os mesmos R$ 100, você agora compra só **6 fatias** (e ainda sobra um pouco).
+
+👉 **O que aconteceu?** O dinheiro não virou papel bamba, mas ele **enfraqueceu**. Ele perdeu força de compra.
+
+---
+
+#### 📈 Passo 2: Por que os preços sobem? (3 motivos simples)
+
+A inflação não acontece do nada. Geralmente, é por um desses motivos:
+
+1. **Muita gente querendo comprar a mesma coisa (Demanda alta)**  
+   Imagine que todo o seu colégio decide que só quer usar tênis da marca X. Se só tem 100 tênis disponíveis, mas 500 alunos querem comprar, o preço sobe porque o produto está em falta.
+
+2. **Fica mais caro produzir (Custo alto)**  
+   Imagine que o preço do trigo (para fazer o pão) ou do petróleo (para fazer o transporte) aumentou. O padeiro e o motorista vão cobrar mais caro para não ter prejuízo. Esses custos são repassados a você.
+
+3. **O governo emite muito dinheiro**  
+   Pense que o governo "imprime" muitos cédulos novos. Se de repente há muito mais dinheiro circulando nas mãos das pessoas, mas a quantidade de produtos (carros, roupas, comida) continua a mesma, as pessoas vão disputar esses produtos, empurrando os preços para cima.
+
+---
+
+#### 🐌 Passo 3: Inflação não é um preço único!
+
+Alguns itens sobem mais que outros:
+- **Combustível** pode subir 10% num mês.
+- **Frutas**
+
+### ID 005 | tutor #1 (rep 0) | 29.7s
+PROMPT: Explique recursão em programação com um exemplo simples (passo a passo).
+Claro! Vamos explicar **recursão** em programação de forma simples, com um exemplo passo a passo.
+
+---
+
+## 📌 O que é recursão?
+
+**Recursão** é quando uma função **chama a si mesma** para resolver um problema. É como se a função resolvesse uma parte do problema e depois pedisse ajuda a si mesma para resolver o restante.
+
+---
+
+## 📌 Exemplo simples: Calculando o fatorial de um número
+
+Vamos calcular o **fatorial** de um número. O fatorial de um número `n` é dado por:
+
+```
+n! = n × (n-1) × (n-2) × ... × 1
+```
+
+Por exemplo:
+- 5! = 5 × 4 × 3 × 2 × 1 = 120
+- 3! = 3 × 2 × 1 = 6
+
+Vamos criar uma função recursiva para calcular o fatorial.
+
+---
+
+## 📌 Função recursiva para calcular o fatorial
+
+```python
+def fatorial(n):
+    if n == 1:
+        return 1
+    else:
+        return n * fatorial(n - 1)
+```
+
+---
+
+## 📌 Passo a passo: Calculando `fatorial(5)`
+
+Vamos ver como a função funciona passo a passo.
+
+1. `fatorial(5)` → chama `fatorial(4)`
+2. `fatorial(4)` → chama `fatorial(3)`
+3. `fatorial(3)` → chama `fatorial(2)`
+4. `fatorial(2)` → chama `fatorial(1)`
+5. `fatorial(1)` → **retorna 1**
+
+Agora começa a "subir" os valores:
+
+6. `fatorial(2)` → `2 * 1 = 2`
+7. `fatorial(3)` → `3 * 2 = 6`
+8. `fatorial(4)` → `4 * 6 = 24`
+9. `fatorial(5)` → `5 * 24 = 120`
+
+👉 **Resultado final: 120**
+
+---
+
+## 📌 Conclusão
+
+- A recursão é útil quando podemos dividir um problema em partes menores e semelhantes.
+- Cada chamada da função resolve uma parte do problema.
+- A **condição de parada** (no caso, `n == 1`) é essencial para evitar uma chamada infinita.
+
+---
+
+Se quiser, posso te mostrar outros exemplos de recursão, como a sequência de Fibonacci ou a soma de uma lista! 😊
+
+### ID 006 | tutor #1 (rep 0) | 156.6s
+PROMPT: Explique recursão em programação com um exemplo simples (passo a passo).
+A **recursão** é uma técnica de programação onde uma função se chama a si mesma para resolver um problema.
+
+Pense nisso como uma "caixa dentro de uma caixa", ou como escadas: para subir uma escada, você dá um passo, e se ainda não chegou ao topo, você dá *outro* passo (repetindo a mesma ação).
+
+### O Segredo da Recursão
+Para que a recursão funcione e não cause um erro infinito, ela precisa de duas partes obrigatórias:
+1.  **Caso Base:** A condição que para a recursão (o "fim da linha").
+2.  **Passo Recursivo:** A parte onde a função chama a si mesma, geralmente com um problema menor.
+
+---
+
+### Exemplo Prático: Fatorial
+
+Vamos calcular o **fatorial** de um número.
+*   O fatorial de 5 (`5!`) é `5 × 4 × 3 × 2 × 1 = 120`.
+*   A fórmula recursiva é: `n! = n × (n-1)!`
+
+#### Código em Python (Simples)
+
+```python
+def fatorial(n):
+    # 1. CASO BASE: Se n for 1, paramos e retornamos 1.
+    if n == 1:
+        return 1
+    
+    # 2. PASSO RECURSIVO: A função chama a si mesma com (n - 1)
+    return n * fatorial(n - 1)
+
+# Chamada inicial
+resultado = fatorial(5)
+print(resultado) # Saída: 120
+```
+
+---
+
+### Passo a Passo Visual (Como o computador pensa)
+
+Quando chamamos `fatorial(5)`, o computador não resolve tudo de uma vez. Ele vai "guardando" as operações na memória (chamado de *stack*) até chegar ao caso base.
+
+#### 1. Chamada: `fatorial(5)`
+*   `n` é 5. Não é 1, então vai para o passo recursivo.
+*   Operação: `5 * fatorial(4)`
+*   *Aguardando resposta de `fatorial(4)`...*
+
+#### 2. Chamada: `fatorial(4)`
+*   `n` é 4. Não é 1.
+*   Operação: `4 * fatorial(3)`
+*   *Aguardando resposta de `fatorial(3)`...*
+
+#### 3. Chamada: `fatorial(3)`
+*   `n` é 3. Não é 1.
+*   Operação: `3 * fatorial(2)`
+*   *Aguardando resposta de `fatorial(2)`...*
+
+### ID 007 | tutor #1 (rep 1) | 20.6s
+PROMPT: Explique recursão em programação com um exemplo simples (passo a passo).
+Claro! Vamos explicar **recursão em programação** com um **exemplo simples**, passo a passo.
+
+---
+
+### 🧠 O que é recursão?
+
+**Recursão** é quando uma função **chama a si mesma** para resolver um problema. Ela é útil para resolver problemas que podem ser **divididos em partes menores e semelhantes**.
+
+---
+
+### 📌 Exemplo simples: Contar até 5
+
+Vamos criar uma função que conta de 1 até 5.
+
+#### ✅ Passo 1: Definir a função
+
+```python
+def contar(n):
+    print(n)
+    if n < 5:
+        contar(n + 1)
+```
+
+#### ✅ Passo 2: Chamar a função
+
+```python
+contar(1)
+```
+
+---
+
+### 🧩 Passo a passo da execução
+
+1. **Primeira chamada:** `contar(1)`
+   - Imprime `1`
+   - Como `1 < 5`, chama `contar(2)`
+
+2. **Segunda chamada:** `contar(2)`
+   - Imprime `2`
+   - Como `2 < 5`, chama `contar(3)`
+
+3. **Terceira chamada:** `contar(3)`
+   - Imprime `3`
+   - Como `3 < 5`, chama `contar(4)`
+
+4. **Quarta chamada:** `contar(4)`
+   - Imprime `4`
+   - Como `4 < 5`, chama `contar(5)`
+
+5. **Quinta chamada:** `contar(5)`
+   - Imprime `5`
+   - Como `5 < 5` é **falso**, **não chama mais a função**
+
+---
+
+### 📝 Saída do programa
+
+```
+1
+2
+3
+4
+5
+```
+
+---
+
+### 🧠 Como funciona a recursão?
+
+- A função **chama a si mesma** com um valor **atualizado**
+- A recursão **para** quando atinge uma **condição de parada** (no nosso exemplo, quando `n >= 5`)
+
+---
+
+### 💡 Dica
+
+A recursão é como um "caminhão de mão": você resolve uma parte do problema, e depois vai para a próxima, até chegar ao fim.
+
+---
+
+Se quiser, posso te mostrar outro exemplo, como calcular o fatorial ou a sequência de Fibonacci usando recursão! 😊
+
+### ID 008 | tutor #1 (rep 1) | 146.1s
+PROMPT: Explique recursão em programação com um exemplo simples (passo a passo).
+A **recursão** é uma técnica de programação em que uma função chama a si mesma para resolver um problema.
+
+Pense nisso como uma **matryoshka (boneca russa)**: para abrir a boneca maior, você precisa abrir a boneca de dentro, que por sua vez tem outra ainda menor, até chegar na menor de todas, que não tem mais nada dentro.
+
+---
+
+### Os 2 Pilares da Recursão
+Para que a recursão funcione e não cause um erro de "estouro de pilha" (infinite loop), ela precisa ter:
+
+1. **Caso Base**: A condição que para a recursão (o fim da cadeia).
+2. **Chamada Recursiva**: A função se chama novamente, mas com um problema **menor** ou mais próximo do caso base.
+
+---
+
+### Exemplo Simples: Fatorial
+
+Vamos calcular o fatorial de um número. O fatorial de `n` (escrito como `n!`) é a multiplicação de todos os números inteiros positivos menores ou iguais a `n`.
+
+- `5! = 5 × 4 × 3 × 2 × 1 = 120`
+- `3! = 3 × 2 × 1 = 6`
+- `0! = 1` (por definição matemática)
+
+#### Código em Python
+
+```python
+def fatorial(n):
+    # 1. CASO BASE: Se n for 0 ou 1, o resultado é 1
+    if n == 0 or n == 1:
+        return 1
+    
+    # 2. CHAMADA RECURSIVA: n * fatorial do número anterior
+    return n * fatorial(n - 1)
+
+# Vamos calcular fatorial(5)
+print(fatorial(5))
+```
+
+---
+
+### Passo a Passo: Como o computador executa `fatorial(5)`
+
+O computador não calcula tudo de uma vez. Ele **empilha** as chamadas até atingir o caso base, depois **desempilha** fazendo as multiplicações.
+
+#### 🟢 Fase 1: Descida (Chamadas Recursivas)
+
+| Passo | Chamada | Ação | Estado da Pilha |
+|-------|---------|------|-----------------|
+| 1     | `fatorial(5)` | 5 não é 0 ou 1. Vai chamar `fatorial(4)` | Aguardando `5 * ?` |
+| 2     | `fatorial(4)` | 4 não é 0 ou 1. Vai chamar `fatorial(3)` | Aguardando `4 * ?` |
+| 3     | `fatorial(3)` | 3 não é 0 ou
+
+### ID 009 | tutor #2 (rep 0) | 23.1s
+PROMPT: Explique o conceito de custo de oportunidade em economia, de forma didática.
+Claro! Vamos explicar o **custo de oportunidade** de forma didática, como se fosse uma aula para alguém que está começando a estudar economia.
+
+---
+
+### 🎯 **O que é custo de oportunidade?**
+
+O **custo de oportunidade** é o **valor da melhor alternativa que você abandona** ao escolher uma opção.
+
+Em outras palavras: **quando você faz uma escolha, você deixa de fazer outra coisa. O custo de oportunidade é o que você perde ao fazer essa escolha.**
+
+---
+
+### 🧠 Exemplo simples
+
+Imagine que você tem R$ 100 para investir. Você pode:
+
+- **Opção 1:** Investir no mercado financeiro, que pode render 10% no final do ano.
+- **Opção 2:** Comprar um curso de inglês, que vai te ajudar no futuro profissional.
+
+Se você escolher investir no mercado financeiro, **você deixa de fazer o curso de inglês**.  
+Então, o **custo de oportunidade** de investir no mercado financeiro é o **curso de inglês que você poderia ter feito**.
+
+---
+
+### 📌 Resumindo:
+
+> **Custo de oportunidade = O que você deixa de ganhar ao escolher uma opção.**
+
+---
+
+### 📊 Exemplo com números
+
+Vamos supor que:
+
+- Se você estudar, você ganha **R$ 200** de bônus no final do semestre.
+- Se você trabalhar, você ganha **R$ 150**.
+
+Se você escolher estudar, **você deixa de ganhar R$ 150**.  
+Então, o **custo de oportunidade** de estudar é **R$ 150**.
+
+---
+
+### 💡 Por que o custo de oportunidade é importante?
+
+Porque ele nos ajuda a **tomar decisões mais conscientes**.  
+Ao considerar o custo de oportunidade, você entende **o que você realmente está sacrificando** ao escolher uma opção.
+
+---
+
+### 🧩 Exemplo do dia a dia
+
+- **Você escolhe ir ao cinema ao invés de estudar.**  
+  O custo de oportunidade é **o tempo de estudo que você perdeu**.
+
+- **Você compra uma camisa nova em vez de poupar dinheiro.**  
+  O custo de oportunidade é **o dinheiro que você poderia ter economizado**.
+
+---
+
+### 🎓 Conclusão
+
+O **custo de oportunidade** é uma forma de entender **o que você deixa de ganhar** ao escolher uma opção. Ele nos ajuda a pensar melhor antes de
+
+### ID 010 | tutor #2 (rep 0) | 146.3s
+PROMPT: Explique o conceito de custo de oportunidade em economia, de forma didática.
+Imagine que você tem apenas **uma hora livre** no final do dia e dois hobbies que adora: ler um livro ou assistir a um filme.
+
+Como você não pode fazer as duas coisas ao mesmo tempo, você terá que escolher uma. Se você decidir ler o livro, o **custo de oportunidade** não é o dinheiro que você gastou com o livro (se houver), mas sim o **prazer de assistir ao filme que você deixou de ter**.
+
+### O que é Custo de Oportunidade?
+
+Em termos simples, o **custo de oportunidade** é o valor da **melhor alternativa que você放弃了** (deixou de fazer) quando toma uma decisão.
+
+> **Definição:** É o que você "perde" ao escolher uma opção entre várias disponíveis. Não é só o dinheiro, mas qualquer recurso escasso: tempo, energia, esforço, etc.
+
+---
+
+### Por que isso é importante?
+
+A economia parte de uma premissa básica: os **recursos são escassos** (tempo, dinheiro, matéria-prima), mas os **desejos são ilimitados**. Por isso, toda escolha implica em abrir mão de outras possibilidades.
+
+O custo de oportunidade nos ajuda a entender que **toda decisão tem um "preço escondido"**.
+
+---
+
+### Exemplos Práticos para Entender Melhor
+
+#### 1. Exemplo Pessoal: Estudar vs. Trabalhar
+Suponha que você pode:
+- **Opção A:** Estudar para uma prova importante.
+- **Opção B:** Trabalhar em um emprego temporário e ganhar R$ 100.
+
+Se você escolher **estudar**, seu custo de oportunidade são os **R$ 100** que você deixou de ganhar.
+Se você escolher **trabalhar**, seu custo de oportunidade é o **conhecimento/nota** que você poderia ter conquistado estudando.
+
+#### 2. Exemplo Empresarial: Investir em Marketing vs. Pesquisa
+Uma empresa tem R$ 1 milhão para investir. Ela pode:
+- **Opção A:** Investir em marketing, esperando aumentar as vendas em 10%.
+- **Opção B:** Investir em pesquisa e desenvolvimento (P&D), criando um novo produto.
+
+Se a empresa escolher o **marketing**, o custo de oportunidade é o **potencial lucro do novo produto** que ela não desenvolveu.
+
+#### 3. Exemplo Macroeconômico: Armas ou Manteiga?
+Durante guerras, países muitas vezes precisam escolher entre produzir armas para defesa ou bens de consumo (como comida e roupas). Se o país decide produzir mais armas, o custo de oportunidade é a **menor quantidade de comida e roupas** disponível para a população.
+
+---
+
+### Um Detalhe Importante: Não é a Soma de Todas as Alternativas
+
+### ID 011 | tutor #2 (rep 1) | 16.7s
+PROMPT: Explique o conceito de custo de oportunidade em economia, de forma didática.
+Claro! Vamos explicar o **custo de oportunidade** de forma didática, como se estivéssemos conversando:
+
+---
+
+Imagine que você tem **R$ 100** para gastar. Você pode escolher entre comprar um **celular novo** ou investir em um **curso de inglês**.
+
+Se você escolher o **celular**, vai ficar com um aparelho moderno, mas vai perder a chance de aprender inglês.
+
+Se você escolher o **curso de inglês**, vai melhorar seu inglês, mas vai perder a chance de ter um celular novo.
+
+Então, **o custo de oportunidade** é o que você **deixa de ganhar** ao escolher uma opção em vez de outra.
+
+---
+
+### Em termos simples:
+
+> **Custo de oportunidade** é **o que você deixa de ganhar** ao escolher uma opção, em vez de outra.
+
+---
+
+### Exemplo prático:
+
+- **Opção 1:** Estudar na faculdade (você gasta tempo e dinheiro).
+- **Opção 2:** Trabalhar (você ganha dinheiro, mas não estuda).
+
+Se você escolher estudar, o **custo de oportunidade** é o **salário que você poderia ganhar** se tivesse trabalhado.
+
+---
+
+### Resumindo:
+
+> **Custo de oportunidade** = **o que você deixa de fazer** para fazer algo.
+
+É como se você estivesse fazendo uma **escolha**, e a **outra opção** é o que você **deixa de ganhar**.
+
+---
+
+Se quiser, posso dar mais exemplos ou até um desenho para ilustrar melhor! 😊
+
+### ID 012 | tutor #2 (rep 1) | 151.1s
+PROMPT: Explique o conceito de custo de oportunidade em economia, de forma didática.
+O **custo de oportunidade** é, basicamente, o conceito de que toda escolha que fazemos implica deixar de fazer outra coisa. Em economia, nada é realmente "grátis", porque para obter algo, você precisa abrir mão de algo que poderia ter feito ou comprado com os mesmos recursos.
+
+Vamos explicar isso de forma bem didática, passo a passo:
+
+---
+
+### 1. A Ideia Central: "Escolher é Renunciar"
+Imagine que você tem **R$ 50,00** e dois desejos:
+- Um livro novo.
+- Um ingresso de cinema.
+
+Você não tem dinheiro para os dois. Se você escolher o **livro**, o custo de oportunidade não é apenas os R$ 50,00. É o **ingresso de cinema** que você deixou de ter.
+
+> **Definição simples:** Custo de oportunidade é o valor da **melhor alternativa** que você não escolheu.
+
+---
+
+### 2. Um Exemplo do Dia a Dia
+Pense na sua hora de almoço:
+
+- **Opção A:** Comer no restaurante da empresa (custa R$ 20,00).
+- **Opção B:** Levar comida de casa (custa R$ 5,00).
+
+Se você escolher comer no restaurante, o custo de oportunidade não é só o dinheiro gasto. É também:
+- Os R$ 15,00 a mais que você pagou.
+- O tempo que você perdeu cozinhando em casa na noite anterior (se tivesse levado de casa).
+- A conveniência de ter algo pronto imediatamente.
+
+O custo de oportunidade ajuda a medir o "preço real" da sua decisão, considerando não só o dinheiro, mas também tempo, esforço e satisfação.
+
+---
+
+### 3. Por Que Isso é Importante?
+O custo de oportunidade nos lembra que **recursos são escassos** (dinheiro, tempo, energia). Como não podemos ter tudo ao mesmo tempo, precisamos decidir qual opção traz mais **benefício** para nós.
+
+#### Exemplo Clássico: Estudar vs. Trabalhar
+Um estudante pode:
+1. Trabalhar meio período e ganhar R$ 1.000,00 por mês.
+2. Estudar em tempo integral para melhorar sua nota média.
+
+Se ele escolher estudar, o custo de oportunidade são os **R$ 1.000,00 que ele deixou de ganhar** + o lazer que deixou de ter. Isso não significa que estudar é "ruim", mas sim que a decisão tem um preço oculto.
+
+---
+
+### 4. Erro Comum: Custo de Oportunidade ≠ Custo Financeiro
+Muitas pessoas confundem custo de oportunidade com o preço que pagaram. Veja a diferença:
+
+| Situação | Custo Financeiro
+
+### ID 013 | sumarizador #0 (rep 0) | 13.1s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+O metrô de São Paulo enfrenta superlotação crescen
+- O metrô de São Paulo enfrenta superlotação crescente no horário pico.  
+- As linhas 1 e 3 transportam, juntas, cerca de 1,2 milhão de passageiros por dia e os intervalos entre trens chegam a 2 minutos.  
+- Estudos apontam que a expansão das linhas 6 e 15, prevista até 2026, deve reduzir o tempo médio de deslocamento em até 15 minutos. A tarifa, atualmente R$ 5,00, não sofre reajuste desde 2021.
+
+### ID 014 | sumarizador #0 (rep 0) | 47.5s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+O metrô de São Paulo enfrenta superlotação crescen
+- As linhas 1 e 3 transportam juntos cerca de 1,2 milhão de passageiros por dia, com intervalos entre trens de até 2 minutos durante o horário pico.
+- A expansão das linhas 6 e 15, prevista até 2026, deve reduzir o tempo médio de deslocamento em até 15 minutos.
+- A tarifa do metrô está atualmente em R$ 5,00 e não sofreu reajuste desde 2021.
+
+### ID 015 | sumarizador #0 (rep 1) | 8.9s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+O metrô de São Paulo enfrenta superlotação crescen
+- O metrô de São Paulo enfrenta superlotação crescente no horário pico.  
+- As linhas 1 e 3 transportam, juntas, cerca de 1,2 milhão de passageiros por dia e os intervalos entre trens chegam a 2 minutos.  
+- Estudos apontam que a expansão das linhas 6 e 15, prevista até 2026, deve reduzir o tempo médio de deslocamento em até 15 minutos. A tarifa, atualmente R$ 5,00, não sofre reajuste desde 2021.
+
+### ID 016 | sumarizador #0 (rep 1) | 37.1s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+O metrô de São Paulo enfrenta superlotação crescen
+*   As linhas 1 e 3 transportam juntas cerca de 1,2 milhão de passageiros por dia, com superlotação no horário pico e intervalos entre trens de 2 minutos.
+*   A expansão das linhas 6 e 15, prevista até 2026, deve reduzir o tempo médio de deslocamento em até 15 minutos.
+*   A tarifa do metrô permanece em R$ 5,00, sem sofrer reajuste desde 2021.
+
+### ID 017 | sumarizador #1 (rep 0) | 7.3s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+Redes neurais convolucionais são usadas principalm
+- Redes neurais convolucionais são usadas principalmente em visão computacional.  
+- A camada de pooling reduz a resolução, mantendo as informações mais relevantes.  
+- Modelos como o ResNet-50 atingem 95% de acurácia em benchmarks como o ImageNet, mas exigem muitas horas de treinamento em GPUs com grandes conjuntos de dados.
+
+### ID 018 | sumarizador #1 (rep 0) | 28.0s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+Redes neurais convolucionais são usadas principalm
+- Redes neurais convolucionais são usadas em visão computacional para detectar bordas, texturas e formas aplicando filtros e reduzindo a resolução via camada de pooling.
+- O modelo ResNet-50 atinge 95% de acurácia em benchmarks como o ImageNet.
+- O treinamento exige muitas horas em GPUs com grandes conjuntos de dados.
+
+### ID 019 | sumarizador #1 (rep 1) | 7.3s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+Redes neurais convolucionais são usadas principalm
+- Redes neurais convolucionais são usadas principalmente em visão computacional.  
+- Elas aplicam filtros sobre a imagem para detectar bordas, texturas e formas em diferentes camadas.  
+- Modelos como o ResNet-50 atingem 95% de acurácia em benchmarks como o ImageNet, mas exigem muitas horas de treinamento em GPUs com grandes conjuntos de dados.
+
+### ID 020 | sumarizador #1 (rep 1) | 32.5s
+PROMPT: Resuma o texto abaixo em 3 bullets mantendo todos os números e nomes:
+Redes neurais convolucionais são usadas principalm
+*   Redes neurais convolucionais, aplicadas em visão computacional, utilizam filtros para detectar bordas, texturas e formas em diferentes camadas, enquanto a camada de pooling reduz a resolução preservando informações relevantes.
+*   O modelo ResNet-50 atinge 95% de acurácia em benchmarks como o ImageNet.
+*   Esse desempenho exige muitas horas de treinamento em GPUs com grandes conjuntos de dados.
+
+### ID 021 | tradutor #0 (rep 0) | 5.5s
+PROMPT: Traduza para o inglês (registro técnico):
+'O servidor apresentou latência elevada durante o pico de tráfego; a equipe im
+"The server showed high latency during the traffic peak; the team implemented a distributed cache to mitigate the issue."
+
+### ID 022 | tradutor #0 (rep 0) | 14.2s
+PROMPT: Traduza para o inglês (registro técnico):
+'O servidor apresentou latência elevada durante o pico de tráfego; a equipe im
+"The server exhibited high latency during peak traffic; the team implemented distributed caching to mitigate the issue."
+
+### ID 023 | tradutor #0 (rep 1) | 5.6s
+PROMPT: Traduza para o inglês (registro técnico):
+'O servidor apresentou latência elevada durante o pico de tráfego; a equipe im
+"The server exhibited high latency during the traffic peak; the team implemented a distributed cache to mitigate the issue."
+
+### ID 024 | tradutor #0 (rep 1) | 14.4s
+PROMPT: Traduza para o inglês (registro técnico):
+'O servidor apresentou latência elevada durante o pico de tráfego; a equipe im
+"The server experienced high latency during the traffic peak; the team implemented distributed caching to mitigate the issue."
+
+### ID 025 | tradutor #1 (rep 0) | 5.9s
+PROMPT: Traduza para o português do Brasil (registro técnico):
+'The new firmware patches three critical vulnerabilities in the n
+O novo firmware corrige três vulnerabilidades críticas no stack de rede, incluindo um overflow de buffer que permitia a execução de código remoto.
+
+### ID 026 | tradutor #1 (rep 0) | 17.6s
+PROMPT: Traduza para o português do Brasil (registro técnico):
+'The new firmware patches three critical vulnerabilities in the n
+O novo firmware corrige três vulnerabilidades críticas na pilha de rede, incluindo um transbordo de buffer que permitia a execução remota de código.
+
+### ID 027 | tradutor #1 (rep 1) | 6.1s
+PROMPT: Traduza para o português do Brasil (registro técnico):
+'The new firmware patches three critical vulnerabilities in the n
+O novo firmware corrige três vulnerabilidades críticas no piloto de rede, incluindo um estouro de buffer que permitia a execução de código remoto.
+
+### ID 028 | tradutor #1 (rep 1) | 17.8s
+PROMPT: Traduza para o português do Brasil (registro técnico):
+'The new firmware patches three critical vulnerabilities in the n
+"A nova atualização de firmware corrige três vulnerabilidades críticas na pilha de rede, incluindo um estouro de buffer que permitia a execução remota de código."
+
+### ID 029 | tradutor #2 (rep 0) | 5.7s
+PROMPT: Traduza para o inglês (registro formal, comercial):
+'Prezado Senhor, anexo a proposta revisada. Aguardo retorno até sext
+Dear Sir,  
+
+Please find attached the revised proposal. I await your reply by Friday so we may proceed with the closing.
+
+### ID 030 | tradutor #2 (rep 0) | 19.7s
+PROMPT: Traduza para o inglês (registro formal, comercial):
+'Prezado Senhor, anexo a proposta revisada. Aguardo retorno até sext
+Dear Sir,
+
+Please find attached the revised proposal. I look forward to receiving your feedback by Friday so that we can proceed with finalizing the agreement.
+
+Sincerely,  
+[Your Name]
+
+### ID 031 | tradutor #2 (rep 1) | 6.0s
+PROMPT: Traduza para o inglês (registro formal, comercial):
+'Prezado Senhor, anexo a proposta revisada. Aguardo retorno até sext
+Dear Sir,  
+
+Please find attached the revised proposal. I await your reply by Friday so we may proceed with the closing.
+
+### ID 032 | tradutor #2 (rep 1) | 32.3s
+PROMPT: Traduza para o inglês (registro formal, comercial):
+'Prezado Senhor, anexo a proposta revisada. Aguardo retorno até sext
+Dear Sir,
+
+Please find attached the revised proposal. I look forward to receiving your response by Friday so that we may proceed with closing the agreement.
+
+### ID 033 | revisor #0 (rep 0) | 6.6s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'Nós fomos na reunião ontém e vi que os relatorios 
+Nós fomos na reunião ontem e vi que os relatórios estão com erros. Deveríamos corrigi-los antes da entrega, ou o cliente vai reclamar de novo.
+
+### ID 034 | revisor #0 (rep 0) | 56.3s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'Nós fomos na reunião ontém e vi que os relatorios 
+Aqui está o texto revisado, com as correções de ortografia (acentuação) e pontuação, mantendo o sentido original:
+
+"Nós fomos à reunião ontem e vi que os relatórios estão com erros. Deveríamos corrigir antes da entrega, ou o cliente vai reclamar de novo."
+
+**Principais correções:**
+*   **ontém** → **ontem** (não leva acento).
+*   **relatorios** → **relatórios** (levar acento agudo).
+*   **Deveriamos** → **Deveríamos** (levar acento agudo).
+*   **denovo** → **de novo** (escreve-se separado).
+*   **na reunião** → **à reunião** (uso do acento grave indicativo de crase, já que se foi *a* uma reunião específica).
+
+### ID 035 | revisor #0 (rep 1) | 17.7s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'Nós fomos na reunião ontém e vi que os relatorios 
+Nós fomos na reunião ontem e vi que os relatórios estão com erros. Devíamos corrigir antes da entrega, ou o cliente vai reclamar de novo.
+
+### ID 036 | revisor #0 (rep 1) | 94.5s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'Nós fomos na reunião ontém e vi que os relatorios 
+Aqui está o texto revisado, com as correções de ortografia (acentuação e uso do "h") mantendo o sentido original:
+
+"Nós fomos à reunião ontem e vi que os relatórios estão com erros. Deveríamos corrigir antes da entrega, ou o cliente vai reclamar de novo."
+
+**Principais correções feitas:**
+*   **ontém** → **ontem**: Não leva acento agudo.
+*   **relatorios** → **relatórios**: Precisa de acento circunflexo por ser oxítona com ditongo aberto.
+*   **Deveriamos** → **Deveríamos**: Precisa de acento circunflexo para indicar a crase/tonicidade na vogal tônica "i".
+*   **denovo** → **de novo**: A locução adverbial "de novo" (no sentido de "novamente" ou "outra vez") escreve-se sempre separada e sem acento.
+*   **na** → **à**: Embora "fomos na reunião" seja comum na fala, o uso da crase ("à reunião") é mais adequado formalmente, indicando "para a reunião". Caso prefira manter o tom mais informal, pode deixar como "na", mas ortograficamente "à" está mais correto neste contexto de direção.
+
+### ID 037 | revisor #1 (rep 0) | 6.4s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'O contrato sera renovado automaticamente caso o cl
+O contrato será renovado automaticamente caso o cliente não manifeste sua saída. Nos termos do documento, a multa aplica-se sobre o valor da mensalidade e poderá ser parcelada em até 3 vezes.
+
+### ID 038 | revisor #1 (rep 0) | 49.4s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'O contrato sera renovado automaticamente caso o cl
+Aqui está o texto revisado, com as correções de ortografia (acentuação e cedilha) mantendo o sentido original:
+
+"O contrato **será** renovado automaticamente caso o cliente não manifeste sua saída. Nos termos do documento, a multa aplica-se sobre o valor da mensalidade e **poderá** ser parcelada em **até** 3 vezes."
+
+**Principais correções:**
+*   **será**: Adição do acento agudo (verbo *ser* no futuro do presente).
+*   **poderá**: Correção de "poderar" para a forma correta do verbo no futuro do presente, com acento.
+*   **até**: Adição do acento circunflexo.
+
+### ID 039 | revisor #1 (rep 1) | 6.7s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'O contrato sera renovado automaticamente caso o cl
+O contrato será renovado automaticamente caso o cliente não manifeste sua saída. Nos termos do documento, a multa aplica-se sobre o valor da mensalidade e poderá ser parcelada em até 3 vezes.
+
+### ID 040 | revisor #1 (rep 1) | 51.8s
+PROMPT: Revise o texto abaixo (gramática e ortografia), sem mudar o sentido.
+'O contrato sera renovado automaticamente caso o cl
+Aqui está o texto revisado, com as correções de acentuação e grafia:
+
+"O contrato **será** renovado automaticamente caso o cliente não manifeste sua saída. Nos termos do documento, a multa aplica-se sobre o valor da mensalidade e **poderá** ser parcelada em **até** 3 vezes."
+
+**Principais correções:**
+*   **será** / **poderá** / **até**: Adição dos acentos agudos nas vogais paroxítonas terminadas em ditongo aberto (â, é, ó) ou no caso da preposição "até".
+*   **poderar** → **poderá**: Correção do verbo (do futuro do presente: *ele poderá*), pois "poderar" não existe.
+
