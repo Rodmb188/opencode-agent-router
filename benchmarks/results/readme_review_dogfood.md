@@ -36,7 +36,19 @@ with emoji. No defects found.
 qwen3-local (14B, multilingual Qwen3) given a long English technical document
 drifts to its dominant training distribution (Chinese/English) and to its
 default behavior (summarize) instead of following the critique directive. Same
-failure mode twice → rule "retry once" exhausted; a 3rd attempt is not warranted.
+failure mode three times → rule "retry once" exhausted; further attempts are
+not warranted.
+
+## 4b. Attempt 3 — post-hardening retest (invalid, then confirmed)
+
+Requested by the user. Same prompt as attempt 1. Result: **identical failure** —
+entirely in Chinese, opening stray CJK char (`颗`), summarized again. However
+the `revisor.md` hardening (item 5) was applied in a session that **had not been
+restarted**; agent files reload only at opencode startup, so this run still used
+the old definition → attempt 3 does NOT validate the hardening. What it adds:
+three identical structural failures across prompts prove the task type (rigorous
+critique of a long English doc) is outside this agent/model combo's reliable
+envelope. The real hardening test must wait for a restarted session.
 
 ## 5. Action taken
 
