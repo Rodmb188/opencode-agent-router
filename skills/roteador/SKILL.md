@@ -16,7 +16,7 @@ ajustadas aqui e valem para todo o opencode.
 | **T01** | Geral / rápido | perguntas de cultura, tradução curta, resumo curto, opinião, código simples no chat, formatação | modelo principal | ~2–10s — **nunca delegar** |
 | **T02** | Cálculo e lógica multi-etapas | idade, dobro, porcentagem "%", desconto, equação, raiz, média, "quantos", troco, conversões | agente `preciso` (qwen3-local) | ~5–10s |
 | **T03** | Contas financeiras | parcelas, juros, taxa, financiamento, orçamento, custo, rendimento, CET | agente `financeiro` (qwen3-local) | ~5–15s |
-| **T04** | Pesquisa web | "pesquisar", "buscar", "qual o melhor", "quanto custa", produto (celular, notebook...), preços, benchmarks, notícias, atualidades, tutoriais, "R$", orçamento, comparações | agente `pesquisa` (nothink-v2 + websearch) | ~30–90s |
+| **T04** | Pesquisa web | "pesquisar", "buscar", "qual o melhor", "quanto custa", produto (celular, notebook...), preços, benchmarks, notícias, atualidades, tutoriais, "R$", orçamento, comparações | você busca (websearch) + agente `pesquisa` (nothink-v2) só sintetiza | ~30–90s |
 | **T05** | Visão / imagem | imagem/foto/print/screenshot anexada, "descreva a imagem", "o que tem nessa foto", OCR | agente `ver` (vision) | ~10–20s |
 | **T06** | Escrita criativa | título, slogan, e-mail, texto publicitário, história, postagem | agente `redator` (nothink-v2) | ~5–15s |
 | **T07** | Revisão / QA de texto | "revise", "corrija o texto", "está bem escrito?", reescrever com mais coesão | agente `revisor` (qwen3-local) | ~5–15s |
@@ -41,7 +41,13 @@ ajustadas aqui e valem para todo o opencode.
    Qualquer conta com mais de 1 operação → nível T02 (`preciso`) ou T03 (`financeiro`).
 3. **`megabrain`/`profundo` apenas em T12** — nunca para cálculo rápido. Para cálculo, `qwen3-local`
    resolve passo a passo e conferindo (mais rápido E mais correto que o modo rápido do 27B).
-4. **Pesquisa web sempre via agente `pesquisa`** (usa `websearch`; `webfetch` em sites .com.br falha).
+4. **Pesquisa web (T04): você busca, o subagente SÓ sintetiza.** `websearch` só existe no provider
+   `opencode`/`opencode-go` (ou com `OPENCODE_ENABLE_EXA`/`OPENCODE_ENABLE_PARALLEL`) — subagentes em `ollama` NÃO recebem
+   a tool, mesmo com permission `allow` (prova: registry.ts `webSearchEnabled`, teste real seção 13). Então:
+   - **Você** roda 2–3 buscas `websearch` (na camada T00/T01, no chat) e extrai os trechos essenciais.
+   - **Embeba os trechos na mensagem** do agente `pesquisa` (nunca aponte arquivo) e peça: ranquear por relevância,
+     justificar, dar veredicto. O `pesquisa` NÃO usa ferramenta — material já vem pronto.
+   - `webfetch` em sites .com.br bloqueia bots (Transport error) — use só em domínio confirmado.
 5. **Versões curtas dos níveis T07–T11** (ex.: "traduza essa frase", "resuma 1 parágrafo") ficam na camada T00/T01; só delega quando a tarefa for substancial ("revise este e-mail de 2 páginas", "resuma o artigo de 10 páginas").
 6. **Instrução do usuário manual vence**: se o usuário escolher explicitamente um modelo ("/model", "use o megabrain"), respeite e não reclassifique.
 7. Em dúvida entre níveis, escolha o mais rápido (não delegue).
@@ -61,3 +67,4 @@ ajustadas aqui e valem para todo o opencode.
 3. Receba o resultado, confira se responde ao pedido e apresente ao usuário em pt-BR, em 1 linha que o agente certo foi usado.
 4. **Sanitize o resíduo CJK**: subagentes qwen3 emitem às vezes 1 caractere estrangeiro como PRIMEIRO token (ex.: `颗`, `起来`, `栋`, `緻`) — artefato de decodificação, NÃO capacidade. Ocorre mesmo com instrução "pense em pt-BR" no prompt (testado A/B, seção 11 do dogfood). Antes de mostrar ao usuário, remova qualquer prefixo não-latino da resposta do subagente.
 5. Se o agente devolver erro/timeout, repita 1x com formulário mais simples ou responda você mesmo com ressalva de incerteza.
+6. **T04 (pesquisa web): NÃO delegue junto com a busca.** Primeiro rode `websearch` você mesmo (2–3 buscas, termos complementares + ano atual), extraia os trechos mais relevantes (nomes, números, preços em faixa, datas) e só então chame o `pesquisa` com esse material embutido na mensagem. O subagente não tem a tool `websearch` (provider ollama) — delegar sem material faz ele cair em `webfetch` de sites bloqueados, lotar o contexto e voltar vazio (`reason: length`, medida real: 9.660 input tokens antes da resposta).

@@ -80,15 +80,17 @@ came from real failures:
 - **Never run heavy 27B sub-agents in parallel.** Six parallel agents caused
   `ProviderHeaderTimeoutError` (5-min header timeout) through swap thrashing.
   Heavy = sequential, light = parallel ok.
-- **A web search that returns empty is a failure.** Fallback to audited knowledge
-  with an explicit disclaimer.
+- **Sub-agents on `ollama` never get the `websearch` tool** (opencode gates it by
+  provider — see dogfood sec. 13), so the primary runs the searches and `pesquisa`
+  synthesizes. A run that returns empty is a context-overflow input bug, not a
+  timeout: cap embedded material (~4k tokens for the deep agent), chunk long texts.
 - **Explicit user model choice always wins.**
 
 |  Tier |                Category               |         Agent (model)        |
 |-------|---------------------------------------|------------------------------|
 |  T02  | Math / logic                          | `preciso` (qwen3-local)      |
 |  T03  | Finance (interest, installments)      | `financeiro` (qwen3-local)   |
-|  T04  | Web research (products, prices, news) | `pesquisa` (nothink-v2)      |
+|  T04  | Web research (products, prices, news) | primary searches + `pesquisa` synthesizes (nothink-v2) |
 |  T05  | Images / OCR                          | `ver` (vision)               |
 |  T06  | Creative writing                      | `redator` (nothink-v2)       |
 |  T07  | Text review / QA                      | `revisor` (qwen3-local)      |
@@ -171,7 +173,7 @@ responses. Other mitigations built into the router:
 │   └── qwen3_template.jinja    ← the fixed chat template
 ├── skills/
 │   ├── roteador/SKILL.md       ← the router: tier ladder + iron rules
-│   └── pesquisa-web/SKILL.md   ← websearch-first research skill
+│   └── pesquisa-web/SKILL.md   ← search guidelines for the primary (T04)
 └── benchmarks/
     ├── avaliar-modelos         ← reusable benchmark CLI
     ├── benc_writing.py         ← A/B creativity harness
@@ -185,6 +187,17 @@ responses. Other mitigations built into the router:
 directory as a delegatable sub-agent and applies `AGENTS.md` as global
 instructions — no plugin code; the whole system is **declarative markdown + one
 JSON config**.
+
+Every agent declares an explicit `permission:` block in its frontmatter (15
+tool keys) — the default is **deny**, and each agent opens only what its role
+needs. Text/vocal agents (including `pesquisa`) are pure readers of embedded
+material with all tools denied; only `codigo`, `dados`, `importador` and
+`sysadmin` keep file/shell tools. `task` is denied on every sub-agent
+(nested delegation is cut off by design). One lesson from real failures
+(dogfood sec. 10 and 13): `permission` frontmatter is necessary but not
+sufficient — opencode's registry can still gate a tool by provider (e.g.
+`websearch` never reaches sub-agents running on `ollama`), so the T04 flow is
+"primary searches, sub-agent synthesizes".
 
 ---
 

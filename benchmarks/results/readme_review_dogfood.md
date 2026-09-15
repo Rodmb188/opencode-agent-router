@@ -260,5 +260,64 @@ two agents that had leaked before (`preciso`, `revisor`):
    is. The honest, deterministic fix is on the *presentation* layer: the router
    strips any non-Latin prefix before showing the result (roteador protocol step 4).
 3. Both smoke tests otherwise passed: correct math step-by-step with
-   verification; correct review with clean, defensible corrections. Tool
-   lockdown (sec. 10) did not break the agents.
+    verification; correct review with clean, defensible corrections. Tool
+    lockdown (sec. 10) did not break the agents.
+
+---
+
+## 12. `profundo` re-test with the new rules: PASSED (no CJK leak)
+
+Pre-registered smoke test after rule 9 rewrite (4k embed budget) + pt-BR rules +
+CJK sanitize. Task: "devo modularizar esse monólito?" with a short scenario
+embedded (~4k tokens, well under budget).
+
+| Check | Result |
+|---|---|
+| Decision quality | Sound 4-point analysis: recommendation, 2 risks, 1 objective signal, verdict |
+| Language | Clean pt-BR throughout — **zero CJK leak** on first run |
+| Context budget | Within 12288 (embedded input ≲ 4k; no `reason: length`) |
+| Compliance | Used the deep-analyze pattern, no tool attempts |
+
+### Verdict
+
+1. The **embedded ≤4k + pt-BR + step-4 sanitize** package works end-to-end on
+   the 27B deep agent. The earlier empty/corrupt outputs (sec. 9/10a) were
+   context-overflow + decode artifacts, both now addressed at the router level.
+2. One cosmetic typo in the verdict ("migraçãoprematura") — a word-gap, not a
+   regression; no action required.
+3. Rule 9 (preventive embedding budget) is the correct control for heavy agents.
+
+---
+
+## 13. `pesquisa` T04: websearch NÃO chega a subagente em `ollama` (regra-real)
+
+Smoke test do `pesquisa` (Nothink-v2 27B, material embutido: "melhor robô aspirador
+custo-benefício Brasil R$1.500–2.500") voltou **vazio**. Investigação no DB + source:
+
+| Evidência | Achado |
+|---|---|
+| Tool calls reais da sessão | `skill` ×2, `webfetch` ×14, **`websearch` ×0** |
+| Reasoning do subagente (verbatim) | "não tenho a ferramenta `websearch` disponível — só tenho `webfetch` e `skill`" |
+| `registry.ts:58` `webSearchEnabled()` | websearch só é exposto se provider = `opencode`/`opencode-go` OU env `OPENCODE_ENABLE_EXA` / `OPENCODE_ENABLE_PARALLEL` |
+| Provider da sessão | `ollama` (primário = `opencode/big-pickle`, subagentes = `ollama/*`) |
+| Envs | nenhuma de EXA/PARALLEL presente no shell nem no systemd |
+| Desfecho | 14 webfetches acumularam `input 9.660` → `reason: length` (12.288) com `output 100` → resposta vazia |
+
+### Conclusão prática
+
+- `permission: websearch: allow` no agente é **necessário mas nunca suficiente**:
+  a tool é filtrada no registry por provider antes de chegar ao toolset do subagente.
+- Sem websearch, o subagente caça `webfetch` (inclusive URLs de buscadores) e
+  estoura o contexto — a mesma classe de falha do `profundo` (sec. 10a).
+- **Fix adotado (não é workaround): inverter a divisão de trabalho em T04.**
+  Quem tem a tool é o primário (`opencode`); quem sintetiza melhor é o subagente.
+  O roteador agora manda: *primário roda 2–3 `websearch`, extrai trechos, embute na
+  mensagem, `pesquisa` sintetiza/ranqueia/veredita sem nenhuma tool*.
+- `pesquisa.md` reescrito: permission **all-deny**, regra "você não tem websearch,
+  o material vem embutido". Roterador: linha T04 + regra 4 + protocolo passo 6.
+
+### Verificado junto
+
+- `websearch` REALMENTE funciona no primário deste ambiente (teste ao vivo com
+  resultado acima): porque o primário roda provider `opencode` (big-pickle).
+- Doc oficial confirma o gate de provider (tools page, seção `websearch`).

@@ -213,6 +213,8 @@ language, no foreign-script artifacts).
 | Live routing wave 1 | preciso / financeiro / revisor / importador | 2/4 perfect, reviewer caught real errors, CSV-quote edge found |
 | Live routing wave 2 | codigo / tutor / sumarizador / tradutor / sysadmin / redator | flawless; one concordance slip caught and fixed |
 | Live routing wave 3 | profundo / pesquisa | profundo excellent (one CJK leak, fixed); pesquisa first run empty → post-mortem → fixed |
+| Wave 4: permission lockdown | all 18 agents | explicit `permission:` blocks; `task` denied everywhere; tool-gated smoke tests |
+| Wave 5: dogfooding | profundo / revisor / preciso / pesquisa | profundo re-test PASSED (no CJK leak); CJK leak proven a decode artifact, fixed at router; T04 websearch provider-gate → search on primary, synthesize on subagent |
 
 ---
 
@@ -231,3 +233,50 @@ language, no foreign-script artifacts).
 
 See [benchmarks/results/readme_review_dogfood.md](../benchmarks/results/readme_review_dogfood.md)
 for the blind main-model vs `revisor` agent comparison of the README.
+
+## Dogfooding waves 4–5 (post-release hardening)
+
+The README shipped; what followed are the real-battle fixes that only show up
+after the system runs. Full evidence in the dogfood log (sections 8–13).
+
+### Context overflow is the recurring silent killer
+
+Two different agents returned *empty* outputs, and both turn out to be the same
+disease: input grew past the model context (12288 tokens) during the request, so
+the answer step was capped at ~100 tokens before it started. First seen with
+`profundo` (README embedded whole: 8.675 input tokens), then with `pesquisa`
+(14 consecutive `webfetch` calls accumulated 9.660 input tokens). **Empty result
+is almost never a timeout and never a model failure — it is an input-size bug**,
+and the fix is preventive (cap/compact input), never retry.
+
+### Tool permission: what "allow" really means (registry > frontmatter)
+
+The `pesquisa` agent had `websearch: allow` in its frontmatter and still couldn't
+search. Root cause is in opencode's own registry (`webSearchEnabled`): the
+`websearch` tool is only exposed when the session's provider is `opencode` /
+`opencode-go`, or `OPENCODE_ENABLE_EXA` / `OPENCODE_ENABLE_PARALLEL` is set.
+All subagents here run on `ollama` → the tool never reaches them. The subagent
+itself diagnosed it mid-run ("não tenho websearch — só webfetch e skill") and
+fell back to 14 `webfetch` calls that blew the context.
+
+**Decision:** invert the T04 division of labor — the primary (which runs on the
+`opencode` provider and *does* have websearch) performs the searches and embeds
+the snippets in the task message; the `pesquisa` agent becomes a pure synthesis
+stage (rank, justify, verdict) with all tools denied. This matches the embed
+pattern that already fixed `profundo` (sec. 8–9); it does not change VRAM (the
+primary is cloud, the 27B subagent was already loaded) and keeps the subagent as
+the synthesis expert rather than replacing it.
+
+### CJK leak: proven a decode artifact, not a prompt problem
+
+A per-agent "pense em pt-BR" rule did *not* stop stray CJK first-tokens (`颗`,
+`起来`, `栋`). The honest conclusion (sec. 11) is that it is a first-token decode
+artifact of Qwen3-family, unaffected by prompting; the deterministic fix lives in
+the router's presentation layer (strip non-Latin prefix). The `profundo` re-test
+under the new rules (sec. 12) came back clean pt-BR on the first run.
+
+### The tools that kept working
+
+Tool lockdown (sec. 10) did not break the stack: `preciso` math and `revisor`
+grammar smoke tests still pass. The pattern that carries the system is:
+**embed material in the message, cap heavy-agent input, sanitize on the way out.**

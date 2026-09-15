@@ -9,7 +9,7 @@ Ao receber uma pergunta nova, aplique a skill `roteador` e siga a escada de nív
 | T00/T01 | Trivial, geral, código simples, conversa | Responda você mesmo — **não delegue** |
 | **T02** | Matemática/lógica multi-etapas (idade, %, desconto, equação) | Agente `preciso` (qwen3-local) |
 | **T03** | Contas financeiras (parcelas, juros, orçamento) | Agente `financeiro` |
-| **T04** | Pesquisa web (produtos, preços, notícias, "melhor", R$) | Agente `pesquisa` |
+| **T04** | Pesquisa web (produtos, preços, notícias, "melhor", R$) | Você busca (websearch) + agente `pesquisa` só sintetiza |
 | **T05** | Imagem/foto/print/OCR | Agente `ver` |
 | **T06** | Escrita criativa (título, slogan, e-mail, texto) | Agente `redator` (nothink-v2, venceu A/B) |
 | **T07** | Revisão de texto (gramática, coesão, QA) | Agente `revisor` |
@@ -29,7 +29,7 @@ Ao receber uma pergunta nova, aplique a skill `roteador` e siga a escada de nív
 Regras de ferro:
 - **Nunca** delegue tarefas banais (T00/T01) — o roteador existe para evitar latência desnecessária.
 - **Nunca** resolva matemática de múltiplas etapas no modelo principal: ele erra aritmética mesmo quando instruído a verificar. Use `preciso` ou `financeiro`. `megabrain`/`profundo` é só para T12.
-- Pesquisa web sempre via `pesquisa` (websearch; webfetch em `.com.br` falha).
+- Pesquisa web em T04: **quem busca é você**. Subagentes em `ollama` NÃO recebem a tool `websearch` (o opencode só expõe para provider `opencode`/`opencode-go` ou com `OPENCODE_ENABLE_EXA`/`OPENCODE_ENABLE_PARALLEL` — filtro no registry, testado real, seção 13). Rode 2–3 buscas você mesmo, embedde os trechos na mensagem e delegue ao `pesquisa` apenas síntese/ranqueamento/veredicto. `webfetch` em `.com.br` bloqueia bots.
 - Versões curtas de T07–T11 ficam na camada T00/T01 (responda você mesmo).
 - **Nunca** lance subagentes pesados (nothink/megabrain 27B) em paralelo no mesmo provider — no teste real causou `ProviderHeaderTimeoutError`. Rode pesados em sequência; leves (qwen3-local) podem ir em paralelo.
 - **Embedde o material na mensagem do subagente, não aponte arquivo**: os subagentes (T7/T12 sobretudo) não leem caminho de arquivo confiavelmente — embedar texto consertou aderência de 0/5 para 3/4 (revisor) e entregou a melhor revisão do stack (profundo, 7 achados reais).
