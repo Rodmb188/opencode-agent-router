@@ -1,7 +1,7 @@
 # Local LLM Agent Routing System for opencode
 
 A multi-agent system that runs **100% locally** on a consumer-grade AMD machine
-(RX 6700 XT, 12 GB VRAM, 32 GB RAM): one 27B and one 14B open-source model
+(RX 6700 XT, 12 GB VRAM, 32 GB RAM): one 27B, one 14B, and one 8B vision model
 become **18 specialized sub-agents**, with automatic routing by task type — no
 cloud, no API costs, no privacy leaks.
 
@@ -15,10 +15,10 @@ post-mortems — not vibes. The chronicle and raw results live in
 
 Running a single large model locally is easy. Running it **well** is hard:
 
-- **One model can't be good at everything.** The 27B (quantized to fit 12 GB
-  VRAM) is great at creative writing but consistently fails multi-step
-  arithmetic — 5 of 5 arithmetic chains were wrong in testing. A 14B nails every
-  calculation. These are complementary strengths.
+- **One model can't be good at everything.** The 27B fast-mode (no thinking,
+  quantized to fit 12 GB VRAM) is great at creative writing but consistently
+  fails multi-step arithmetic — 5 of 5 arithmetic chains were wrong in testing.
+  A 14B nails every calculation. These are complementary strengths.
 - **Latency budgets are tiered.** You don't wait 4 minutes of deep thinking for
   a "what's 15% of 280?" question, and you don't accept 10-second shallow answers
   for an architecture decision.
@@ -114,12 +114,13 @@ journal):
 
 1. **Creativity** — blind A/B (36 shuffled outputs, fixed rubric): 27B no-think
    **17.5/20** vs 14B 16.3/20 → the 27B owns creative tiers.
-2. **Math reliability** — `qwen3-local` **14/14** (~6 s);
-   `nothink-v2` 13/14 (1 arithmetic error, unfixable by instruction);
-   `megabrain-v2` 3/3 (61–235 s) → math/finance/data go only to the 14B.
-3. **Format fidelity** — CSV→JSON blind test: the 27B silently altered types
-   (`"32"` → `32`, `""` → `null`); the 14B preserved the schema → conversion and
-   data tiers go only to the 14B.
+2. **Math reliability** — `qwen3-local` **14/14** (~6 s); `nothink-v2` **13/14**
+   (1 arithmetic error, unfixable by instruction — and 5 of 5 multi-step chains
+   failed in a dedicated dry-run); `megabrain-v2` **3/3** but 61–235 s →
+   math/finance/data go only to the 14B.
+3. **Format fidelity** — CSV→JSON blind test: `nothink-v2` (fast-mode 27B)
+   silently altered types (`"32"` → `32`, `""` → `null`); the 14B preserved the
+   schema → conversion and data tiers go only to the 14B.
 
 ---
 
@@ -158,11 +159,12 @@ responses. Other mitigations built into the router:
 ├── ollama-start                ← server bootstrap (pins OLLAMA_CONTEXT_LENGTH, guards double-start)
 ├── docs/
 │   └── ENGINEERING_JOURNAL.md  ← the full chronicle (benchmarks, failures, results)
-├── agents/                     ← the 18 sub-agent definitions (opencode agent files)
+├── agent/                      ← the 18 sub-agent definitions (opencode agent files, one .md each)
 ├── config/
 │   ├── opencode.jsonc          ← provider + model wiring, 20-min timeout
 │   └── AGENTS.md               ← global iron rules
 ├── models/                     ← how to rebuild the local models
+│   ├── README.md               ← step-by-step: obtain base, apply template fix, rebuild
 │   ├── nothink-v2.Modelfile    ← 27B, no-think, 12288 ctx
 │   ├── megabrain-v2.Modelfile  ← 27B, thinking, 12288 ctx
 │   ├── build_replacement.py    ← the GGUF template-patch tooling
@@ -196,9 +198,9 @@ JSON config**.
    ```bash
    git clone git@github.com:Rodmb188/opencode-agent-router.git ~/.config/opencode
    ```
-2. **Provide the models.** You need a Qwen3-6.5/3.6-class 27B (abliterated, with
-   the template fix applied per `models/README`) and a 14B, pushed into Ollama.
-   Then rebuild with the Modelfiles:
+2. **Provide the models.** You need the `richardyoung/qwen3.6-27b-abliterated`
+   class of 27B (with the template fix applied per `models/README`) and a 14B,
+   pushed into Ollama. Then rebuild with the Modelfiles:
    ```bash
    ollama create nothink-v2   -f models/nothink-v2.Modelfile
    ollama create megabrain-v2 -f models/megabrain-v2.Modelfile   # FROM nothink-v2

@@ -7,7 +7,8 @@ in whether *thinking* is enabled at request time (controlled by opencode, via
 
 ## 1. Obtain the base
 
-Pull a Qwen3.6-3/6.5-class 27B abliterated GGUF and import it into Ollama.
+Pull a Qwen3.6-class **27B abliterated** GGUF (the reference is
+`richardyoung/qwen3.6-27b-abliterated`) and import it into Ollama.
 
 ```bash
 ollama create <base-name> -f <path-to-your-modelfile>

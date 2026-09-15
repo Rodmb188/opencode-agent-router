@@ -145,3 +145,44 @@ prompts — A = full README embedded; B1/B2/B3 = three embedded chunks.
    raises adherence from 0/5 to 3/4 while quality stays shallow. Long-EN critical
    review remains a T1 task; the embedding technique is still worth adopting for
    T7/T12 when reviewing *pt-BR* or short texts.
+---
+
+## 9. Experiment: does embedding fix profundo too? (test A only)
+
+Repeat of section 8's test-A, but on **`profundo` (megabrain-v2 27B, thinking
+ON)** — the model that on attempt 5 greeted without reading the file. One
+variable: the full README was embedded in the prompt (same "DEFECTS ONLY, pt-BR"
+format).
+
+### Result
+
+| Run | Delivery | Outcome |
+|---|---|---|
+| 9a | Full README embedded | First invocation returned **empty result** (0 bytes, state=completed) |
+| 9b | Same task, resumed session | ✓ stayed on-task; delivered **7 real findings**, all in pt-BR, format respected |
+
+The 7 findings (reviewed against the repo): 3 fully valid (intro omits the 8B
+vision model from the "two models, 18 agents" claim; `agent/` vs `agents/` dir
+divergence; `models/README` referenced but absent from the repo tree), 1 partial
+("Qwen3-6.5/3.6-class" is undefined; the phrase is inherited from
+`models/README`), and 3 nuance/coherence flags (intro "5 of 5 arithmetic" vs
+design §"13/14" and megabrain "3/3" — different batteries not distinguished;
+"the 27B" in format-fidelity § was actually `nothink-v2`; same battery-mixing in
+math §).
+
+### Verdict
+
+1. **Embedding fixes adherence on profundo too.** Attempt 5 (file-path) failed;
+   attempt 9b (embedded) delivered on-task, in-format, in pt-BR — same pattern as
+   revisor (0/5 → 3/4).
+2. **Quality ceiling is higher than revisor's.** The 7 findings were mostly
+   real; only the nuance items were near-nits, and several were legitimate
+   coherence gaps the README genuinely had. This is the strongest review the
+   local stack produced.
+3. **New reliability quirk: occasional empty first result.** 9a completed with
+   zero output (megabrain-v2, long prompt + thinking). One data point; a retry
+   recovered it. Worth a retry-on-empty rule for future heavy T12 embeds.
+4. All 7 findings were applied to the README (fixes validated against
+   `models/README.md` and the journal). Embedding is now the **recommended
+   delivery for T12** critical review, and the README no longer contradicts
+   itself on models, batteries, or layout.
