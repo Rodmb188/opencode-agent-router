@@ -59,15 +59,24 @@ step-by-step account of "running grep with the pattern `function parse(argv) {`"
 and "switching to `read` to check for occurrences", i.e. confabulated coding
 activity entirely unrelated to the review request. Zero review items.
 
-## 5. Conclusion — T7 envelope
+## 4d. Attempt 5 — `profundo` (T12, megabrain-v2 27B thinking)
 
-Four attempts, four distinct failures (summary / Chinese / CJK-leak /
-confabulated grep). With qwen3-local, **rigorous critique of a long English
-document is outside the `revisor` agent's reliable envelope — prompt design does
-not recover it.** Routing decision: long-English-document QA goes to the main
-model (T1) or to `profundo` (T12); `revisor` stays the reviewer for pt-BR text.
-The hardening rules stay in `agent/revisor.md` as hygiene (they cost nothing),
-but are no longer expected to rescue this task type.
+Requested by the user as the trio capstone (main model / revisor / profundo on the
+same prompt). Same prompt as attempt 1. Result: **a fifth failure, new mode** —
+the agent answered with a self-introduction ("Olá! Sou o megabrain-v2… Em que
+posso ajudar?") without reading the file or producing any review item. Task
+completion failed outright (no file read, no analysis).
+
+## 5. Conclusion — T7/T12 envelope
+
+Five subagent attempts, five distinct failures — revisor (qwen3-local 14B):
+summary / Chinese / CJK-leak / confabulated grep; profundo (megabrain-v2 27B):
+greeting without task execution. With the local stack, **rigorous critique of a
+long English document is outside the subagent envelope of BOTH tiers — prompt
+design does not recover it.** The recommended routing ("long-EN QA → T12") was
+refuted by the test: for this task type the **main model (T1) is the only
+reliable reviewer**. These failures are consistent and reproducible, and the main
+model found all real issues in the same document — decisive evidence, not noise.
 
 ## 5b. Actions taken
 
@@ -82,6 +91,7 @@ but are no longer expected to rescue this task type.
 
 - [x] Main-model review: 4 fixes applied to the original README
 - [x] `revisor` attempts 1–4: four distinct failures, series registered
+- [x] `profundo` attempt 5: greeting-only, no task execution, registered
 - [x] `revisor.md` hardened (hygiene rules)
-- [x] Conclusion: long-English-doc QA → T1/T12, not T7
+- [x] Conclusion: long-English-doc QA → **T1 only** (T7 and T12 both fail on this hardware)
 - [x] README split into stable layout + `docs/ENGINEERING_JOURNAL.md`
