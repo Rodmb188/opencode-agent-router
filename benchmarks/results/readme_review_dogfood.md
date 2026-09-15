@@ -236,3 +236,29 @@ matched by AGENTS.md iron rules.)
 - Attempt 9a failed from oversized embedding → chunking/budget fixes it (sec. 10a).
 - Both failure classes are now handled at the *router* level (input form + size), which
   is the only stable fix — consistent with the envelope conclusion in sec. 5.
+
+---
+
+## 11. pt-BR thinking rule: prompt-level fix FAILED (CJK leak is a decode artifact)
+
+After the tool lockdown (sec. 10), all 18 agents gained an explicit pt-BR rule
+("raciocínio e resposta em pt-BR; bloqueie outro alfabeto"). Smoke-tested the
+two agents that had leaked before (`preciso`, `revisor`):
+
+| Run | Before fix | After per-agent pt-BR rule |
+|---|---|---|
+| `preciso` | leaked `栋` | STILL leaked `颗` (answer correct: R$73.44) |
+| `revisor` | leaked `起来`, bad "nos vamos" call | STILL leaked `起来` (corrections correct) |
+
+### Verdict
+
+1. **The CJK residue is a first-token decode artifact of Qwen3-family at low
+   sampling, not a reasoning/language defect** — it precedes the actual content
+   and does not affect correctness. It persists under explicit per-agent
+   pt-BR instructions.
+2. **Prompt-level "think in pt-BR" is not a reliable control.** Don't claim it
+   is. The honest, deterministic fix is on the *presentation* layer: the router
+   strips any non-Latin prefix before showing the result (roteador protocol step 4).
+3. Both smoke tests otherwise passed: correct math step-by-step with
+   verification; correct review with clean, defensible corrections. Tool
+   lockdown (sec. 10) did not break the agents.

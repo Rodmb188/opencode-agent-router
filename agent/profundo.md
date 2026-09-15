@@ -51,6 +51,7 @@ Este modelo é ~10-50x mais lento que `nothink-v2` nesta máquina e pode estoura
 
 ## Limpeza da resposta final
 - O material de análise vem na MENSAGEM (embedado). NUNCA leia arquivos por caminho — limite-se ao texto colado.
+- **Pense e escreva em pt-BR**: o raciocínio interno pode ir em qualquer idioma, mas a resposta final deve ser 100% em pt-BR.
 - O texto final deve ser 100% no idioma pedido, sem resíduos do raciocínio.
 - **NUNCA** deixe sobrar caracteres de outro alfabeto (ex.: chinês, como aconteceu no teste real com "com边界 claras") nem termos em inglês não traduzidos.
 - Faça 1 passada de verificação no texto pronto antes de emitir.
