@@ -48,25 +48,40 @@ restarted**; agent files reload only at opencode startup, so this run still used
 the old definition → attempt 3 does NOT validate the hardening. What it adds:
 three identical structural failures across prompts prove the task type (rigorous
 critique of a long English doc) is outside this agent/model combo's reliable
-envelope. The real hardening test must wait for a restarted session.
+envelope.
 
-## 5. Action taken
+## 4c. Attempt 4 — post-restart, hardened definition (failed, new drift)
 
-Hardened `agent/revisor.md` with three rules: (1) critique-only, never summarize;
-(2) never leak internal reasoning; (3) never switch language — pt-BR always, even
-when the reviewed text is in another language. Applies on next opencode restart.
+Requested by the user, run after a real opencode restart (hardened `revisor.md`
+now active). Same prompt as attempt 1. Result: **a fourth, new failure mode** —
+no summary, no Chinese; the agent instead responded with a fabricated
+step-by-step account of "running grep with the pattern `function parse(argv) {`"
+and "switching to `read` to check for occurrences", i.e. confabulated coding
+activity entirely unrelated to the review request. Zero review items.
 
-## 6. Open question
+## 5. Conclusion — T7 envelope
 
-For critique of long English texts, T7 (revisor/qwen3-local) is currently
-unreliable. Options to evaluate later:
-- Route long-English-document critique to the main model (T1) or to `profundo`;
-- Keep `revisor` for pt-BR text only;
-- Retest after prompt hardening.
+Four attempts, four distinct failures (summary / Chinese / CJK-leak /
+confabulated grep). With qwen3-local, **rigorous critique of a long English
+document is outside the `revisor` agent's reliable envelope — prompt design does
+not recover it.** Routing decision: long-English-document QA goes to the main
+model (T1) or to `profundo` (T12); `revisor` stays the reviewer for pt-BR text.
+The hardening rules stay in `agent/revisor.md` as hygiene (they cost nothing),
+but are no longer expected to rescue this task type.
+
+## 5b. Actions taken
+
+- Hardened `agent/revisor.md` with three rules: (1) critique-only, never
+  summarize; (2) never leak internal reasoning; (3) never switch language —
+  pt-BR always.
+- Registered the four-attempt failure series (this file).
+- README split into stable doc + `docs/ENGINEERING_JOURNAL.md` (structure issue
+  surfaced by this dogfood was an input to that: the README read like a chronicle).
 
 ## 7. Status
 
-- [x] Main-model review: 4 fixes applied to README
-- [x] `revisor` attempts 1–2: documented as failure observations
-- [x] `revisor.md` hardened
-- [ ] Retest `revisor` after restart (next session)
+- [x] Main-model review: 4 fixes applied to the original README
+- [x] `revisor` attempts 1–4: four distinct failures, series registered
+- [x] `revisor.md` hardened (hygiene rules)
+- [x] Conclusion: long-English-doc QA → T1/T12, not T7
+- [x] README split into stable layout + `docs/ENGINEERING_JOURNAL.md`
