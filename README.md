@@ -130,6 +130,26 @@ came from real failures:
 |  T18  | Final QA / verification               | `qa` (qwen3-local)           |
 |  T19  | Format conversion (CSV↔JSON...)       | `importador` (qwen3-local)   |
 
+### Known limitations (measured, not theoretical)
+
+- **Context is the killer, not the model.** Several sub-agents have returned
+  *empty* results — every single time it was an input-size bug (`reason: length`
+  at 12,288 tokens: `profundo` with the README embedded whole, `pesquisa` after
+  14 `webfetch` calls), never a model failure. Mitigation is preventive: cap
+  embedded material (~4k tokens for the 27B thinking agent), chunk long texts,
+  never rely on retry.
+- **`websearch` is host-side.** Sub-agents on `ollama` never receive the tool —
+  opencode gates it by provider (dogfood sec. 13). T04 is split by design:
+  primary fetches, sub-agent synthesizes. Same result, right tool, no context blowup.
+- **CJK leakage is a decode artifact, not a prompt problem.** Qwen3-family
+  occasionally emits one foreign character as the very first token, even with an
+  explicit "think in pt-BR" rule. The deterministic fix is presentation-layer:
+  the router strips any non-Latin prefix before showing the result (dogfood sec. 11).
+- **The primary cannot attach images** (main model has no multimodal input), so
+  a T05 vision smoke must be run manually in the TUI with an attached image.
+- **Hardware is the ceiling.** Two 27B parallel agents thrash swap on 32 GB RAM
+  (`ProviderHeaderTimeoutError`). Heavy agents run sequentially by rule.
+
 ---
 
 ## Design decisions, in brief
@@ -146,6 +166,16 @@ journal):
 3. **Format fidelity** — CSV→JSON blind test: `nothink-v2` (fast-mode 27B)
    silently altered types (`"32"` → `32`, `""` → `null`); the 14B preserved the
    schema → conversion and data tiers go only to the 14B.
+4. **Tool gating beats assumptions (T04 worked example).** The first design had
+   the `pesquisa` sub-agent run `websearch` itself. It never happened: opencode
+   only exposes that tool on `opencode`-provider sessions, not `ollama`, and
+   without it the agent fell into 14 `webfetch` calls that filled its 12,288-token
+   context and returned *empty* (`reason: length`). The fix came from the
+   evidence, not a preference: **split the job where the tool exists** — the
+   primary runs 2–3 `websearch` calls, extracts the essential snippets, embeds
+   them in the task message, and the local 27B does the synthesis/ranking/
+   verdict. Same quality, no context blowup, and the exact same "data online,
+   thinking local" split described in the intro. (Dogfood sec. 8–9 and 12–13.)
 
 ---
 
