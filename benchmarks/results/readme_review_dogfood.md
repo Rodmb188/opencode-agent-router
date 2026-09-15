@@ -111,3 +111,37 @@ agents.
 - [x] `profundo` attempt 6 sanity check (native task): **PASSED** — envelope, not breakage
 - [x] Conclusion: long-English-doc QA → **T1 only** (T7 and T12 fail it, but T12 stays for deep analysis)
 - [x] README split into stable layout + `docs/ENGINEERING_JOURNAL.md`
+
+---
+
+## 8. Experiment: embed whole vs chunking (the user's hypothesis)
+
+The user proposed the failures might come from **how** the text is delivered, not
+from capability. Controlled test, one variable changed, on `revisor`
+(qwen3-local 14B): same task (list DEFECTS ONLY, pt-BR, "don't summarize"), four
+prompts — A = full README embedded; B1/B2/B3 = three embedded chunks.
+
+| Test | Delivery | Task adherence | Output quality |
+|---|---|---|---|
+| A | Full README embedded | ✓ stayed on task (format respected) | ✗ invented **reformat suggestions** as defects (e.g. "14B → 14B (quantized to 9 GB)", "12 GB VRAM → (27B)"), lone opening CJK char |
+| B1 | Chunk 1 (intro/arch) | ✓ on task | ✗ nitpicks as defects ("nails is informal", "italic vs bold") |
+| B2 | Chunk 2 (decisions/memory/layout) | ✓ on task, best | ~decent: 2 fair stylistic/nuance flags + 3 weak ones ("saves" vs "economiza" in an English doc) |
+| B3 | Chunk 3 (getting-started/stack) | ✗ **drifted**: answered "how to configure opencode.json" as a tutorial | off-task |
+
+### Verdict
+
+1. **The form WAS a real factor — for task-adherence.** Embedding the text in the
+   prompt (instead of pointing at the file) fixed what 5/5 earlier attempts got
+   wrong on adherence (Chinese / summary / greeting / confabulated grep): 3 of 4
+   embedded runs stayed on-task and obeyed the output format.
+2. **But the ceiling is judgment, not format.** Once on-task, qwen3-local
+   *invents* defects (reformatting suggestions, stylistics) even when told "APENAS
+   problemas reais". It cannot reliably distinguish a real defect from a nitpick
+   in English technical prose.
+3. **Chunking risks decontextualization.** B3 (imperative "Clone… Start… Use it")
+   got read as a user request → helper mode. Descriptive sections (B2) fare best.
+4. Conclusion: for the local stack, **embed + section-chunking is the best
+   possible local form**, but it does not close the gap to the main model — it
+   raises adherence from 0/5 to 3/4 while quality stays shallow. Long-EN critical
+   review remains a T1 task; the embedding technique is still worth adopting for
+   T7/T12 when reviewing *pt-BR* or short texts.
