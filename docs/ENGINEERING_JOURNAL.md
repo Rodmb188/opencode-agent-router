@@ -224,7 +224,11 @@ language, no foreign-script artifacts).
   1–2 GB win)
 - [ ] Add a 7B tier for T00/T01 and T02 to offload the 14B
 - [ ] Automated regression battery that re-runs the A/Bs on every model change
-- [ ] CI-style "router sanity" smoke suite on live routing
+- [x] CI-style "router sanity" smoke suite on live routing → partial: static
+  layer landed in `benchmarks/regressao.py` + `.github/workflows/rota-ci.yml`;
+  live smokes are a TUI checklist because headless `opencode run` hangs on this
+  stack (dogfood 14b). A fully headless live run needs the CLI to route
+  subagents — tracked as future.
 - [ ] Standalone CLI so the router works outside opencode
 
 ---

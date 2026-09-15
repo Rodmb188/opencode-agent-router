@@ -321,3 +321,36 @@ custo-benefício Brasil R$1.500–2.500") voltou **vazio**. Investigação no DB
 - `websearch` REALMENTE funciona no primário deste ambiente (teste ao vivo com
   resultado acima): porque o primário roda provider `opencode` (big-pickle).
 - Doc oficial confirma o gate de provider (tools page, seção `websearch`).
+
+---
+
+## 14. Two real boundaries found during post-restart polish
+
+### 14a. T05 (vision) cannot be smoked by the primary — no image input
+
+The primary model (`opencode`/big-pickle) is **not multimodal**: this session
+cannot attach/read an image, so a `task` to `ver` cannot carry the attachment.
+The `ver` agent (vision 8B VL) does support images, but the delegation link
+fails before it — the error is raised on the primary side ("ERROR: Cannot read
+image"). Consequence: T05 must be smoked manually in the TUI (user attaches an
+image). Documented in README "Known limitations".
+
+### 14b. `opencode run --agent <subagent>` does not work headless
+
+Attempted to headless-smoke the stack via CLI:
+`opencode run --agent preciso "17*23"` → the CLI **falls back to the default
+agent** with a warning ("agent preciso is a subagent, not a primary agent").
+Attempts to route via the roteador (`__TIER__ T02 ...`) and even a trivial
+`opencode run "2+2"` each hung >120 s with no output — the CLI opens an
+interactive session that never returns on this stack. So the automated
+regression (`benchmarks/regressao.py`) deliberately splits: **static checks
+run headless, live smokes are a TUI checklist**. The static layer is the one
+that catches the real breakage class (YAML/permission/link integrity).
+
+### 14c. Bonus: the three `description:` YAML bugs finally fixed
+
+The binary validator flagged `qa.md`, `sumarizador.md`, `tradutor.md` for
+unescaped `:` inside `description:` ("erros inadmissíveis", "A/B de
+sumarização: 14,75", "A/B de tradução: 14,67"). Tagged harmless pre-existing
+... but they were real YAML breaks. Fixed by quoting the descriptions; the
+regression script now fails if any frontmatter fails to parse. 18/18 green.

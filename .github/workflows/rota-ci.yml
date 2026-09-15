@@ -1,0 +1,34 @@
+name: rota-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Run static regression
+        run: python3 benchmarks/regressao.py
+
+      - name: Verify frontmatter is untouched by append-only rules
+        run: |
+          python3 - <<'PY'
+          import glob, yaml
+          for f in sorted(glob.glob("agent/*.md")):
+              t = open(f, encoding="utf-8").read()
+              meta = yaml.safe_load(t.split("---")[1])
+              assert "description" in meta, f
+              assert len(meta.get("permission", {})) == 15, f
+          print("OK: 18 agentes, frontmatter no formato esperado")
+          PY
