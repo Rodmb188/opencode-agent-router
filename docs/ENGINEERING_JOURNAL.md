@@ -342,3 +342,26 @@ Regression now fails if `vision.modalities` is not this object shape (section 4)
 so a silent revert breaks CI instead of quietly disabling vision. **Outstanding:**
 confirm the end-to-end T05 smoke after a restart with these modalities live, and
 verify whether opencode hot-reloads provider config (safer to just restart).
+
+### T05, round 3: path-with-space is a parser trap; the multimodal primary is a trap too
+
+After the modalities fix, the real smoke ("Analisando imagem de cavaleiro",
+2026-09-15) taught two things that were added to the rules:
+
+1. The `vision` model *can* now see images end-to-end (the fix worked), but the
+   session that finally succeeded ran the image **through a fresh `ver` sub-
+   session** (~36 s via `read` on the exact path). When the *primary* ran on
+   `vision` and tried to analyze the image directly, opencode hit "exceeded the
+   provider's size limit due to large media attachments", then entered a retry
+   loop of 0-token responses (`finish: unknown`), and finally the model started
+   hallucinating paths (`/src/index.ts`, `/src/`, an `explore` hunt) while the
+   real path sat in the conversation. Conclusion written into the router iron
+   rule: **T05 always delegates — a multimodal primary must not analyze images
+   itself.**
+2. The user had to quote `/home/rodmb188/Imagens/Capturas de tela/Teste.png` for
+   it to be honored — the unquoted space path was being re-parsed. But a direct
+   test showed `read` *accepts* the space path in full; the failure was the
+   primary/parser splitting it. Rule added: transfer paths **verbatim**
+   (preserve quotes, never "fix" spaces into `/src/...`). Same guidance embedded
+   in `ver.md`, `SKILL.md` rule 6 + protocol 7, `config/AGENTS.md`, README, and
+   the regression `ver` smoke entry.

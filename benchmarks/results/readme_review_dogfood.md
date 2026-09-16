@@ -455,3 +455,42 @@ Fix shipped:
   opencode, run the T05 smoke again (path in prompt, image = `Teste.png`), and
   confirm the `ver` output describes the knight image — without *any* "Cannot read
   image" or hallucinated "text" in its reasoning.
+
+---
+
+## 17. T05, round 3: the multimodal primary is the trap, not the helper
+
+Two follow-up sessions after the `modalities` fix shipped showed what happens when
+the main model (running `vision` directly) tries to *analyze* the image instead of
+delegating:
+
+- Session "Analisando imagem de cavaleiro" (`ses_f58474c...`): the primary ran on
+  `ollama/vision`. Sending the attached `Teste.png` straight into the main context
+  produced `exceeded the provider's size limit due to large media attachments`,
+  followed by a loop of retries with **0 input/0 output tokens** and `finish:
+  "unknown"`. Then the confused primary started hallucinating paths: `read
+  /src/index.ts`, `read /src/`, and `task → explore` "Find the correct path for
+  the 'src' directory" — while the real answer (`/home/rodmb188/Imagens/Capturas
+  de tela/Teste.png`) was in the conversation. That is the "muito pensar" the
+  report references: not slow thinking, but a retry/hallucination loop.
+- The user then pasted the path **in quotes**: the flow finally worked. A
+  fresh `ver` sub-session (`ses_f57a0f244...`) called `read` on
+  `/home/rodmb188/Imagens/Capturas de tela/Teste.png`, got the attachment, and
+  described the knight image correctly in ~36 s (read at 01:00:10, answer at
+  01:00:32, 4,804 total tokens).
+
+Two real fixes distilled:
+
+1. **Paths with spaces are valid** — `read` accepts them fine when passed *in
+   full*. What breaks is re-parsing: splitting `Capturas de tela` into tokens, or
+   "correcting" the path into `/src/index.ts`. The router/AGENTS rules now
+   mandate **verbatim** transfer (keep quotes if given, otherwise pass intact,
+   never normalize). `ver.md` got the same instruction.
+2. **A multimodal primary must still delegate to `ver`.** A clean sub-session
+   context + `read` on the exact path is fast and reliable; running the image
+   through the primary's own context overflows the provider limit and loops. The
+   iron rule now says: if the task is T05, delegate — do not analyze yourself even
+   if you can see.
+
+Regression smoke for `ver` now explicitly covers the space-path case and forbids
+re-parsing.

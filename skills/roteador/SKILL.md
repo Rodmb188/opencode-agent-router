@@ -17,7 +17,7 @@ ajustadas aqui e valem para todo o opencode.
 | **T02** | Cálculo e lógica multi-etapas | idade, dobro, porcentagem "%", desconto, equação, raiz, média, "quantos", troco, conversões | agente `preciso` (qwen3-local) | ~5–10s |
 | **T03** | Contas financeiras | parcelas, juros, taxa, financiamento, orçamento, custo, rendimento, CET | agente `financeiro` (qwen3-local) | ~5–15s |
 | **T04** | Pesquisa web | "pesquisar", "buscar", "qual o melhor", "quanto custa", produto (celular, notebook...), preços, benchmarks, notícias, atualidades, tutoriais, "R$", orçamento, comparações | você busca (websearch) + agente `pesquisa` (nothink-v2) só sintetiza | ~30–90s |
-| **T05** | Visão / imagem | imagem/foto/print/screenshot anexada, "descreva a imagem", "o que tem nessa foto", OCR | agente `ver` (vision) — SEMPRE repasse o caminho absoluto no prompt | ~10–20s |
+| **T05** | Visão / imagem | imagem/foto/print/screenshot anexada, "descreva a imagem", "o que tem nessa foto", OCR | agente `ver` (vision) — SEMPRE repasse o caminho absoluto (verbatim, espaços ok) no prompt | ~30–40s |
 | **T06** | Escrita criativa | título, slogan, e-mail, texto publicitário, história, postagem | agente `redator` (nothink-v2) | ~5–15s |
 | **T07** | Revisão / QA de texto | "revise", "corrija o texto", "está bem escrito?", reescrever com mais coesão | agente `revisor` (qwen3-local) | ~5–15s |
 | **T08** | Código isolado | função, script, corrigir bug, refatorar, revisar código, regex, converter formatos (fora do fluxo de edição do projeto) | agente `codigo` (nothink-v2) | ~5–15s |
@@ -49,16 +49,24 @@ ajustadas aqui e valem para todo o opencode.
      justificar, dar veredicto. O `pesquisa` NÃO usa ferramenta — material já vem pronto.
    - `webfetch` em sites .com.br bloqueia bots (Transport error) — use só em domínio confirmado.
 5. **Versões curtas dos níveis T07–T11** (ex.: "traduza essa frase", "resuma 1 parágrafo") ficam na camada T00/T01; só delega quando a tarefa for substancial ("revise este e-mail de 2 páginas", "resuma o artigo de 10 páginas").
-6. **T05 (imagem): o anexo NÃO chega sozinho ao `ver`; repasse o caminho absoluto.** O primário não repassa a
-   imagem anexada ao subagente automaticamente — em teste real o `ver` recebeu 3 chamadas após o envio de uma
-   foto e em todas respondeu "não vejo imagem" (correto: nada chegou). O `ver` só enxerga a imagem se (a) o anexo
-   vier dentro do task (raro) ou (b) você incluir o **caminho absoluto do arquivo no prompt** e contar com o `read`
-   do `ver` (permitido por config) para abrir. **PASSO A PASSO OBRIGATÓRIO**: (1) confirme o caminho com o usuário
-   se não vier explícito ("Capturei a pasta... é /home/rodmb188/Imagens/Capturas de tela/Teste.png?"); (2) chame o
-   `ver` com o pedido COMPLETO + `Caminho da imagem: <absoluto>` no prompt; (3) NUNCA delegue a `explore` para
-   "descobrir onde fica a screenshot" — em teste real o explore saiu varrendo `/public`, `/assets`, `/static`,
-   `/docs` e voltou com "nenhum diretório de screenshots" enquanto a pasta certa (`Capturas de tela`) estava dada
-   na conversa. Se o caminho foi fornecido pelo usuário, use-o; só pergunte se faltar.
+6. **T05 (imagem): o anexo NÃO chega sozinho ao `ver`; repasse o caminho absoluto, VERBATIM.** O primário não repassa a
+    imagem anexada ao subagente automaticamente — em teste real o `ver` recebeu 3 chamadas após o envio de uma
+    foto e em todas respondeu "não vejo imagem" (correto: nada chegou). O `ver` só enxerga a imagem se (a) o anexo
+    vier dentro do task (raro) ou (b) você incluir o **caminho absoluto do arquivo no prompt** e contar com o `read`
+    do `ver` (permitido por config) para abrir. **PASSO A PASSO OBRIGATÓRIO**: (1) confirme o caminho com o usuário
+    se não vier explícito ("Capturei a pasta... é /home/rodmb188/Imagens/Capturas de tela/Teste.png?"); (2) chame o
+    `ver` com o pedido COMPLETO + `Caminho da imagem: <absoluto>` no prompt; (3) NUNCA delegue a `explore` para
+    "descobrir onde fica a screenshot" — em teste real o explore saiu varrendo `/public`, `/assets`, `/static`,
+    `/docs` e voltou com "nenhum diretório de screenshots" enquanto a pasta certa (`Capturas de tela`) estava dada
+    na conversa. Se o caminho foi fornecido pelo usuário, use-o; só pergunte se faltar.
+    **Caminhos com espaço**: copie o path EXATO do usuário, sem re-parsear nem "consertar" — `read` aceita espaço
+    normalmente (verificado na sessão "Analisando imagem de cavaleiro": `/home/rodmb188/Imagens/Capturas de tela/
+    Teste.png` leu certo quando passado intacto). Nunca divida "Capturas de tela" em tokens separados nem invente
+    variantes (`/src/index.ts`, `/src/` são alucinações já observadas quando o primário perdeu o chão). Se o usuário
+    mandou o path entre aspas, mantém as aspas; se mandou sem, repassa sem aspas mas INTACTO.
+    **Primário com modelo multimodal**: mesmo que o modelo principal enxergue imagem, NÃO analise você mesmo —
+    delegue ao `ver` com o path. Teste real: primário no `vision` analisando direto estourou o limite do provider
+    e entrou em loop de retries com 0 tokens, além de alucinar paths. O `ver` (contexto limpo + read) resolve em ~36s.
 7. **Instrução do usuário manual vence**: se o usuário escolher explicitamente um modelo ("/model", "use o megabrain"), respeite e não reclassifique.
 8. Em dúvida entre níveis, escolha o mais rápido (não delegue).
 9. **NUNCA lance subagentes pesados paralelos (nothink/megabrain 27B) no mesmo provider**: no teste real, 6 em paralelo causaram `ProviderHeaderTimeoutError` (300000ms) por thrash de swap. Rode subagentes pesados em SEQUÊNCIA. Subagentes leves (qwen3-local) podem ir em paralelo sem problema.
@@ -78,4 +86,4 @@ ajustadas aqui e valem para todo o opencode.
 4. **Sanitize o resíduo CJK**: subagentes qwen3 emitem às vezes 1 caractere estrangeiro como PRIMEIRO token (ex.: `颗`, `起来`, `栋`, `緻`) — artefato de decodificação, NÃO capacidade. Ocorre mesmo com instrução "pense em pt-BR" no prompt (testado A/B, seção 11 do dogfood). Antes de mostrar ao usuário, remova qualquer prefixo não-latino da resposta do subagente.
 5. Se o agente devolver erro/timeout, repita 1x com formulário mais simples ou responda você mesmo com ressalva de incerteza.
 6. **T04 (pesquisa web): NÃO delegue junto com a busca.** Primeiro rode `websearch` você mesmo (2–3 buscas, termos complementares + ano atual), extraia os trechos mais relevantes (nomes, números, preços em faixa, datas) e só então chame o `pesquisa` com esse material embutido na mensagem. O subagente não tem a tool `websearch` (provider ollama) — delegar sem material faz ele cair em `webfetch` de sites bloqueados, lotar o contexto e voltar vazio (`reason: length`, medida real: 9.660 input tokens antes da resposta).
-7. **T05 (imagem): repasse o caminho absoluto no prompt do `ver`** (veja regra 6 da seção de regras obrigatórias) — o anexo do usuário NÃO chega ao subagente sozinho, e explorar/"caçar" o arquivo é proibido: se o caminho não vier na mensagem, pergunte ao usuário em vez de procurar.
+7. **T05 (imagem): repasse o caminho absoluto no prompt do `ver`** (veja regra 6 da seção de regras obrigatórias) — o anexo do usuário NÃO chega ao subagente sozinho, e explorar/"caçar" o arquivo é proibido: se o caminho não vier na mensagem, pergunte ao usuário em vez de procurar. É proibido re-parsear caminhos com espaço ou inventar variantes — o path vai VERBATIM para o prompt do `ver` (aspas preservadas se vieram com aspas).

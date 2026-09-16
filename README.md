@@ -153,8 +153,13 @@ came from real failures:
   on the `vision` model in `opencode.jsonc` — opencode derives the model's image
   capability from `modalities.input` (an object `{input:[...], output:[...]}`, not
   an array), and `attachment: true` alone leaves `input.image` false (dogfood
-  sec. 16). A live T05 smoke must be run manually in the TUI with an attached
-  image (headless `opencode run` hangs on this stack — dogfood sec. 14).
+  sec. 16). **Spaces in paths are valid and must be passed verbatim** — the `read`
+  tool handles them fine; re-parsing or "fixing" a path is what breaks it (seen:
+  hallucinated `/src/...` variants). **Even a multimodal primary must delegate to
+  `ver`** — analyzing the image directly in the main session overflowed the
+  provider limit and looped retries (dogfood sec. 17). A live T05 smoke must be
+  run manually in the TUI with an attached image (headless `opencode run` hangs on
+  this stack — dogfood sec. 14).
 - **Hardware is the ceiling.** Two 27B parallel agents thrash swap on 32 GB RAM
   (`ProviderHeaderTimeoutError`). Heavy agents run sequentially by rule.
 

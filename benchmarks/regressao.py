@@ -206,7 +206,7 @@ SMOKE_CHECKLIST = [
     ("importador", 'Converta JSON {"a":1,"b":""} para CSV preservando o vazio.', 'preserva "" vazio'),
     ("tutor", "Explique o que é uma variável para um iniciante.", "analogia clara em pt-BR"),
     ("tradutor", "Traduza para inglês: 'O gato preto dormiu.'", "The black cat slept"),
-    ("ver", "Anexe uma imagem e peça: 'Descreva o que vê' — SEMPRE com o caminho no prompt (Caminho: /.../foto.png).", "descrição/OCR em pt-BR; NÃO deve responder 'não vejo imagem' com caminho dado"),
+    ("ver", "Anexe uma imagem e peça 'Descreva o que vê' com O CAMINHO VERBATIM no prompt, mesmo com espaço (ex.: Caminho da imagem: \"/home/rodmb188/Imagens/Capturas de tela/Teste.png\").", "descrição/OCR em pt-BR; NÃO deve responder 'não vejo imagem' nem re-parsear o path (espaços são válidos)"),
 ]
 
 
