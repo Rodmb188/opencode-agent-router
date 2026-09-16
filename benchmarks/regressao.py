@@ -10,9 +10,12 @@ Duas camadas, separadas honestamente:
    - Confere que a permission reflete o papel do agente (leves são "deny-all";
      codigo/dados/importador/sysadmin têm ferramentas; ver tem só read para abrir
      a imagem via caminho — T05 fix; task sempre deny).
-   - Cruzamento: cada nível T02–T19 do roteador aponta para um agente existente.
-   - Integridade de links internos do README (arquivos citados existem).
-   - Verifica que o bloco "Tom e energia" está presente nos 18 (T9).
+- Cruzamento: cada nível T02–T19 do roteador aponta para um agente existente.
+    - Integridade de links internos do README (arquivos citados existem).
+    - Verifica que o bloco "Tom e energia" está presente nos 18 (T9).
+    - Confere o shape do modelo `vision` no config/opencode.jsonc: modalities DEVE ser
+      objeto {input:[...], output:[...]} com "image" na entrada — `attachment: true` sozinho
+      não habilita imagem no opencode (capabilities derivam de modalities, T05).
 
 2. SMOKE VIVA (orientada, exige o TUI)
    - `opencode run --agent <x>` NÃO funciona headless neste stack: subagente não é
@@ -26,6 +29,7 @@ Uso:
 """
 
 import glob
+import json
 import os
 import re
 import sys
@@ -35,6 +39,46 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AGENTS_DIR = os.path.join(ROOT, "agent")
 SKILL = os.path.join(ROOT, "skills", "roteador", "SKILL.md")
 README = os.path.join(ROOT, "README.md")
+CONFIG = os.path.join(ROOT, "config", "opencode.jsonc")
+
+
+def strip_jsonc(text):
+    """Remove comentários // e /* */ conservando strings."""
+    out = []
+    i = 0
+    in_str = False
+    while i < len(text):
+        c = text[i]
+        if in_str:
+            out.append(c)
+            if c == "\\" and i + 1 < len(text):
+                out.append(text[i + 1])
+                i += 2
+                continue
+            if c == '"':
+                in_str = False
+            i += 1
+            continue
+        if c == '"':
+            in_str = True
+            out.append(c)
+            i += 1
+            continue
+        if c == "/" and i + 1 < len(text):
+            n = text[i + 1]
+            if n == "/":
+                while i < len(text) and text[i] != "\n":
+                    i += 1
+                continue
+            if n == "*":
+                i += 2
+                while i + 1 < len(text) and not (text[i] == "*" and text[i + 1] == "/"):
+                    i += 1
+                i += 2
+                continue
+        out.append(c)
+        i += 1
+    return "".join(out)
 
 TOOL_KEYS = [
     "read", "edit", "glob", "grep", "list", "bash", "task",
@@ -123,6 +167,30 @@ def static_checks():
         full = os.path.normpath(os.path.join(os.path.dirname(README), target))
         if not os.path.exists(full):
             problems.append(f"README: link quebrado -> {target}")
+
+    # 4) Modelo `vision` no config: modalities tem que ser OBJETO {input:[...], output:[...]},
+    #    não array de strings. O schema do opencode (Model.modalities, v1/config/provider.ts)
+    #    só reconhece a forma de objeto; `input.image` = input.includes("image").
+    #    `attachment: true` sozinho NÃO habilita imagem (capabilities derivam de modalities).
+    try:
+        cfg = json.loads(strip_jsonc(open(CONFIG, encoding="utf-8").read()))
+        vision = (cfg.get("provider", {}).get("ollama", {}).get("models", {})).get("vision")
+    except Exception as e:
+        problems.append(f"config/opencode.jsonc: falha ao parsear: {e}")
+        vision = None
+    if vision is None:
+        problems.append("config/opencode.jsonc: modelo `vision` ausente em provider.ollama.models")
+    else:
+        if not vision.get("attachment"):
+            problems.append("config/opencode.jsonc: vision deveria ter attachment: true")
+        mod = vision.get("modalities")
+        if not isinstance(mod, dict):
+            problems.append(f"config/opencode.jsonc: vision.modalities deve ser OBJETO {{input,output}}, achado {type(mod).__name__}")
+        else:
+            if not isinstance(mod.get("input"), list) or "image" not in mod.get("input", []):
+                problems.append(f"config/opencode.jsonc: vision.modalities.input deve conter 'image' (tem {mod.get('input')})")
+            if not isinstance(mod.get("output"), list) or "text" not in mod.get("output", []):
+                problems.append(f"config/opencode.jsonc: vision.modalities.output deve conter 'text' (tem {mod.get('output')})")
 
     return (len(problems) == 0, problems)
 

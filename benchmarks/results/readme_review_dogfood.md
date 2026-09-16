@@ -385,3 +385,73 @@ Fix (shipped):
   in the task prompt; never delegate to `explore` to "find" the screenshot; ask the
   user for the path if missing instead of guessing.
 - Regression now encodes it: `ver` must have exactly `["read"]` allow.
+
+After the fix, a smoke was run twice in the same session:
+
+- **21:11 — FALSE POSITIVE.** The `read` fix had shipped, but the live config was
+  not re-loaded yet. The smoke *appeared* to pass because the model described
+  "text in a sans-serif font" — there is no such text in the test image. The ver
+  answered from its system prompt / prompt template, without ever calling `read`
+  (zero tool calls in the session part). Lesson: on vision, trust only output that
+  references *visible content that matches the image*, not any description with
+  plausible object nouns. The `ver` smoke checklist note was updated to demand a
+  description/OCR that matches the actual image.
+- **21:41 — the real blocker surfaced.** After a restart, `ver` **did** call `read`
+  and the tool returned the image (attachment present in the tool result), but the
+  model received `Cannot read image (this model does not support image input)`
+  instead of the bytes. Same error hits the non-multimodal primary when it reads a
+  PNG, so the gate is in opencode, not ollama: a direct call to the `vision` model
+  (native API and OpenAI-compatible `/v1/chat/completions` with `image_url`)
+  correctly describes the image (a knight in armor holding a sword). The model has
+  vision; the stack was cutting it.
+
+---
+
+## 16. T05, round 2: opencode derives image support from `modalities`, not `attachment`
+
+The 21:41 failure above was traced into the opencode binary (strings on v1.18.29,
+`/usr/bin/opencode`):
+
+- For a model defined in `provider.<id>.models`, capabilities are computed as
+  `input.image = k.modalities?.input?.includes("image") ?? providerCapability.image ?? false`.
+- `attachment: true` alone maps to a different flag and does **not** set
+  `input.image` to true. A custom model needs `modalities` declared.
+
+The tricky part: the V1 schema for `Model.modalities` (packages/core
+`v1/config/provider.ts`) is an **object** —
+
+```ts
+modalities: Schema.optional(Schema.Struct({
+  input:  Schema.optional(Schema.Array(Schema.Literals(["text","audio","image","video","pdf"]))),
+  output: Schema.optional(Schema.Array(Schema.Literals(["text","audio","image","video","pdf"]))),
+}))
+```
+
+— not an array of strings. A first attempt wrote `"modalities": ["text", "image"]`
+(array), which the decoder would never map onto `.input`; the compact `lower()`
+step in `config/v2-compat.ts` deliberately does not touch provider models. The
+correct shape in `opencode.jsonc`:
+
+```jsonc
+"vision": {
+  "name": "Qwen3-VL 8B (visão)",
+  "attachment": true,
+  "modalities": { "input": ["text", "image"], "output": ["text"] }
+}
+```
+
+The SDK types agree: `modalities?: { input: Array<"text"|"audio"|"image"|"video"|"pdf">; output: ... }`.
+
+Fix shipped:
+- `config/opencode.jsonc` (repo) and `~/.config/opencode/opencode.jsonc` (live)
+  now carry the object-shaped `modalities` on `vision`.
+- `benchmarks/regressao.py` gained a static check (section 4) that fails if
+  `vision.modalities` is not an object containing `image` in `input` and `text` in
+  `output` — so a future array-shaped revert breaks CI instead of silently
+  toggling `input.image` off.
+- **Open question:** whether opencode hot-reloads provider config at runtime.
+  Config files are read per instance state (config.ts `loadInstanceState`); the
+  safe path is a restart after editing `opencode.jsonc`. **Next action:** restart
+  opencode, run the T05 smoke again (path in prompt, image = `Teste.png`), and
+  confirm the `ver` output describes the knight image — without *any* "Cannot read
+  image" or hallucinated "text" in its reasoning.

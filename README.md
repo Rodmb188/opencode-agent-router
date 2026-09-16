@@ -148,9 +148,13 @@ came from real failures:
 - **The primary cannot attach images** (main model has no multimodal input), so
   T05 has a fixed hand-off: the router confirms the absolute path and embeds
   `Caminho da imagem: <absoluto>` in the task prompt; `ver` opens it via its
-  `read` tool (permission is allow for read). A live T05 smoke must be run
-  manually in the TUI with an attached image (headless `opencode run` hangs on
-  this stack — dogfood sec. 14).
+  `read` tool (permission is allow for read). Two independent gates had to be
+  opened: `read` allowed on `ver` (dogfood sec. 15) **and** `modalities` declared
+  on the `vision` model in `opencode.jsonc` — opencode derives the model's image
+  capability from `modalities.input` (an object `{input:[...], output:[...]}`, not
+  an array), and `attachment: true` alone leaves `input.image` false (dogfood
+  sec. 16). A live T05 smoke must be run manually in the TUI with an attached
+  image (headless `opencode run` hangs on this stack — dogfood sec. 14).
 - **Hardware is the ceiling.** Two 27B parallel agents thrash swap on 32 GB RAM
   (`ProviderHeaderTimeoutError`). Heavy agents run sequentially by rule.
 

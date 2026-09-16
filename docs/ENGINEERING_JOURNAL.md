@@ -304,3 +304,41 @@ was broken. Two fixes shipped together:
 
 Same lesson as T04, migrated across modality boundaries: **whoever owns the
 input owns passing it to the expert.**
+
+### T05, round 2: `attachment: true` is not enough — the model needs `modalities`
+
+Refinement of sec. 15, driven by two smokes in the same session:
+
+1. **21:11 — false positive.** After the `read` fix shipped, a smoke appeared to
+   pass, but the model described "text in a sans-serif font" that does not exist
+   in the test image — it answered from the prompt without ever calling `read`
+   (zero tool calls). The con here was not a paranoid model; it was the primary
+   trusting a plausible-sounding description. Vision smoke checks must match
+   description to actual image content.
+2. **21:41 — the real gate.** After restart, `ver` correctly called `read`, the
+   tool returned the image, yet the model received `Cannot read image (this model
+   does not support image input)`. The same error hits the non-multimodal primary
+   on a PNG, so the gate is in opencode, not ollama: direct calls to `vision`
+   (native + OpenAI-compatible `/v1/chat/completions`) describe the knight image
+   correctly.
+
+Tracing the opencode binary (v1.18.29) showed the capability derivation for
+config-defined models: `input.image = k.modalities?.input?.includes("image") ?? provider.image ?? false`. **`attachment: true` does not set `input.image`** —
+a custom model needs `modalities`. And the V1 schema (`packages/core
+v1/config/provider.ts`) wants `modalities` as an **object**
+`{input:[...], output:[...]}`, not an array; the compact `lower()` in
+`config/v2-compat.ts` deliberately ignores provider models, so no auto-conversion.
+First attempt used the array form (invalid); the shipped shape is:
+
+```jsonc
+"vision": {
+  "name": "Qwen3-VL 8B (visão)",
+  "attachment": true,
+  "modalities": { "input": ["text", "image"], "output": ["text"] }
+}
+```
+
+Regression now fails if `vision.modalities` is not this object shape (section 4),
+so a silent revert breaks CI instead of quietly disabling vision. **Outstanding:**
+confirm the end-to-end T05 smoke after a restart with these modalities live, and
+verify whether opencode hot-reloads provider config (safer to just restart).
