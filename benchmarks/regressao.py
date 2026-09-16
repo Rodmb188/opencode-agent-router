@@ -87,7 +87,7 @@ TOOL_KEYS = [
 ]
 
 TOOLED_AGENTS = {"codigo", "dados", "importador", "sysadmin"}
-READ_TOOLED_AGENTS = {"ver"}  # visão: só read, para abrir a imagem via caminho (T05 fix)
+READ_TOOLED_AGENTS = {"ver"}  # visão: só list (diretório padrão) + read (abre via caminho — T05 fix)
 QUESTION_OK = {"entrevistador"}
 
 
@@ -136,8 +136,8 @@ def static_checks():
             if perm.get("task") != "deny":
                 problems.append(f"{name}: tooled agent deve ter task deny")
             allow = [k for k, v in perm.items() if v == "allow"]
-            if allow != ["read"]:
-                problems.append(f"{name}: visão deveria ter SÓ read allow (tem {allow})")
+            if sorted(allow) != ["list", "read"]:
+                problems.append(f"{name}: visão deveria ter SÓ list+read allow (tem {allow})")
         else:
             allow = [k for k, v in perm.items() if v == "allow"]
             if name in QUESTION_OK:
@@ -232,6 +232,18 @@ def static_checks():
             if "@opencode/plugin/tui" not in src:
                 problems.append("plugins/progress/tui.tsx: falta import @opencode/plugin/tui")
 
+    # 6) Diretório padrão do T05: quando o usuário não dá caminho, o `ver`
+    #    procura em /home/rodmb188/Imagens/Análise IA/ via `list` e avisa se
+    #    estiver vazia (1 imagem → abre; várias → pergunta qual; vazia → avisa).
+    #    A regra precisa existir no agente E no roteador — sem ela o fluxo
+    #    "sem caminho" volta a perguntar ao usuário/inventar arquivos.
+    default_ver = open(os.path.join(AGENTS_DIR, "ver.md"), encoding="utf-8").read()
+    skill_txt = open(SKILL, encoding="utf-8").read()
+    if "Análise IA" not in default_ver:
+        problems.append("ver.md: falta o diretório padrão 'Análise IA'")
+    if "Análise IA" not in skill_txt:
+        problems.append("SKILL.md: falta o diretório padrão 'Análise IA'")
+
     return (len(problems) == 0, problems)
 
 
@@ -275,6 +287,7 @@ SMOKE_CHECKLIST = [
     ("tradutor", "Traduza para inglês: 'O gato preto dormiu.'", "The black cat slept"),
     ("ver", "Anexe uma imagem e peça 'Descreva o que vê' com O CAMINHO VERBATIM no prompt, mesmo com espaço (ex.: Caminho da imagem: \"/home/rodmb188/Imagens/Capturas de tela/Teste.png\").", "descrição/OCR em pt-BR; NÃO deve responder 'não vejo imagem' nem re-parsear o path (espaços são válidos)"),
     ("barra-progresso", "Rode QUALQUER prompt e observe o slot session.composer.top durante a execução (plugin progress).", "barra visível com % que avança; some ao terminar; deve reaparecer a cada turno"),
+    ("ver-sem-caminho", "Peça 'Descreva a imagem' SEM caminho, com a pasta padrão /home/rodmb188/Imagens/Análise IA/ vazia. O ver deve usar list nela, achar nada e AVISAR.", "aviso 'não há imagem no diretório padrão' + pedido do caminho; NUNCA inventar nome de arquivo"),
 ]
 
 

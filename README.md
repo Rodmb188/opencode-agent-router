@@ -146,10 +146,12 @@ came from real failures:
   explicit "think in pt-BR" rule. The deterministic fix is presentation-layer:
   the router strips any non-Latin prefix before showing the result (dogfood sec. 11).
 - **The primary cannot attach images** (main model has no multimodal input), so
-  T05 has a fixed hand-off: the router confirms the absolute path and embeds
-  `Caminho da imagem: <absoluto>` in the task prompt; `ver` opens it via its
-  `read` tool (permission is allow for read). Two independent gates had to be
-  opened: `read` allowed on `ver` (dogfood sec. 15) **and** `modalities` declared
+  T05 has a fixed hand-off: the router embeds the absolute path in the task
+  prompt when the user gives one, or the **default directory**
+  (`/home/rodmb188/Imagens/Análise IA/`) when they don't; `ver` opens it via its
+  `read` tool and looks in the default dir via `list` (one image → open, several
+  → ask which, empty → say so). Three independent gates had to be
+  opened: `read` + `list` allowed on `ver` (dogfood sec. 15), `modalities` declared
   on the `vision` model in `opencode.jsonc` — opencode derives the model's image
   capability from `modalities.input` (an object `{input:[...], output:[...]}`, not
   an array), and `attachment: true` alone leaves `input.image` false (dogfood

@@ -398,3 +398,36 @@ Also re-validated: paths with spaces passed **verbatim and unquoted** work — t
 quoting requirement from sec. 17 was a parser artifact of the primary, not of
 `read`; extensions can be omitted since the agent opens the exact path. This
 closes the "outstanding" from sec. 16 (live end-to-end smoke after restart).
+
+### T05, round 5: a default directory so the user stops typing paths
+
+Every T05 request so far required the absolute path in the prompt. The user
+asked for a default: when no path is given, `ver` checks
+`/home/rodmb188/Imagens/Análise IA/` first and only reports failure after
+actually looking there (folder name as proposed, kept — spaces are fine, the
+verbatim rule covers them).
+
+Implementation, applied to every layer that carries the T05 rule:
+
+- `ver.md`: `list: allow` (tool pair becomes exactly `list` + `read`). Behaviour
+  rule: use `list` *only* on the default directory, never hunt elsewhere; one
+  image → `read` it, several → list the names and ask which, empty/missing →
+  say so and request the exact path; never invent filenames or variants.
+- Router (`SKILL.md` rule 6 + protocol 7) and `config/AGENTS.md` (repo + live
+  copy): when the user gives no path, embed
+  `Caminho padrão: /home/rodmb188/Imagens/Análise IA/` in the `ver` prompt
+  instead of asking the user upfront; ask the user only if `ver` reports the
+  folder empty. The `explore` prohibition is untouched — this is `ver`'s own
+  `list` on one fixed directory, not a hunt.
+- Regression (`regressao.py`): `ver` permission must be exactly
+  `["list", "read"]`, the default-directory string must appear in `ver.md` and
+  `SKILL.md`, and a new smoke entry covers the empty-folder path (must warn and
+  ask, never invent).
+
+Live check with the empty folder behaved correctly: `ver` read the default
+directory, reported it empty, and asked for the exact path — no phantom
+filenames. One slip caught and hardened into the rule: it offered a fabricated
+"Caminho alternativo: /home/rodmb188/Imagens/Capturas de tela/" as if it
+existed. The behaviour rule now explicitly forbids suggesting alternative paths
+the user never mentioned; checking the folder (or not) is the difference between
+helping and hallucinating.
