@@ -354,3 +354,34 @@ unescaped `:` inside `description:` ("erros inadmissíveis", "A/B de
 sumarização: 14,75", "A/B de tradução: 14,67"). Tagged harmless pre-existing
 ... but they were real YAML breaks. Fixed by quoting the descriptions; the
 regression script now fails if any frontmatter fails to parse. 18/18 green.
+
+---
+
+## 15. T05 smoke test: the image never reached `ver` (and the "screenshots" hunt)
+
+Real session (`Revisão Teste.png`, 2026-09-15, primary `build` on `big-pickle`):
+
+1. User sent `@ver /home/rodmb188/Imagens/Capturas de tela/Teste.png "Me diga o que
+   você vê"`. The primary spawned `ver` with a **text-only prompt** ("Analyze
+   attached image...") that carried neither the attachment nor the path. `ver`
+   correctly replied "I can't see any image" — nothing had arrived. **The subagent
+   was right; the router was broken.**
+2. User: "it's in the screenshots folder". Primary invented paths: `read
+   /screenshots/Teste.png` and `read /screenshots/` → both failed.
+3. Primary then delegated to `explore` "search screenshots directory in codebase,
+   check conventions like /public/screenshots or /assets/screenshots" — 12 web-stack
+   globs (`public`, `assets`, `static`, `media`, `uploads`, `docs`...), all empty,
+   while the answer was plain in the conversation: `Capturas de tela`.
+4. Two more `task`→`ver` attempts (20:46, 20:52) repeated failure #1.
+
+Root cause is division of labor, same class as T04's websearch gate: the primário
+does not automatically hand the attachment to the subagent, and `ver.md` had
+`read: deny`, so it couldn't open the file by itself even if handed the path.
+
+Fix (shipped):
+- `ver.md`: `read: allow` (vision only, all else deny) + behaviour rule #2: if the
+  prompt carries a file path, USE `read` on it before saying "I see no image".
+- `roteador/AGENTS.md` rule for T05: always embed `Caminho da imagem: <absoluto>`
+  in the task prompt; never delegate to `explore` to "find" the screenshot; ask the
+  user for the path if missing instead of guessing.
+- Regression now encodes it: `ver` must have exactly `["read"]` allow.

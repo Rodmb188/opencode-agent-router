@@ -284,3 +284,23 @@ under the new rules (sec. 12) came back clean pt-BR on the first run.
 Tool lockdown (sec. 10) did not break the stack: `preciso` math and `revisor`
 grammar smoke tests still pass. The pattern that carries the system is:
 **embed material in the message, cap heavy-agent input, sanitize on the way out.**
+
+### The T05 hand-off: the image never reached `ver` (sec. 15)
+
+A real "Revisão Teste.png" session exposed a mirror image of the T04 bug, this
+time in vision: the primary spawned `ver` three times with text-only prompts
+(no attachment, no path), invented `/screenshots/...` reads, and sent `explore`
+on a web-stack "screenshots" hunt while the folder (`Capturas de tela`) sat in
+the conversation. `ver` was right every time ("I can't see an image"); the router
+was broken. Two fixes shipped together:
+
+1. `ver.md` permission `read: allow` (vision-only, all else stays deny) so the
+   subagent can open the image itself via its `read` tool, plus a behaviour rule
+   that says *use the given path before claiming no image exists*.
+2. Router/AGENTS rule for T05: always embed `Caminho da imagem: <absoluto>` in
+   the task prompt; never delegate `explore` to "find" a screenshot; ask for the
+   path when missing instead of guessing. Regression encodes *exactly* `["read"]`
+   allowed on `ver`.
+
+Same lesson as T04, migrated across modality boundaries: **whoever owns the
+input owns passing it to the expert.**

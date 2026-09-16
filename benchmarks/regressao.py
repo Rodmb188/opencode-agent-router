@@ -8,7 +8,8 @@ Duas camadas, separadas honestamente:
    - Valida os frontmatters YAML dos 18 agentes (parse, description, mode, model,
      15 chaves de permission).
    - Confere que a permission reflete o papel do agente (leves são "deny-all";
-     codigo/dados/importador/sysadmin têm ferramentas; task sempre deny).
+     codigo/dados/importador/sysadmin têm ferramentas; ver tem só read para abrir
+     a imagem via caminho — T05 fix; task sempre deny).
    - Cruzamento: cada nível T02–T19 do roteador aponta para um agente existente.
    - Integridade de links internos do README (arquivos citados existem).
    - Verifica que o bloco "Tom e energia" está presente nos 18 (T9).
@@ -42,6 +43,7 @@ TOOL_KEYS = [
 ]
 
 TOOLED_AGENTS = {"codigo", "dados", "importador", "sysadmin"}
+READ_TOOLED_AGENTS = {"ver"}  # visão: só read, para abrir a imagem via caminho (T05 fix)
 QUESTION_OK = {"entrevistador"}
 
 
@@ -86,6 +88,12 @@ def static_checks():
             for k in ("read", "edit", "glob", "grep", "list", "bash", "external_directory"):
                 if perm.get(k) != "allow":
                     problems.append(f"{name}: deveria ter {k} allow")
+        elif name in READ_TOOLED_AGENTS:
+            if perm.get("task") != "deny":
+                problems.append(f"{name}: tooled agent deve ter task deny")
+            allow = [k for k, v in perm.items() if v == "allow"]
+            if allow != ["read"]:
+                problems.append(f"{name}: visão deveria ter SÓ read allow (tem {allow})")
         else:
             allow = [k for k, v in perm.items() if v == "allow"]
             if name in QUESTION_OK:
@@ -130,6 +138,7 @@ SMOKE_CHECKLIST = [
     ("importador", 'Converta JSON {"a":1,"b":""} para CSV preservando o vazio.', 'preserva "" vazio'),
     ("tutor", "Explique o que é uma variável para um iniciante.", "analogia clara em pt-BR"),
     ("tradutor", "Traduza para inglês: 'O gato preto dormiu.'", "The black cat slept"),
+    ("ver", "Anexe uma imagem e peça: 'Descreva o que vê' — SEMPRE com o caminho no prompt (Caminho: /.../foto.png).", "descrição/OCR em pt-BR; NÃO deve responder 'não vejo imagem' com caminho dado"),
 ]
 
 

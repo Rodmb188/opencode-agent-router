@@ -146,7 +146,11 @@ came from real failures:
   explicit "think in pt-BR" rule. The deterministic fix is presentation-layer:
   the router strips any non-Latin prefix before showing the result (dogfood sec. 11).
 - **The primary cannot attach images** (main model has no multimodal input), so
-  a T05 vision smoke must be run manually in the TUI with an attached image.
+  T05 has a fixed hand-off: the router confirms the absolute path and embeds
+  `Caminho da imagem: <absoluto>` in the task prompt; `ver` opens it via its
+  `read` tool (permission is allow for read). A live T05 smoke must be run
+  manually in the TUI with an attached image (headless `opencode run` hangs on
+  this stack — dogfood sec. 14).
 - **Hardware is the ceiling.** Two 27B parallel agents thrash swap on 32 GB RAM
   (`ProviderHeaderTimeoutError`). Heavy agents run sequentially by rule.
 
