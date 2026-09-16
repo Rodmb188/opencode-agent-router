@@ -4,6 +4,10 @@
 > 2026-09-16). O usuário decidiu: **FASE A — CONSOLIDAR** primeiro.
 > O diário técnico completo (medidas, falhas, decisões) vive em
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
+>
+> **Status em 2026-09-16:** C3 ✅ (este arquivo versionado) · C4 ✅
+> (orçamento formalizado em [CONTEXT_BUDGET.md](CONTEXT_BUDGET.md)) ·
+> próximos: **C2** (T05 com imagem real) e **C1** (CI reformulado).
 
 ## Fluxograma do sistema
 
@@ -54,7 +58,7 @@
 | C1 | Fechar CI (camada **headless-friendly** nos 20 níveis) | Estático completo no Actions + testes de modelo via Ollama direto; vivo continua checklist manual (o stack trava headless — dogfood sec. 14) | M | Alta | — |
 | C2 | T05: testar fluxos com imagem presente | 1 imagem na pasta padrão → abre; 2+ → pergunta qual (manual, 5 min) | S | Alta | — |
 | C3 | ROADMAP.md versionado | Este arquivo no repo | S | Alta | — |
-| C4 | Orçamento de contexto formalizado | Tabela modelo → num_ctx → cap embed → comportamento; números já medidos, só formalizar | S | Alta | — |
+| C4 ✅ | Orçamento de contexto formalizado | Feito 2026-09-16 → [`CONTEXT_BUDGET.md`](CONTEXT_BUDGET.md) | S | Alta | — |
 
 ### 🟡 Médio prazo (≤ 1 mês)
 

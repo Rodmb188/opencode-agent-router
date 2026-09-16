@@ -431,3 +431,32 @@ filenames. One slip caught and hardened into the rule: it offered a fabricated
 existed. The behaviour rule now explicitly forbids suggesting alternative paths
 the user never mentioned; checking the folder (or not) is the difference between
 helping and hallucinating.
+
+### T16 r1 — roadmap (fase A) and a canonical context budget (C4)
+
+The user hit "done building, no direction" and asked for a flowchart + goals
+before continuing. `planner` produced the full map (flowchart, 3-horizon goals,
+4 strategic scenarios, risks) and the router audited it against the real
+constraints of this stack — two corrections went in before versioning:
+
+1. **C1 (CI) reformulated**: `opencode run` headless still hangs on this box
+   (sec. 14), so "20 levels green in CI" is impossible today. Realistic CI =
+   full static layer on GitHub Actions + model checks via Ollama directly
+   (no TUI) + a versioned manual live checklist.
+2. **C2 does not depend on CI** — it is a 5-minute manual test with a real
+   image in the default directory.
+
+Decision: **Fase A — Consolidar**, order **A → D → B → C** (publish before
+consolidating = technical debt).
+
+- `docs/ROADMAP.md` created (commit `d27b92d`): flowchart, C1–C4 / M1–M4 /
+  L1–L4 with done-when criteria, scenarios, risks, first step.
+- **C4 done**: `docs/CONTEXT_BUDGET.md` — canonical measured table:
+  qwen3-local (14B) **8192**, nothink-v2/megabrain-v2 (27B) **12288**,
+  vision (8B VL) **16384**; embed caps (~5k / ~4k / 1 image per turn); overflow
+  behaviour (27B empty = `reason: length` → never retry, chunk instead; vision
+  8192 → 16384 fix); KV cost ≈ 384 KB/token (~1.5 GB per 4k). The 14B cap is
+  an estimate flagged for M2 profiling.
+- Iron rule updated in `config/AGENTS.md` + live copy: CONTEXT_BUDGET is the
+  single source for context limits — update the doc before committing a
+  Modelfile change.
