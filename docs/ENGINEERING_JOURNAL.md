@@ -98,7 +98,7 @@ default + deep thinking on demand) viable.
 | `nothink` | Qwen3.6 27B abliterated | Daily driver (fast, no thinking) | 16k |
 | `megabrain` | Same blob, thinking ON | Deep analysis, critical decisions | 16k |
 | `qwen3-local` | Qwen3 14B abliterated | Fast math, reliable review | 8k |
-| `vision` | Qwen3-VL 8B | Image/OCR | 8k |
+| `vision` | Qwen3-VL 8B | Image/OCR | 16k (raised from 8k — T05 round 4) |
 
 ### Operational tooling built in Part I
 
@@ -365,3 +365,35 @@ After the modalities fix, the real smoke ("Analisando imagem de cavaleiro",
    (preserve quotes, never "fix" spaces into `/src/...`). Same guidance embedded
    in `ver.md`, `SKILL.md` rule 6 + protocol 7, `config/AGENTS.md`, README, and
    the regression `ver` smoke entry.
+
+### T05, round 4: five real photos — the model out-scored its own ground truth
+
+First real-world challenge after secs. 15–17: five photos from the user's camera
+roll, one question each, verified against the user's expectations.
+
+| Photo | Question | `ver` answer | Verdict |
+|---|---|---|---|
+| `Família.jpg` | How many people? | 4 | ✅ |
+| `André jóia.jpg` | What is on André's face? | black fabric mask | ✅ (the first framing, "what is André wearing?", answered about clothing — asking *on the face* is required for facial items) |
+| `Carro alegórico.jpg` | Describe the person | blue shirt, white medical mask, flower lei + crown, stylized carnival mask (orange/purple/gold) | ✅ (the carnival mask matches the user's "stack of carnival glasses" — accepted) |
+| `Última foto.jpg` | How many people, and what's on each face? | **8 people: 4 masked (black, white surgical, pink, green) + 4 unmasked** | ✅ (the user's original ground truth said "4 people"; the model's count was the correct one) |
+| `Eu no sítio.png` | Describe | health bar bottom-left + "virtual/nature" scene, read as a game screenshot | ⚠️ partial (the cutout-over-saturated-landscape edit was not named; extra point not earned) |
+
+**Reading:** 4/5 fully correct, 1 partial. The two "failures" of earlier rounds
+did not recur; the standout is the 8-people count — the evaluator's own
+expectation was wrong, the model was right. The only miss (call a photo-editing
+montage a "game screenshot") is a genre-classification nuance, not a vision gap.
+
+**Context sizing — the 12k vs 16k question.** A 12 MP photo (4608×3456)
+tokenizes to **≈8,520 tokens**. With the `ver` system prompt (~0.8k), the
+question and the answer, a single turn lands at **≈9.6–10.1k**. `num_ctx 8192`
+overflowed (`exceed_context_size_error`); the model was recreated with
+**16384** and validated across all five photos. 12288 would fit the single-turn
+case (~2.5k of headroom) but leaves no margin for a same-session follow-up or a
+denser image; the 4k extra tokens of KV cache cost ~1.5 GB RAM, which this box
+has. **Decision: `vision` stays at 16384** (see `models/vision.Modelfile`).
+
+Also re-validated: paths with spaces passed **verbatim and unquoted** work — the
+quoting requirement from sec. 17 was a parser artifact of the primary, not of
+`read`; extensions can be omitted since the agent opens the exact path. This
+closes the "outstanding" from sec. 16 (live end-to-end smoke after restart).

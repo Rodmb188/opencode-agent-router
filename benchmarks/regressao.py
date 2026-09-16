@@ -193,12 +193,12 @@ def static_checks():
                 problems.append(f"config/opencode.jsonc: vision.modalities.output deve conter 'text' (tem {mod.get('output')})")
 
     # 5) Plugin `progress` (barra de latência): o TUI só carrega plugins cujo
-    #    SERVIDOR reporta features.tui=true. Isso condiciona os imports corretos:
-    #    - index.ts (entrypoint server) DEVE importar de "@opencode-ai/plugin/v2/promise".
-    #      Bug real visto: importar "@opencode/plugin" no server quebrava o load
-    #      ("Cannot find package '@opencode/plugin'") e a barra sumia.
-    #    - tui.tsx (entrypoint TUI) DEVE importar de "@opencode/plugin/tui"
-    #      (módulo virtual fornecido pelo runtime v2 — o bundle contém esse specifier).
+    #    SERVIDOR reporta features.tui=true. Cada lado usa o specifier certo:
+    #    - index.ts (entrypoint server) usa "@opencode-ai/plugin/v2/promise" — o
+    #      pacote instalado no node_modules (o specifier @opencode/plugin não
+    #      resolve no runtime do servidor).
+    #    - tui.tsx (entrypoint TUI) usa "@opencode/plugin/tui" — módulo virtual
+    #      fornecido pelo runtime do TUI v2 (o bundle contém esse specifier).
     home_cfg = os.path.expanduser("~/.config/opencode")
     cli_json = os.path.join(home_cfg, "cli.json")
     plugin_dir = os.path.join(home_cfg, "plugins", "progress")
