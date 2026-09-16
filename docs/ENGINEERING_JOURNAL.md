@@ -377,12 +377,13 @@ roll, one question each, verified against the user's expectations.
 | `André jóia.jpg` | What is on André's face? | black fabric mask | ✅ (the first framing, "what is André wearing?", answered about clothing — asking *on the face* is required for facial items) |
 | `Carro alegórico.jpg` | Describe the person | blue shirt, white medical mask, flower lei + crown, stylized carnival mask (orange/purple/gold) | ✅ (the carnival mask matches the user's "stack of carnival glasses" — accepted) |
 | `Última foto.jpg` | How many people, and what's on each face? | **8 people: 4 masked (black, white surgical, pink, green) + 4 unmasked** | ✅ (the user's original ground truth said "4 people"; the model's count was the correct one) |
-| `Eu no sítio.png` | Describe | health bar bottom-left + "virtual/nature" scene, read as a game screenshot | ⚠️ partial (the cutout-over-saturated-landscape edit was not named; extra point not earned) |
+| `Eu no sítio.png` | Describe | health bar bottom-left + "virtual/nature" scene, read as a game screenshot | ✅ (user confirmed the reading was exactly right) |
 
-**Reading:** 4/5 fully correct, 1 partial. The two "failures" of earlier rounds
-did not recur; the standout is the 8-people count — the evaluator's own
-expectation was wrong, the model was right. The only miss (call a photo-editing
-montage a "game screenshot") is a genre-classification nuance, not a vision gap.
+**Reading:** **5/5 fully correct.** The two "failures" of earlier rounds did not
+recur. Two standouts: the 8-people count — the evaluator's own expectation was
+wrong, the model was right — and the sítio photo, initially graded as partial by
+the router, which the user then confirmed as spot-on (the health-bar + virtual
+scene reading was the correct one).
 
 **Context sizing — the 12k vs 16k question.** A 12 MP photo (4608×3456)
 tokenizes to **≈8,520 tokens**. With the `ver` system prompt (~0.8k), the
