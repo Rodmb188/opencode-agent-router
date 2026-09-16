@@ -1,0 +1,19 @@
+# Modelo de visão (Qwen3-VL 8B) para o agente `ver` (T05).
+#
+# num_ctx 16384 — decidido a partir dos estudos de tokenização:
+#   - Foto 12MP (4608x3456) tokeniza em ~8.5k tokens de imagem;
+#   - 16384 = folga 2x sobre o caso máximo medido (8520 tokens), que estourava
+#     com num_ctx 8192 (exceed_context_size_error);
+#   - 8B Q4 com 16k ctx ≈ 5-6GB RAM — cabe na regra de rodar pesados em sequência.
+#
+# Recriar depois de alterações:
+#   ollama create vision -f <este arquivo>
+#
+FROM /home/rodmb188/.ollama/models/blobs/sha256-ed12a4674d727a74ac4816c906094ea9d3119fbea46ca93288c3ce4ffbe38c55
+TEMPLATE {{ .Prompt }}
+RENDERER qwen3-vl-thinking
+PARSER qwen3-vl-thinking
+PARAMETER temperature 1
+PARAMETER top_k 20
+PARAMETER top_p 0.95
+PARAMETER num_ctx 16384
