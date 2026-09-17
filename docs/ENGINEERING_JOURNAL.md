@@ -492,3 +492,22 @@ stray CJK output and a 200-char creativity test drift into English thinking):
 - Verified `docs/ROADMAP.md` / `docs/CONTEXT_BUDGET.md` contain **no real
   CJK** — the planner's leaked character was display-output only, already
   sanitized in the saved file.
+
+### T16 r3 — progress bar removed (user decision after analysing its saga)
+
+The user reviewed the other conversation ("Notificação quando resposta
+termina", 577 messages: 39 user turns, 475 assistant, 9 compactions) — it ran
+from "I stopped getting end-of-response notifications" into a long progress-bar
+campaign: repeated "Invalid V2 TUI plugin module" load errors, an
+investigation into the compiled Bun single-file binary, plugin reconciliations
+after two opencode updates, esbuild via npx — and the bar still never rendered
+reliably. Decision: **remove the progress bar entirely**.
+
+- Runtime: `~/.config/opencode/plugins/progress/` deleted; `tui.json` cleared
+  of its entrypoint reference (`plugin: []`) — no more load errors on startup,
+  no more phantom entries.
+- Repo: `benchmarks/regressao.py` — removed the static section 5 (plugin
+  checks), the `live_plugin_check()` function and its call, and the
+  `barra-progresso` smoke entry. Regression is green again.
+- The end-of-response *notification* (the conversation's original request)
+  was deliberately left in place — only the bar was removed.

@@ -192,47 +192,7 @@ def static_checks():
             if not isinstance(mod.get("output"), list) or "text" not in mod.get("output", []):
                 problems.append(f"config/opencode.jsonc: vision.modalities.output deve conter 'text' (tem {mod.get('output')})")
 
-    # 5) Plugin `progress` (barra de latência): o TUI só carrega plugins cujo
-    #    SERVIDOR reporta features.tui=true. Cada lado usa o specifier certo:
-    #    - index.ts (entrypoint server) usa "@opencode-ai/plugin/v2/promise" — o
-    #      pacote instalado no node_modules (o specifier @opencode/plugin não
-    #      resolve no runtime do servidor).
-    #    - tui.tsx (entrypoint TUI) usa "@opencode/plugin/tui" — módulo virtual
-    #      fornecido pelo runtime do TUI v2 (o bundle contém esse specifier).
-    home_cfg = os.path.expanduser("~/.config/opencode")
-    cli_json = os.path.join(home_cfg, "cli.json")
-    plugin_dir = os.path.join(home_cfg, "plugins", "progress")
-    index_ts = os.path.join(plugin_dir, "index.ts")
-    tui_tsx = os.path.join(plugin_dir, "tui.tsx")
-    if not os.path.exists(cli_json):
-        problems.append(f"cli.json ausente: {cli_json} (não dá para conferir o plugin)")
-    else:
-        try:
-            cli = json.loads(open(cli_json, encoding="utf-8").read())
-            plist = cli.get("plugins", []) or []
-            if not any("plugins/progress" in str(p) for p in plist):
-                problems.append("cli.json: plugin progress não listado em plugins")
-        except Exception as e:
-            problems.append(f"cli.json: falha ao parsear: {e}")
-    if not os.path.exists(plugin_dir):
-        problems.append(f"plugins/progress: diretório ausente ({plugin_dir})")
-    else:
-        if not os.path.exists(index_ts):
-            problems.append("plugins/progress: index.ts (entrypoint server) ausente")
-        else:
-            src = open(index_ts, encoding="utf-8").read()
-            if "@opencode-ai/plugin/v2/promise" not in src:
-                problems.append("plugins/progress/index.ts: falta import @opencode-ai/plugin/v2/promise")
-            if 'from "@opencode/plugin"' in src:
-                problems.append("plugins/progress/index.ts: import proibido @opencode/plugin (quebra o load no server)")
-        if not os.path.exists(tui_tsx):
-            problems.append("plugins/progress: tui.tsx (entrypoint TUI) ausente")
-        else:
-            src = open(tui_tsx, encoding="utf-8").read()
-            if "@opencode/plugin/tui" not in src:
-                problems.append("plugins/progress/tui.tsx: falta import @opencode/plugin/tui")
-
-    # 6) Diretório padrão do T05: quando o usuário não dá caminho, o `ver`
+    # 5) Diretório padrão do T05: quando o usuário não dá caminho, o `ver`
     #    procura em /home/rodmb188/Imagens/Análise IA/ via `list` e avisa se
     #    estiver vazia (1 imagem → abre; várias → pergunta qual; vazia → avisa).
     #    A regra precisa existir no agente E no roteador — sem ela o fluxo
@@ -247,33 +207,6 @@ def static_checks():
     return (len(problems) == 0, problems)
 
 
-def live_plugin_check(problems):
-    """Consulta o servidor ativo (se responder) e confere features.tui do progress.
-
-    Não falha a suíte se o serviço não estiver rodando — é uma verificação viva,
-    complementar. O TUI só renderiza a barra quando o plugin está active + tui:true.
-    """
-    import subprocess
-
-    try:
-        out = subprocess.run(
-            ["opencode", "api", "get", "/api/plugin"],
-            capture_output=True, text=True, timeout=20,
-        )
-        data = json.loads(out.stdout)
-    except Exception:
-        return  # serviço indisponível — pulado, não é falha
-    for p in data.get("data", []):
-        if p.get("id") == "progress.server":
-            feats = p.get("features", {})
-            if p.get("state", {}).get("status") != "active":
-                problems.append(f"live: progress.server status={p.get('state', {}).get('status')} (esperado active)")
-            if not feats.get("tui"):
-                problems.append("live: progress.server features.tui ausente — TUI não vai renderizar a barra")
-            return
-    problems.append("live: progress.server não listado na API do servidor")
-
-
 SMOKE_CHECKLIST = [
     ("preciso", "Quanto é 17 × 23? Responda apenas o número.", "391"),
     ("financeiro", "Parcela de R$1.200 em 6x sem juros? Responda com o valor.", "R$ 200,00/unidade"),
@@ -286,7 +219,6 @@ SMOKE_CHECKLIST = [
     ("tutor", "Explique o que é uma variável para um iniciante.", "analogia clara em pt-BR"),
     ("tradutor", "Traduza para inglês: 'O gato preto dormiu.'", "The black cat slept"),
     ("ver", "Anexe uma imagem e peça 'Descreva o que vê' com O CAMINHO VERBATIM no prompt, mesmo com espaço (ex.: Caminho da imagem: \"/home/rodmb188/Imagens/Capturas de tela/Teste.png\").", "descrição/OCR em pt-BR; NÃO deve responder 'não vejo imagem' nem re-parsear o path (espaços são válidos)"),
-    ("barra-progresso", "Rode QUALQUER prompt e observe o slot session.composer.top durante a execução (plugin progress).", "barra visível com % que avança; some ao terminar; deve reaparecer a cada turno"),
     ("ver-sem-caminho", "Peça 'Descreva a imagem' SEM caminho, com a pasta padrão /home/rodmb188/Imagens/Análise IA/ vazia. O ver deve usar list nela, achar nada e AVISAR.", "aviso 'não há imagem no diretório padrão' + pedido do caminho; NUNCA inventar nome de arquivo"),
 ]
 
@@ -300,7 +232,6 @@ def main():
         log_path = os.path.join(log_dir, f"regressao_{datetime.now():%Y%m%d_%H%M}.log")
 
     ok, problems = static_checks()
-    live_plugin_check(problems)
     out = []
     out.append("== REGRESSÃO ESTÁTICA ===")
     out.append("PASS - 18 agentes com frontmatter YAML íntegro" if ok else "FAIL")
