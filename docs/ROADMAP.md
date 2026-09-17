@@ -56,7 +56,7 @@
 |---|----------|----------------|---------|------------|--------------|
 | C1 | Fechar CI (camada **headless-friendly** nos 20 níveis) | Estático completo no Actions + testes de modelo via Ollama direto; vivo continua checklist manual (o stack trava headless — dogfood sec. 14) | M | Alta | — |
 | C2 ✅ | T05: fluxos com imagem testados | 2026-09-17: 2 imagens na pasta padrão → `ver` listou (`Casa.png`, `Homem.png`) e perguntou qual ✅; identificação: Lula (confiança alta) + isométrico de sobrevivência (estilo ✅, título não reconhecido — honesto) | S | Alta | — |
-| C3 | ROADMAP.md versionado | Este arquivo no repo | S | Alta | — |
+| C3 ✅ | ROADMAP.md versionado | Este arquivo no repo (commit `d27b92d`) | S | Alta | — |
 | C4 ✅ | Orçamento de contexto formalizado | Feito 2026-09-16 → [`CONTEXT_BUDGET.md`](CONTEXT_BUDGET.md) | S | Alta | — |
 
 ### 🟡 Médio prazo (≤ 1 mês)
@@ -96,7 +96,10 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 | Matemática silenciosa no 27B | T02 → 14B é ferro; asserts no CI |
 | Hardware estacionário | 7B nas rotas leves (M1); monitoramento de acurácia (M4) |
 
-## Primeiro passo
+## Próximo passo
 
-Executar C4 + C2 (rápidos, sem dependência), depois C1 (reformulado para o limite
-headless do stack). Registrar cada ajuste no ENGINEERING_JOURNAL.
+**C1 (fechar o CI)** — destravado em 2026-09-17 (regressão verde após a remoção
+da barra): dividir em C1a (estático completo no GitHub Actions + checagem de
+que `Modelfile` ⇢ `CONTEXT_BUDGET.md` batem) e C1b (testes headless dos 3
+modelos via `/api/generate` do Ollama — sem TUI; o vivo continua checklist
+manual). Sugestões de refinamento para M1–M4 estão na conversa.
