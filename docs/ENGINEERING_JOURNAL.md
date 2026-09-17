@@ -539,3 +539,42 @@ C1 (fase A) implemented and validated live:
   presentation. A real fix would be a `nothink-v3` with qwen3 PARSER that
   strips the thinking block (or a template that disables it) — parked in the
   roadmap as a future finding.
+
+### T16 r5 — full smoke: all 18 agents live (first complete run, 2026-09-17)
+
+First time every sub-agent was exercised in one session (leves in parallel,
+27B strictly sequential — iron rule). One green-wave of 7 + 11 sequential:
+
+| agent | prompt | result |
+|---|---|---|
+| preciso | 17×23 | ✅ 391 |
+| financeiro | R$1.200/6x | ✅ R$ 200,00 |
+| revisor | grammar fix | ✅ "Nós vamos amanhã para a festa." |
+| qa | 10% of R$1.500 | ✅ "sim" — ⚠ CJK first token (润色后) + English reasoning in output |
+| importador | JSON→CSV | ✅ empty city preserved (`""`) |
+| dados | mean of 4 numbers | ✅ 25 |
+| pesquisa | verdict on embedded material | ✅ Y cheaper by R$ 600 |
+| codigo | fix `a - b` | ✅ `a + b` (added unprompted "Resumo:" tail) |
+| redator | slogan ≤6 words | ✅ "Feito à mão, servido com alma." |
+| sumarizador | 1-sentence summary | ✅ faithful |
+| tutor | variable analogy | ✅ labeled box |
+| tradutor | pt→en | ✅ "The black cat slept." |
+| sysadmin | disk command | ✅ `df -h` |
+| seo (1st) | meta description | ❌ answered with only a "Resumo:" — no meta |
+| seo (retry, harder phrasing) | same | ✅ meta, 152 chars + count — ⚠ CJK first token (分步骤思考) |
+| entrevistador | STAR question | ✅ — ⚠ "opinion" for "opinião" |
+| planner | 3 steps for v1.0 | ✅ coherent with L2 goals |
+| profundo | 27B parallel risk | ✅ swap/OOM-kill, 14–16 GB each |
+| ver | identify Homem.png | ✅ Lula da Silva, 95% confidence |
+
+Reading: **18/18 functional** — no arithmetic, link or hallucination failures.
+Two findings:
+
+1. The CJK first-token decode artifact still shows up on the qwen3 family
+   (qa, seo): the primary-side sanitization rule (SKILL rule 4) remains
+   required; the pt-BR reinforcement reduces but does not eliminate it.
+2. **Sub-agents read the global AGENTS.md and copy the "Resumo:" rule** —
+   codigo, redator, seo and profundo appended an unprompted summary, and
+   seo's first attempt answered *only* the summary (format instead of
+   deliverable). Suggest scoping the mandatory-summary rule to the main
+   assistant only — pending user decision.
