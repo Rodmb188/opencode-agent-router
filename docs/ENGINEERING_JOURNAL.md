@@ -608,3 +608,37 @@ decode-level property of the qwen3 family — instruction hardening reduces how
 often it surfaces and guarantees the handler cleans it, but the primary-side
 sanitization (SKILL rule 4) remains the last line of defense. Factual time
 context (Lula) is a knowledge-cut limitation, mitigated by the new guard.
+
+### T16 r7 — standard test-log + B01 re-run (prompt hardening is not a cure)
+
+Two deliverables this round:
+
+1. **Standard test-log format** (user's idea: stop scattering tests across
+   dozens of conversations). New `benchmarks/results/README.md` indexes the
+   batteries; each battery is one file
+   `baterias/B0X_<goal>_<date>.md` with header (date, rules in force, models,
+   goal) and, per test: sequential number, agent, verbatim prompt, verbatim
+   answer, artifact note and verdict. Legacy outputs stay linked as
+   "legado". B01 = full 18-agent smoke re-run after T16 r6.
+
+2. **B01 result: 16 PASS, 1 partial, 1 FAIL.** Language-rule hardening did
+   **not** eliminate the decode artefact — 6/18 answers carried a vestige
+   (r5 had 5): `preciso` diacritic + English reasoning; `revisor` a whole
+   Chinese reasoning block **and** a wrong correction (the sole FAIL);
+   `qa`/`dados` stray CJK first token + English; `pesquisa` CJK mid-text;
+   `seo` Chinese thinking. Primary-side sanitization remains the only
+   guarantee of a clean delivery — which strengthens the parked case for a
+   structural fix (`nothink-v3`: thinking parser or thinking disabled).
+
+   Other findings:
+   - **`ver` guard works** (no office asserted — the r5 "ex-presidente" is
+     fixed) but the model stopped naming the person at all; needs calibration
+     to name + not assert office.
+   - **New:** `seo` miscounted characters — reported 143, real count 82 (the
+     primary reconfirmed). LLM character counting is unreliable by nature; the
+     good-sense rule (primary reconfirms) is what saves it.
+   - **"Resumo:" tail** reappeared in 6 agents (codigo, importador, pesquisa,
+     tutor, planner, ver) — the r5 inheritance finding is still open, pending
+     user decision on scoping the mandatory summary to the main assistant.
+
+Data: `benchmarks/results/baterias/B01_smoke18_pos-endurecimento_2026-09-17.md`.

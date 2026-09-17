@@ -103,3 +103,12 @@ C1 concluído (2026-09-17). Próximos: **M1** (camada 7B para T00/T01/T02 —
 bateria T02 ≥ 14/14 antes) ou **M2** (script de profiling por nível).
 Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em
 chamadas cruas (sem parser qwen3) — JOURNAL T16 r4.
+
+## Registro de baterias de teste (novo, 2026-09-17)
+
+Cada bateria de teste vira **um arquivo** em `benchmarks/results/baterias/`,
+com número sequencial, data, prompts e respostas verbatim e veredito — o
+índice fica em `benchmarks/results/README.md`. Isso evita acumular dezenas de
+conversas e deixa o histórico auditável. Primeira bateria: **B01** (smoke dos
+18 agentes pós-endurecimento — 16 PASS, 1 parcial, 1 FAIL; ver JOURNAL
+T16 r7).
