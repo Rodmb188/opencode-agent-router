@@ -5,9 +5,8 @@
 > O diário técnico completo (medidas, falhas, decisões) vive em
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
 >
-> **Status em 2026-09-16:** C3 ✅ (este arquivo versionado) · C4 ✅
-> (orçamento formalizado em [CONTEXT_BUDGET.md](CONTEXT_BUDGET.md)) ·
-> próximos: **C2** (T05 com imagem real) e **C1** (CI reformulado).
+> **Status em 2026-09-17:** C3 ✅ · C4 ✅ · C2 ✅ (fluxos T05 com imagem real testados)
+> · próximos: **C1** (CI reformulado — camada headless-friendly).
 
 ## Fluxograma do sistema
 
@@ -56,7 +55,7 @@
 | # | Objetivo | Pronto quando… | Esforço | Prioridade | Dependências |
 |---|----------|----------------|---------|------------|--------------|
 | C1 | Fechar CI (camada **headless-friendly** nos 20 níveis) | Estático completo no Actions + testes de modelo via Ollama direto; vivo continua checklist manual (o stack trava headless — dogfood sec. 14) | M | Alta | — |
-| C2 | T05: testar fluxos com imagem presente | 1 imagem na pasta padrão → abre; 2+ → pergunta qual (manual, 5 min) | S | Alta | — |
+| C2 ✅ | T05: fluxos com imagem testados | 2026-09-17: 2 imagens na pasta padrão → `ver` listou (`Casa.png`, `Homem.png`) e perguntou qual ✅; identificação: Lula (confiança alta) + isométrico de sobrevivência (estilo ✅, título não reconhecido — honesto) | S | Alta | — |
 | C3 | ROADMAP.md versionado | Este arquivo no repo | S | Alta | — |
 | C4 ✅ | Orçamento de contexto formalizado | Feito 2026-09-16 → [`CONTEXT_BUDGET.md`](CONTEXT_BUDGET.md) | S | Alta | — |
 

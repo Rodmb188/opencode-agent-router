@@ -460,3 +460,35 @@ consolidating = technical debt).
 - Iron rule updated in `config/AGENTS.md` + live copy: CONTEXT_BUDGET is the
   single source for context limits — update the doc before committing a
   Modelfile change.
+
+### T16 r2 — C2 done, language rule reinforced fleet-wide, character-count sanity
+
+Live C2 test with two real images in the default directory (2026-09-17):
+
+- **Flow check**: `ver` with no path listed both files verbatim (`Casa.png`,
+  `Homem.png`) and asked which to analyze — the "several → ask" branch of the
+  T05 protocol works live.
+- **Identification (not description)** — user's framing: "identify what it
+  sees, don't describe it". `Homem.png` → **Luiz Inácio Lula da Silva,
+  confidence high** (facial features, dark suit, green/yellow/blue striped
+  tie, green backdrop) — a named identification, above the user's own
+  expectation. `Casa.png` → **isometric 2D survival game** (style: high,
+  genre: medium; blood, weapons, supplies, no HUD); the title was honestly
+  not recognized (low confidence, Rust/TLoU considered and rejected as
+  imperfect matches). The user had expected no identification at all.
+
+Fleet-wide rule reinforcement (requested after the user saw the planner's
+stray CJK output and a 200-char creativity test drift into English thinking):
+
+- **Language**: every one of the 18 agents must think AND answer in pt-BR;
+  foreign traces (CJK/Latin/English) fail the delivery. Added a canonical
+  block to all `agent/*.md` and strengthened the iron rule in `AGENTS.md`
+  (repo + live copy).
+- **Character-count sanity**: "N characters" requests are answered on the
+  FIRST attempt with a small margin (±5% or ±10 chars, whichever is larger),
+  reporting the exact count alongside, with no endless rewrites — the user
+  decides whether to accept. Root cause of the request: a simple 200-char
+  creativity answer took 20+ minutes of silent rewriting (201 vs 198 chars).
+- Verified `docs/ROADMAP.md` / `docs/CONTEXT_BUDGET.md` contain **no real
+  CJK** — the planner's leaked character was display-output only, already
+  sanitized in the saved file.
