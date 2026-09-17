@@ -1,5 +1,7 @@
 # Local LLM Agent Routing System for opencode
 
+[![CI](https://github.com/Rodmb188/opencode-agent-router/actions/workflows/rota-ci.yml/badge.svg)](https://github.com/Rodmb188/opencode-agent-router/actions/workflows/rota-ci.yml)
+
 A multi-agent system that runs **every model 100% locally** on a consumer-grade
 AMD machine (RX 6700 XT, 12 GB VRAM, 32 GB RAM): one 27B, one 14B, and one 8B
 vision model become **18 specialized sub-agents**, with automatic routing by

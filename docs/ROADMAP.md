@@ -5,8 +5,9 @@
 > O diário técnico completo (medidas, falhas, decisões) vive em
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
 >
-> **Status em 2026-09-17:** C3 ✅ · C4 ✅ · C2 ✅ (fluxos T05 com imagem real testados)
-> · próximos: **C1** (CI reformulado — camada headless-friendly).
+> **Status em 2026-09-17:** C3 ✅ · C4 ✅ · C2 ✅ · **C1 ✅** (CI em 3 camadas:
+> estático no Actions + paridade Modelfile⇢CONTEXT_BUDGET + `model_checks.py`
+> headless) · próximos: **M1/M2**.
 
 ## Fluxograma do sistema
 
@@ -54,7 +55,7 @@
 
 | # | Objetivo | Pronto quando… | Esforço | Prioridade | Dependências |
 |---|----------|----------------|---------|------------|--------------|
-| C1 | Fechar CI (camada **headless-friendly** nos 20 níveis) | Estático completo no Actions + testes de modelo via Ollama direto; vivo continua checklist manual (o stack trava headless — dogfood sec. 14) | M | Alta | — |
+| C1 ✅ | Fechar CI (camada **headless-friendly**) | 2026-09-17: estático no Actions (`rota-ci.yml`, badge no README) + paridade Modelfile⇢CONTEXT_BUDGET + `benchmarks/model_checks.py` headless (qwen3 `391` ✅, nothink "bom dia" ✅, 4 modelos presentes) — vivo continua checklist manual | M | Alta | — |
 | C2 ✅ | T05: fluxos com imagem testados | 2026-09-17: 2 imagens na pasta padrão → `ver` listou (`Casa.png`, `Homem.png`) e perguntou qual ✅; identificação: Lula (confiança alta) + isométrico de sobrevivência (estilo ✅, título não reconhecido — honesto) | S | Alta | — |
 | C3 ✅ | ROADMAP.md versionado | Este arquivo no repo (commit `d27b92d`) | S | Alta | — |
 | C4 ✅ | Orçamento de contexto formalizado | Feito 2026-09-16 → [`CONTEXT_BUDGET.md`](CONTEXT_BUDGET.md) | S | Alta | — |
@@ -98,8 +99,7 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 
 ## Próximo passo
 
-**C1 (fechar o CI)** — destravado em 2026-09-17 (regressão verde após a remoção
-da barra): dividir em C1a (estático completo no GitHub Actions + checagem de
-que `Modelfile` ⇢ `CONTEXT_BUDGET.md` batem) e C1b (testes headless dos 3
-modelos via `/api/generate` do Ollama — sem TUI; o vivo continua checklist
-manual). Sugestões de refinamento para M1–M4 estão na conversa.
+C1 concluído (2026-09-17). Próximos: **M1** (camada 7B para T00/T01/T02 —
+bateria T02 ≥ 14/14 antes) ou **M2** (script de profiling por nível).
+Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em
+chamadas cruas (sem parser qwen3) — JOURNAL T16 r4.

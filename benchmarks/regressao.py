@@ -16,6 +16,8 @@ Duas camadas, separadas honestamente:
     - Confere o shape do modelo `vision` no config/opencode.jsonc: modalities DEVE ser
       objeto {input:[...], output:[...]} com "image" na entrada — `attachment: true` sozinho
       não habilita imagem no opencode (capabilities derivam de modalities, T05).
+    - Paridade Modelfile ⇢ CONTEXT_BUDGET.md: num_ctx do arquivo == num_ctx documentado
+      (herança via FROM respeitada) — C1a: ninguém altera o motor sem atualizar o manual.
 
 2. SMOKE VIVA (orientada, exige o TUI)
    - `opencode run --agent <x>` NÃO funciona headless neste stack: subagente não é
@@ -203,6 +205,33 @@ def static_checks():
         problems.append("ver.md: falta o diretório padrão 'Análise IA'")
     if "Análise IA" not in skill_txt:
         problems.append("SKILL.md: falta o diretório padrão 'Análise IA'")
+
+    # 6) Paridade Modelfile ⇢ CONTEXT_BUDGET.md (regra de ferro C4): cada modelo
+    #    com Modelfile no repo deve ter o MESMO num_ctx documentado no orçamento
+    #    (ou herdar de um pai com esse valor). Evita divergência silenciosa entre
+    #    o que o modelo roda e o que o documento oficial diz.
+    budget_doc = ""
+    budget_path = os.path.join(ROOT, "docs", "CONTEXT_BUDGET.md")
+    if os.path.exists(budget_path):
+        budget_doc = open(budget_path, encoding="utf-8").read()
+    else:
+        problems.append(f"CONTEXT_BUDGET.md ausente: {budget_path}")
+    ctx_by_model = {}
+    for mf in sorted(glob.glob(os.path.join(ROOT, "models", "*.Modelfile"))):
+        mname = os.path.basename(mf)[: -len(".Modelfile")]
+        src = open(mf, encoding="utf-8").read()
+        m_ctx = re.search(r"PARAMETER num_ctx (\d+)", src)
+        if m_ctx:
+            ctx_by_model[mname] = int(m_ctx.group(1))
+        else:
+            parent = re.search(r"FROM ([\w.-]+)", src)
+            if parent and parent.group(1) in ctx_by_model:
+                ctx_by_model[mname] = ctx_by_model[parent.group(1)]
+    for model, ctx in sorted(ctx_by_model.items()):
+        if budget_doc and f"`{model}`" not in budget_doc:
+            problems.append(f"CONTEXT_BUDGET.md: falta o modelo `{model}` na tabela")
+        elif budget_doc and f"**{ctx}**" not in budget_doc:
+            problems.append(f"CONTEXT_BUDGET.md: `{model}` deveria citar num_ctx {ctx}")
 
     return (len(problems) == 0, problems)
 

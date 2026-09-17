@@ -511,3 +511,31 @@ reliably. Decision: **remove the progress bar entirely**.
   `barra-progresso` smoke entry. Regression is green again.
 - The end-of-response *notification* (the conversation's original request)
   was deliberately left in place — only the bar was removed.
+
+### T16 r4 — C1 done: CI in three layers, plus a real finding from the new check
+
+C1 (fase A) implemented and validated live:
+
+- **C1a (static)**: `rota-ci.yml` already ran `regressao.py` on every push —
+  added the parity check (seção 6): each `models/*.Modelfile` `num_ctx` must
+  match `docs/CONTEXT_BUDGET.md`, with `FROM` inheritance respected
+  (megabrain-v2 → 12288 from nothink-v2). CI badge added to the README.
+- **C1b (model sanity, headless)**: new `benchmarks/model_checks.py` calls
+  Ollama directly via `/api/generate` — no TUI, no opencode. The first run
+  FAILED instructively: `num_predict: 64` cut inside the Qwen3 family's hidden
+  thinking, so the final response never arrived (qwen3-local returned empty);
+  bumped to 1024 → **both PASS**: qwen3-local `17 × 23 → 391` (27.4 s),
+  nothink-v2 translation contains "bom dia" (88.4 s). All four models verified
+  present via `/api/tags`. megabrain-v2 (thinking ON, minutes) and vision
+  (needs an image) stay in the manual live checklist by design.
+- **Runs only locally** (honest scope): the GitHub runner has no Ollama and no
+  models — static checks live in Actions; model checks live on this box.
+- **Finding (matches the user's own report)**: `nothink-v2` called raw emits
+  its reasoning as visible English text ("Here's a thinking process: …") —
+  the model has no qwen3 RENDERER/PARSER or suppressing chat template, so it
+  "thinks out loud". This is the same symptom the user saw in the 200-char
+  creativity test (started thinking in pt-BR, drifted to English, answered in
+  pt-BR). Not fixed here; the router's pt-BR sanity rule mitigates
+  presentation. A real fix would be a `nothink-v3` with qwen3 PARSER that
+  strips the thinking block (or a template that disables it) — parked in the
+  roadmap as a future finding.
