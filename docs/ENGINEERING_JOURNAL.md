@@ -578,3 +578,33 @@ Two findings:
    seo's first attempt answered *only* the summary (format instead of
    deliverable). Suggest scoping the mandatory-summary rule to the main
    assistant only — pending user decision.
+
+### T16 r6 — language rule hardened to maximum, plus `ver` factuality guard
+
+The user audited the T16 r5 smoke outputs and found stray CJK tokens beyond
+the two flagged ones: `preciso` (颗), `financeiro` (颗), `revisor`
+(字词句修正如下), `qa` (润色后 + English reasoning), `seo` (丄 then a full
+Chinese thinking block), and a **factual error** from `ver`: it called Lula
+"ex-presidente" — he is the sitting president since 2023. Actions taken:
+
+- **Fleet-wide language block rewritten (all 18 `agent/*.md`)**: "rigor máximo"
+  — every output in pt-BR latin-only (reasoning included); mandatory
+  self-review of the FULL output (start, middle, end) before finishing; drop a
+  stray first token and restart; no thinking in English/Chinese.
+- **`config/AGENTS.md` + live copy**: the iron rule now demands the primary
+  **inspect the complete sub-agent output and sanitize everything** before
+  showing — never pass through foreign characters; documents the exact leaked
+  tokens from T16 r5.
+- **`ver.md`**: new factuality guard — identify the person from the image, but
+  never assert current/former public office with certainty without image
+  support (office is external context that changes); prefer "figura pública
+  brasileira" or flag "confirme a atualidade".
+- **Regression**: new static check (seção 7) — every one of the 18 agents must
+  contain the "## Regras reforçadas de idioma" block, so a future agent can't
+  ship without it. Regression green (EXIT=0).
+
+Honest expectation (kept in the rules): the CJK first-token artefact is a
+decode-level property of the qwen3 family — instruction hardening reduces how
+often it surfaces and guarantees the handler cleans it, but the primary-side
+sanitization (SKILL rule 4) remains the last line of defense. Factual time
+context (Lula) is a knowledge-cut limitation, mitigated by the new guard.

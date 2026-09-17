@@ -233,6 +233,13 @@ def static_checks():
         elif budget_doc and f"**{ctx}**" not in budget_doc:
             problems.append(f"CONTEXT_BUDGET.md: `{model}` deveria citar num_ctx {ctx}")
 
+    # 7) Regra de idioma em TODOS os agentes (T16 r6): sem o bloco de rigor de
+    #    pt-BR, os vazamentos CJK voltam — a regra é obrigatória por arquivo.
+    lang_rule = "## Regras reforçadas de idioma"
+    for agent_path in sorted(glob.glob(os.path.join(AGENTS_DIR, "*.md"))):
+        if lang_rule not in open(agent_path, encoding="utf-8").read():
+            problems.append(f"{os.path.basename(agent_path)}: falta o bloco de regras de idioma (## Regras reforçadas de idioma)")
+
     return (len(problems) == 0, problems)
 
 
