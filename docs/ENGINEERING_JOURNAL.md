@@ -642,3 +642,45 @@ Two deliverables this round:
      user decision on scoping the mandatory summary to the main assistant.
 
 Data: `benchmarks/results/baterias/B01_smoke18_pos-endurecimento_2026-09-17.md`.
+
+### T16 r8 — user review of B01: scope resumo, remove decoys, fix ver/seo/revisor
+
+The user read the B01 raw outputs and made a sharp architectural point: if the
+main assistant must sanitize every sub-agent answer, the local-model premise
+is weakened. That framing is right — the primary sanitization is a **safety
+net, not the solution**; the real fix is deterministic and local (a parser
+that strips the reasoning block / disables thinking at the source, i.e. the
+parked `nothink-v3`). Prompt hardening is now proven insufficient by B01.
+Decisions implemented:
+
+1. **`Resumo:` scoped to the main assistant** — the mandatory-summary iron
+   rule in the global `AGENTS.md` (runtime + repo copy) now says explicitly
+   that **sub-agents must NOT add "Resumo:"** or any unprompted summary; the
+   rule belongs to the primary only. This is the fix for the tail reappearing
+   in 6 agents. (The rule lived only in the runtime AGENTS.md, which is why
+   the sub-agents inherited it; the repo copy now carries the scoped version
+   too, restoring parity.)
+2. **Removed the CJK literals from the rule texts** (all 18 `agent/*.md` and
+   both AGENTS.md). Insight: listing the leaked glyphs inside the prompt is
+   *priming* — it can raise the very leakage it warns against. Stray examples
+   were also found and scrubbed from `preciso.md`, `profundo.md` and
+   `revisor.md`; `agent/` now has zero foreign literals. History/evidence
+   files (journal, old dogfood/battery logs) were left as-is: they are not
+   loaded into any agent prompt.
+3. **`ver.md` — identification is the job** (B01/T18): name the person/object
+   with a confidence level; do not withhold the name out of caution (in B01
+   it only described clothes and failed the actual question). Office/vínculo
+   may not be asserted; if the task needs external judgment (current office,
+   changing data), the `ver` returns description + identification and the
+   primary routes the interpretation to `pesquisa`/`preciso`/`profundo`.
+   Same routing note added to the T05 iron rule in both AGENTS.md.
+4. **`seo.md` — counting rule** (B01/T14): never estimate; count one by one.
+   Spaces count (Google's meta-description convention); if the ask defines a
+   different convention, follow it and say which was used. Note: the reported
+   143 vs the real 82 was **not** a space miscount (space-free it still could
+   not reach 143) — it was a fabricated number.
+5. **`revisor.md` — mandatory final self-review** (B01/T03): re-read your own
+   correction and confirm the final sentence has none of the errors you were
+   supposed to fix; if unsure about a rule, don't invent — flag it.
+
+Regression green (EXIT=0); all 18 agents carry the language block.
