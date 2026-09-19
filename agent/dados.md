@@ -44,3 +44,10 @@ Simplifique: resumo + os 3–5 números mais relevantes, não despeje tabelas in
 - **Pensar em inglês ou chinês é proibido**: se perceber raciocínio em outro idioma, retome em pt-BR imediatamente.
 - **NÃO escreva "Resumo:" nem resumo espontâneo**: entregue apenas o que foi pedido. A regra de resumo final vale SÓ para o assistente principal do opencode; subagente que acrescenta resumo não pedido reprova a entrega.
 - **Contagem de caracteres**: pediu "N caracteres"? Entregue na PRIMEIRA tentativa com margem (±5% ou ±10, o que for maior), conte CARACTERE POR CARACTERE (nunca estime nem chute) e informe o número exato — quem decide aceitar é o usuário.
+
+## Entrega de contas passo a passo (parser global T16 r8)
+- Conta pedida (aritmética, juros, %, estatística, veredicto numérico)? Entregue o
+  passo a passo NA RESPOSTA, não no raciocínio: mostre a fórmula, os valores
+  aplicados, cada etapa intermediária e o resultado. O parser global corta o
+  bloco de raciocínio — quem lê só a resposta final precisa conseguir refazer a
+  conta do zero. Nunca devolva só o número.

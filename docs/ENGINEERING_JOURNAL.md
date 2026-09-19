@@ -684,3 +684,62 @@ Decisions implemented:
    supposed to fix; if unsure about a rule, don't invent — flag it.
 
 Regression green (EXIT=0); all 18 agents carry the language block.
+## T16 r11 — nothink-v3: parser determinístico global ENTREGUE e 3/3 PASS
+(2026-09-19 · B02 preparatório)
+
+**Decisão do usuário (r9): parser GLOBAL (todos os agentes com thinking),
+não recorte de um "trio CJK" fixo.** Motivos registrados:
+- Não existe trio canônico estável: os vazamentos alternaram entre agentes
+  a cada rodada (r5: preciso, financeiro, revisor, qa, seo; B01 r6:
+  revisor, seo, qa, dados, pesquisa...). "Os 3" não é uma lista determinável;
+  parser global elimina a necessidade de saber quais são.
+- Parser global = mesma infra de parser em 3, mas sem buracos.
+
+**Entrega: `benchmarks/nothink_parser.py`** — sanitização determinística,
+100% local, SEM dependência de provider/modelo:
+- `sanitize()` → filtra por característica Unicode: mantém only latin
+  (ASCII + Latin-1 + Latin Extended-A com acentos pt-BR), espaços e os
+  símbolos comuns (%, $, #...). Remove qual Err (CJK, kana, cirílico etc.)
+  por bloco Unicode — a MESMA rede que os agentes usam, agora como função
+  reutilizável.
+- `corta_bloco_rascunho()` → remove bloco de raciocínio marcado
+  (marcadores padrão: <thinking>, RASCUNHO, Raciocínio:) quando presente.
+- CLI: `python3 benchmarks/nothink_parser.py` (sanitiza stdin → stdout) e
+  `--self-test`.
+- Self-test embutido verifica 3 cenários; **3/3 PASS** (r11 corrigiu o
+  único falso negativo: o literal `cenario_limpo` tinha `%%` herdado de
+  heredoc, não o parser — o teste agora testa o que pretendia).
+
+**Escopo do parser vs. passo a passo (pergunta do usuário respondida):**
+- O parser corta o RASCUNHO (raciocínio interno), NÃO a resposta final.
+  O passo a passo das contas deve viver na RESPOSTA final (é ali que o
+  usuário lê), não no raciocínio — isso é regra de entrega, não de charset.
+- O parser preserva integralmente o texto limpo (ver self-test cenario_limpo:
+  "Taxa de 5%... R$ 210." passa intacto).
+- Portanto: parser global NÃO compromete o passo a passo das contas; o que
+  é comprometido — e resolvido — é o vazamento de rascunho em charset.
+
+**Duas camadas possíveis de aplicação (documentado, decisão final do
+usuário em aberto):**
+1. Parser na saída do primário (meu lado): eu recebo a resposta crua do
+   subagente e aplico `sanitize()` de forma mecânica antes de entregar.
+   → eu TENHO acesso ao rascunho (vejo para cortar), não "penso" nele.
+2. Parser na fonte (proxy local entre Ollama e opencode, tipo nothink na
+   origem): o bloco é cortado ANTES de chegar ao opencode.
+   → nem o primário veria o rascunho; sanitização do primário vira só
+   garantia redundante.
+
+**ICA / regra de idioma segue reforçada** (independente do parser, que é
+rede): AGENTS.md e os 18 agentes continuam exigindo pt-BR latino do
+subagente; parser é a rede estrutural, sanitização é a rede de segurança.
+
+**Próximo passo (proposto):** B02 — bateria de validação cruzada rodando
+todos os 18 agentes com `notthink-v3` (parser global) como provider apontando
+para o parser (camada 2 via proxy local ou camada 1 via sanitização no
+primário). A decisão de rodar camada 1 ou 2 é do usuário quando quiser B02.
+
+**Arquivos tocados nesta revisão:**
+- benchmarks/nothink_parser.py (criado; parser 100% local determinístico)
+- benchmarks/README.md (índice da bateria) — se aplicável
+- benchmarks/results/baterias/B02_... (quando B02 rodar)
+- docs/ENGINEERING_JOURNAL.md (este registro)
