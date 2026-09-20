@@ -743,3 +743,24 @@ primário). A decisão de rodar camada 1 ou 2 é do usuário quando quiser B02.
 - benchmarks/README.md (índice da bateria) — se aplicável
 - benchmarks/results/baterias/B02_... (quando B02 rodar)
 - docs/ENGINEERING_JOURNAL.md (este registro)
+
+
+## r12 — proxy B02: corte-na-fonte validado (drift da def local eliminado)
+
+**Decisão do usuário**: plugar o proxy local (corte na fonte, antes de chegar ao
+primário). Historico: parser determinístico global (r11, notchink_global 3/3).
+
+**O que foi feito** (benchmarks/nothink_proxy.py):
+1. Proxy HTTP local (11436 -> 11434, ThreadingHTTPServer, stdlib pura) que
+   repassa /api/chat ao Ollama com stream=False e aplica o sanitize DENTRO do
+   objeto de resposta (fonte única = nothink_parser.sanitize).
+2. Self-test determinístico (cenarios gerados em runtime via chr, sem literal
+   estrangeiro no fonte): 3/3 PASS.
+3. **Bug real encontrado e corrigido**: o proxy tinha `def sanitize` LOCAL que
+   sobrescrevia o import (drift de cópia — o mesmo problema que critiquei na
+   arq). Removida a def local; fonte única = import. Proxy 3/3 + parser 3/3.
+
+**O que falta (decisão do usuário)**: plugar o proxy no provider do opencode
+(baseURL -> http://127.0.0.1:11436) para que o corte aconteça na fonte — nem o
+primário veria o rascunho. É mudança de runtime do provider, não feita nesta
+rodada (decisão dele).
