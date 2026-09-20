@@ -5,9 +5,10 @@
 > O diário técnico completo (medidas, falhas, decisões) vive em
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
 >
-> **Status em 2026-09-17:** C3 ✅ · C4 ✅ · C2 ✅ · **C1 ✅** (CI em 3 camadas:
-> estático no Actions + paridade Modelfile⇢CONTEXT_BUDGET + `model_checks.py`
-> headless) · próximos: **M1/M2**.
+> **Status em 2026-09-20:** FASE A (consolidação) concluída — C1 ✅ · C2 ✅ · C3 ✅ · C4 ✅.
+> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte 3/3** (self-tests,
+> commit `3e9d038` r12). B01 ✅ (smoke dos 18 agentes). Próximos: **B02 — plug do
+> proxy na fonte** (pendente, só com OK do usuário + backup/rollback) e depois **M1/M2**.
 
 ## Fluxograma do sistema
 
@@ -99,8 +100,11 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 
 ## Próximo passo
 
-C1 concluído (2026-09-17). Próximos: **M1** (camada 7B para T00/T01/T02 —
-bateria T02 ≥ 14/14 antes) ou **M2** (script de profiling por nível).
+**B02 — plug do proxy na fonte** (continuação da r12): o proxê está pronto e
+verde (3/3), falta subir e apontar o provider para ele. Condições acordadas com
+o usuário: executa só com **OK explícito**, com **backup** da configuração atual
+e **rollback em 1 comando**. Feito o B02, os próximos são **M1** (camada 7B para
+T00/T01/T02 — bateria T02 ≥ 14/14 antes) ou **M2** (script de profiling por nível).
 Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em
 chamadas cruas (sem parser qwen3) — JOURNAL T16 r4.
 
@@ -111,4 +115,5 @@ com número sequencial, data, prompts e respostas verbatim e veredito — o
 índice fica em `benchmarks/results/README.md`. Isso evita acumular dezenas de
 conversas e deixa o histórico auditável. Primeira bateria: **B01** (smoke dos
 18 agentes pós-endurecimento — 16 PASS, 1 parcial, 1 FAIL; ver JOURNAL
-T16 r7).
+T16 r7). B02 (corte-na-fonte): self-tests do parser e do proxy em 3/3 (r12);
+bateria completa do plug fica registrada aqui quando executada.
