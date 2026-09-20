@@ -6,9 +6,12 @@
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
 >
 > **Status em 2026-09-20:** FASE A (consolidação) concluída — C1 ✅ · C2 ✅ · C3 ✅ · C4 ✅.
-> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte 3/3** (self-tests,
-> commit `3e9d038` r12). B01 ✅ (smoke dos 18 agentes). Próximos: **B02 — plug do
-> proxy na fonte** (pendente, só com OK do usuário + backup/rollback) e depois **M1/M2**.
+> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte 4/4** (self-tests,
+> commits `3e9d038` r12 + `6ebd77f` r13). **Achado r13:** o Ollama devolve o raciocínio
+> em campo separado (`message.thinking`) e o proxy o remove na fonte — sem isso, o
+> rascunho sairia inteiro mesmo com o parser ligado. B01 ✅ (smoke dos 18 agentes).
+> Próximos: **B02 — plug do proxy na fonte** (pendente, só com OK do usuário +
+> backup/rollback) e depois **M1/M2**.
 
 ## Fluxograma do sistema
 
@@ -19,22 +22,23 @@
 └───────────┬───────────────────────────────────────────┘
             ▼
 ┌──────────────────────────────────────────────────────┐
-│      AGENTS.md (rotas T00–T19) + config + Regras      │
-│      de Ferro (aprendidas de falha real)              │
+│      opencode · AGENTS.md (rotas T00–T19) + config     │
+│      Primário: big-pickle │ subagentes via Ollama      │
 └───────────┬───────────────────────────────────────────┘
-            ▼
+            ▼  ⏳ B02: provider aponta p/ proxy local
 ┌──────────────────────────────────────────────────────┐
-│  ROTEADOR  ── delegação via opencode subagent         │
-│   27B no-think: T06 redação │ T09 tutoria │ T10 resumo│
-│   27B thinking: T12 profundo                          │
-│   14B: T02 matemática │ T03 finanças │ T13 dados      │
-│         T18 QA │ T19 conversão                        │
-│   8B vision: T05 imagem/OCR                           │
-│   Primário: T00/T01 trivial │ T04 busca + síntese     │
+│  PROXY corte-na-fonte   ✅ parser 3/3 · proxy 4/4      │
+│  11436 → 11434  (⏳ plug pendente — backup + rollback  │
+│  prontos em benchmarks/rollback/)                      │
+│  · corta <thinking>/RASCUNHO em content                │
+│  · remove message.thinking/rascunho na fonte (r13)     │
+│  · sanitiza charset → latino pt-BR                     │
 └───────────┬───────────────────────────────────────────┘
             ▼
 ┌──────────────────────────────────────────────────────┐
 │            OLLAMA local (32GB RAM, sequencial)         │
+│   27B thinking: T12 │ 27B no-think: T06/T09/T10        │
+│   14B: T02/T03/T13/T18/T19 │ 8B vision: T05            │
 └───────────┬───────────────────────────────────────────┘
             │ resposta / erro / timeout
 ┌───────────▼───────────┐   ┌─────────────────────────┐
@@ -48,6 +52,8 @@
      ▼                                    │
   PASS/FAIL ──────────────────────────────┘
   LOOP: teste → falha → regra → regressão → próximo teste
+
+Legenda: ✅ pronto · ⏳ pendente (é o próximo passo — B02)
 ```
 
 ## Metas
@@ -97,14 +103,22 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 | T05 sem imagem na pasta padrão | Fluxo "avisa e pede caminho" já implementado (r5); teste C2 |
 | Matemática silenciosa no 27B | T02 → 14B é ferro; asserts no CI |
 | Hardware estacionário | 7B nas rotas leves (M1); monitoramento de acurácia (M4) |
+| Primário degenera em sessão longa/contexto poluído (r13) | Executar mudanças de runtime (B02) em sessão curta e escopo mínimo; inspecionar saída bruta com truncamento; kit de rollback pronto |
 
 ## Próximo passo
 
-**B02 — plug do proxy na fonte** (continuação da r12): o proxê está pronto e
-verde (3/3), falta subir e apontar o provider para ele. Condições acordadas com
-o usuário: executa só com **OK explícito**, com **backup** da configuração atual
-e **rollback em 1 comando**. Feito o B02, os próximos são **M1** (camada 7B para
-T00/T01/T02 — bateria T02 ≥ 14/14 antes) ou **M2** (script de profiling por nível).
+**B02 — plug do proxy na fonte** (continuação da r12 + achado r13): o proxê está
+pronto e verde (**4/4**, commit `6ebd77f`), falta subir e apontar o provider para
+ele. Condições acordadas com o usuário: executa só com **OK explícito**, com
+**backup** da configuração atual e **rollback em 1 comando** (kit pronto em
+`benchmarks/rollback/`). Guia de execução (aprendido na Fase B — ver JOURNAL r13):
+1. Rodar o plug numa **sessão curta e de escopo mínimo** (backup → apontar
+   `baseURL` → validar repasse → rollback se preciso), sem despejar saídas
+   grandes no contexto do primário (inspecione JSON cru com truncamento).
+2. Validar o repasse com modelo leve e saída curta; conferir que `thinking`
+   não aparece na resposta (r13).
+Feito o B02, os próximos são **M1** (camada 7B para T00/T01/T02 — bateria T02 ≥
+14/14 antes) ou **M2** (script de profiling por nível).
 Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em
 chamadas cruas (sem parser qwen3) — JOURNAL T16 r4.
 
@@ -115,5 +129,6 @@ com número sequencial, data, prompts e respostas verbatim e veredito — o
 índice fica em `benchmarks/results/README.md`. Isso evita acumular dezenas de
 conversas e deixa o histórico auditável. Primeira bateria: **B01** (smoke dos
 18 agentes pós-endurecimento — 16 PASS, 1 parcial, 1 FAIL; ver JOURNAL
-T16 r7). B02 (corte-na-fonte): self-tests do parser e do proxy em 3/3 (r12);
+T16 r7). B02 (corte-na-fonte): self-tests do parser 3/3 (r12) e do proxy
+**4/4** após o achado r13 (`message.thinking` — commit `6ebd77f`);
 bateria completa do plug fica registrada aqui quando executada.

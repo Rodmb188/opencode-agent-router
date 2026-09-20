@@ -764,3 +764,53 @@ primário). Historico: parser determinístico global (r11, notchink_global 3/3).
 (baseURL -> http://127.0.0.1:11436) para que o corte aconteça na fonte — nem o
 primário veria o rascunho. É mudança de runtime do provider, não feita nesta
 rodada (decisão dele).
+
+## r13 — achado `message.thinking`: o rascunho passaria INTACTO pela fonte
+(2026-09-20 · sessão "Roteador Local - Fase B", commit `6ebd77f`)
+
+**Contexto**: sessão nova iniciada com o handoff para executar o B02 (r12) com
+backup + rollback. Durante a validação do repasse real (proxy 11436 → 11434 com
+qwen3-local), o teste imprimiu o JSON cru do Ollama e revelou um vazamento que o
+self-test 3/3 não cobria:
+
+- O Ollama devolve o raciocínio em **campo separado `message.thinking`** (em
+  inglês), fora do `content`.
+- O proxy r12 só sanitizava `message.content` → **o rascunho sairia da fonte
+  INTACTO**, exatamente o vazamento que o B02 existe para cortar.
+- O achado só apareceu no teste real: os self-tests 3/3 usavam `content` apenas.
+
+**Correção aplicada** (`benchmarks/nothink_proxy.py`):
+- `sanitize_stream_resposta` remove `thinking` e `thinking_duration` do objeto
+  `message` em bloco (o rascunho não é sanitizado — é eliminado na fonte).
+- Self-test ampliado para 4 cenários, incluindo `message.thinking` com CJK:
+  **4/4 PASS** (determinístico).
+
+**Kit de rollback** (`benchmarks/rollback/`): criado antes de qualquer plug —
+`opencode.jsonc.bak-20260920-055511` + `README.md` com o comando único de
+restauração. O plug em si NÃO foi feito (a sessão colapsou antes; ver abaixo).
+
+**Sessão Fase B colapsou no fim (roteiro do looping, repetido)**: após os testes
+de repasse, o contexto da sessão acumulou a saída crua gigante do `thinking` do
+qwen3 (milhares de tokens) + JSONs + logs. Logo em seguida o reasoning do
+primário (big-pickle) degenerou em repetição (37k → 44k chars de lixo em uma só
+resposta), o stream ficou longo demais e o provider cortou sem `finish_reason`
+(`provider.invalid-output`), com o opencode emendando retries sintéticos. Mesmo
+padrão da Fase A (31× o mesmo erro, sem proxy). Observado:
+- O proxy em si é inerte enquanto nada aponta para a porta 11436 — não é a
+  causa de rede; o gatilho foi a **poluição do contexto da sessão** durante o
+  trabalho de implementação.
+- Consequência prática: **manter as sessões do primário curtas e o contexto
+  limpo**; executar validação pesada (repasse real, JSON cru) fora da sessão do
+  primário ou com saída truncada.
+
+**Lições para o B02 (forma positiva):**
+- Executar o plug em sessão curta e de escopo mínimo (backup → apontar
+  `baseURL` → validar → rollback se preciso), evitando despejar saídas grandes
+  no contexto do primário.
+- O kit de rollback já está pronto; o achado r13 torna o corte-na-fonte
+  efetivamente completo (sem ele, o plug seria inútil).
+
+**Arquivos tocados:**
+- benchmarks/nothink_proxy.py (editado; achado r13 — commit `6ebd77f`)
+- benchmarks/rollback/ (criado: README.md + backup da config)
+- docs/ROADMAP.md e docs/ENGINEERING_JOURNAL.md (registros)
