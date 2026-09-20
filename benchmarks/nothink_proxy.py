@@ -56,11 +56,18 @@ def _eh_latino(ch):
 
 def sanitize_stream_resposta(resposta_json):
     """Aplica a sanitização DENTRO do objeto de resposta do Ollama
-    (formato /api/chat). Preserva o resto (modelo, timestamps)."""
+    (formato /api/chat). Preserva o resto (modelo, timestamps).
+
+    Remove o campo "thinking" da mensagem: o raciocínio do modelo chega
+    do Ollama num campo separado (message.thinking, em ingês) e o rascunho
+    NÃO deve sair da fonte — nem sanitizado, removido em bloco."""
     if isinstance(resposta_json, dict):
         msg = resposta_json.get("message", {})
-        if isinstance(msg, dict) and "content" in msg:
-            msg["content"] = sanitize(msg["content"])
+        if isinstance(msg, dict):
+            if "content" in msg:
+                msg["content"] = sanitize(msg["content"])
+            msg.pop("thinking", None)
+            msg.pop("thinking_duration", None)
         return resposta_json
     return resposta_json
 
@@ -151,12 +158,23 @@ def _self_test():
     ok1 = (cjk not in saida) and (kana not in saida) and ("2 + 2 = 4" in saida) and ("RASCUNHO" not in saida)
     ok2 = sanitize(cenario_limpo) == cenario_limpo
     ok3 = (ciril not in sanitize("Valor %s misturado %s fim" % (cjk, ciril)))
+    # cenário do achado r13: Ollama devolve message.thinking separado; o rascunho
+    # nao deve sair da fonte NEM sanitizado — removido em bloco
+    resposta_tipo_ollama = {
+        "model": "qwen3-local",
+        "message": {"role": "assistant", "content": "resposta limpa", "thinking": "pensei em %s em ingles" % cjk},
+        "done": True,
+    }
+    saida4 = sanitize_stream_resposta(resposta_tipo_ollama)
+    msg4 = saida4.get("message", {})
+    ok4 = ("thinking" not in msg4) and ("thinking_duration" not in msg4) and (msg4["content"] == "resposta limpa")
 
     print("self-test:")
     print("  corta rascunho + rede charset :", "PASS" if ok1 else "FAIL")
     print("  texto limpo segue intacto      :", "PASS" if ok2 else "FAIL")
     print("  cira/ideograma removidos       :", "PASS" if ok3 else "FAIL")
-    return ok1 and ok2 and ok3
+    print("  campo thinking removido        :", "PASS" if ok4 else "FAIL")
+    return ok1 and ok2 and ok3 and ok4
 
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
