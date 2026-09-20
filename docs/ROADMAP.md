@@ -6,12 +6,15 @@
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
 >
 > **Status em 2026-09-20:** FASE A (consolidação) concluída — C1 ✅ · C2 ✅ · C3 ✅ · C4 ✅.
-> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte 4/4** (self-tests,
-> commits `3e9d038` r12 + `6ebd77f` r13). **Achado r13:** o Ollama devolve o raciocínio
-> em campo separado (`message.thinking`) e o proxy o remove na fonte — sem isso, o
-> rascunho sairia inteiro mesmo com o parser ligado. B01 ✅ (smoke dos 18 agentes).
-> Próximos: **B02 — plug do proxy na fonte** (pendente, só com OK do usuário +
-> backup/rollback) e depois **M1/M2**.
+> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte 7/7** (self-tests,
+> commits `3e9d038` r12 + `6ebd77f` r13 + `b6810db` r14). **Achado r13:** o Ollama
+> devolve o raciocínio em campo separado (`message.thinking`); o proxy o remove na
+> fonte. **Achado r14:** o package `@ai-sdk/ollama` não existe no npm (404); o proxy
+> agora fala o formato OpenAI (`/v1/chat/completions` + SSE) e o plug usa o mesmo
+> `@ai-sdk/openai-compatible` já comprovado. **B02 plug APLICADO e validado** (6/6
+> passos, `opencode run` limpo). B01 ✅ (smoke dos 18 agentes). Próximos: **apontar
+> os agentes com thinking para `ollama-nothink`** (rota final do corte na fonte) e
+> depois **M1/M2**.
 
 ## Fluxograma do sistema
 
@@ -107,17 +110,18 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 
 ## Próximo passo
 
-**B02 — plug do proxy na fonte** (continuação da r12 + achado r13): o proxê está
-pronto e verde (**4/4**, commit `6ebd77f`), falta subir e apontar o provider para
-ele. Condições acordadas com o usuário: executa só com **OK explícito**, com
-**backup** da configuração atual e **rollback em 1 comando** (kit pronto em
-`benchmarks/rollback/`). Guia de execução (aprendido na Fase B — ver JOURNAL r13):
-1. Rodar o plug numa **sessão curta e de escopo mínimo** (backup → apontar
-   `baseURL` → validar repasse → rollback se preciso), sem despejar saídas
-   grandes no contexto do primário (inspecione JSON cru com truncamento).
-2. Validar o repasse com modelo leve e saída curta; conferir que `thinking`
-   não aparece na resposta (r13).
-Feito o B02, os próximos são **M1** (camada 7B para T00/T01/T02 — bateria T02 ≥
+**B02 — plug do proxy na fonte** ✅ **APLICADO e validado** (2026-09-20, r14):
+o proxy (`benchmarks/nothink_proxy.py`) agora atende o formato OpenAI
+(`/v1/chat/completions`, JSON e SSE com `[DONE]`), self-test **7/7**, e o plug foi
+executado com o script seguro `benchmarks/b02_plug.sh`:
+backup ✅ → provider `ollama-nothink` (npm `@ai-sdk/openai-compatible`,
+baseURL `http://127.0.0.1:11436/v1`) ✅ → proxy de pé ✅ → validação `/api/chat`
+sem `thinking` ✅ → OpenAI JSON sem `thinking` ✅ → SSE com `[DONE]` ✅ →
+`opencode run --model ollama-nothink/qwen3-local` respondeu limpo ✅.
+Rollback em 1 comando (guardado no final da execução). Próximo passo da rota:
+**apontar os agentes com thinking para `ollama-nothink`** (hoje ainda usam
+`ollama` direto) — aí o corte na fonte vale para as rotas reais.
+Feito isso, os próximos são **M1** (camada 7B para T00/T01/T02 — bateria T02 ≥
 14/14 antes) ou **M2** (script de profiling por nível).
 Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em
 chamadas cruas (sem parser qwen3) — JOURNAL T16 r4.

@@ -814,3 +814,44 @@ padrão da Fase A (31× o mesmo erro, sem proxy). Observado:
 - benchmarks/nothink_proxy.py (editado; achado r13 — commit `6ebd77f`)
 - benchmarks/rollback/ (criado: README.md + backup da config)
 - docs/ROADMAP.md e docs/ENGINEERING_JOURNAL.md (registros)
+
+## r14 — plug do B02 APLICADO e validado (endpoint OpenAI + script seguro)
+(2026-09-20 · commit `b6810db`)
+
+**Bloqueio encontrado na execução**: o package `@ai-sdk/ollama` (formato nativo
+do Ollama) **não existe no registry npm** — `404 Not Found` na inicialização do
+provider. Confirmado via registry: `@ai-sdk/ollama` → 404; `ollama-ai-provider`
+→ 200; `@ai-sdk/openai-compatible` → 200 (o pacote em uso há meses).
+
+**Decisão (rota mais robusta)**: sem dependência nova — o proxy passa a falar o
+**formato OpenAI** (`/v1/chat/completions`), traduzindo para o `/api/chat`
+nativo do Ollama e devolvendo no formato que o `@ai-sdk/openai-compatible`
+já consome (JSON e SSE com `[DONE]`). O rascunho (`thinking`) é descartado por
+construção na tradução: só o `content` sanitizado é levado para a resposta
+OpenAI. Self-test ampliado para **7/7 PASS** (inclui tradução OpenAI→Ollama,
+Ollama→OpenAI sem thinking e SSE completo).
+
+**Entrega do plug**: `benchmarks/b02_plug.sh` (prévia / `--executar` /
+`--rollback`), com backup antes de tocar a config, rollback automático em
+qualquer falha e validação em 4 frentes + o caminho real do SDK:
+1. `/api/chat` (curl): content presente, thinking ausente ✅
+2. `/v1/chat/completions` JSON (curl): choices[0].message.content ✅, thinking ausente ✅
+3. `/v1/chat/completions` SSE (curl): `data:` no início e `[DONE]` no fim ✅
+4. `opencode run --model ollama-nothink/qwen3-local "Responda apenas com a palavra ok"` → **"ok" limpo** ✅
+
+**Estado do plug**: config `~/.config/opencode/opencode.jsonc` ganhou o provider
+`ollama-nothink` (npm `@ai-sdk/openai-compatible`, baseURL
+`http://127.0.0.1:11436/v1`), proxy rodando na 11436 com log em
+`/tmp/opencode/proxy.log`, rollback em 1 comando guardado na saída da execução.
+Cadeia inteiramente local (loopback 11436 → 11434); nada sai da máquina. A única
+peça não local do stack segue sendo o primário big-pickle (decisão do usuário).
+
+**O que falta para a rota final do B02**: apontar os agentes com thinking
+(profundo, preciso etc. — via AGENTS.md/skills) para `ollama-nothink/...` em vez
+de `ollama/...`; hoje o provider novo está plugado e validado, mas as rotas ainda
+usam o `ollama` direto. Bateria completa do B02 registrada quando isso rodar.
+
+**Arquivos tocados:**
+- benchmarks/nothink_proxy.py (endpoint OpenAI + SSE; self-test 7/7 — `b6810db`)
+- benchmarks/b02_plug.sh (novo; plug seguro com prévia/executar/rollback — `b6810db`)
+- docs/ROADMAP.md e docs/ENGINEERING_JOURNAL.md (registros)
