@@ -30,6 +30,7 @@
 import json
 import re
 import sys
+import time
 import unicodedata
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -71,6 +72,54 @@ def sanitize_stream_resposta(resposta_json):
         return resposta_json
     return resposta_json
 
+# ---- bloco 1b: tradução OpenAI <-> Ollama (endpoint /v1/chat/completions) ----
+
+def traduz_oai_para_ollama(req):
+    """Converte um request do formato OpenAI (openai-compatible SDK) para o
+    corpo nativo do Ollama (/api/chat). Sempre pede stream=False ao Ollama;
+    o streaming é reconstruído na resposta, após o corte do rascunho."""
+    corpo = {
+        "model": req.get("model", ""),
+        "messages": req.get("messages", []),
+        "stream": False,
+    }
+    opts = {"num_ctx": 12288}
+    if "temperature" in req:
+        opts["temperature"] = req["temperature"]
+    if "max_tokens" in req:
+        opts["num_predict"] = req["max_tokens"]
+    if req.get("options") and isinstance(req["options"], dict):
+        opts.update(req["options"])
+    corpo["options"] = opts
+    return corpo
+
+def traduz_ollama_para_oai(resposta_ollama, model, stream_pedido):
+    """Converte a resposta já sanitizada do Ollama para o formato OpenAI
+    (chat.completion). O 'thinking' nem entra aqui: é descartado por
+    construção na tradução (o content é o único campo levado)."""
+    mensagem = resposta_ollama.get("message", {}) or {}
+    conteudo = mensagem.get("content", "")
+    agora = int(time.time())
+    base = {"id": "chatcmpl-local", "created": agora, "model": model}
+    if not stream_pedido:
+        return {
+            **base,
+            "object": "chat.completion",
+            "choices": [{
+                "index": 0,
+                "message": {"role": "assistant", "content": conteudo},
+                "finish_reason": "stop",
+            }],
+        }
+    chunks = [
+        {**base, "object": "chat.completion.chunk",
+         "choices": [{"index": 0, "delta": {"role": "assistant", "content": conteudo}, "finish_reason": None}]},
+        {**base, "object": "chat.completion.chunk",
+         "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]},
+    ]
+    corpo_sse = "".join("data: %s\n\n" % json.dumps(c, ensure_ascii=False) for c in chunks)
+    return corpo_sse + "data: [DONE]\n\n"
+
 # ---- bloco 2: proxy HTTP local ---------------------------------------------
 
 _DEFAULT_UPSTREAM = "127.0.0.1:11434"
@@ -86,8 +135,10 @@ class _Handler(BaseHTTPRequestHandler):
         return getattr(self.server, "upstream", _DEFAULT_UPSTREAM)
 
     def do_POST(self):
-        if self.path.rstrip("/") not in ("/api/chat", "/api/generate"):
-            self.send_error(404, "use /api/chat")
+        caminho = self.path.rstrip("/")
+        eh_openai = caminho == "/v1/chat/completions"
+        if caminho not in ("/api/chat", "/api/generate", "/v1/chat/completions"):
+            self.send_error(404, "caminho nao suportado: %s" % caminho)
             return
         try:
             tamanho = int(self.headers.get("Content-Length", "0"))
@@ -97,15 +148,24 @@ class _Handler(BaseHTTPRequestHandler):
             self.send_error(400, "json invalido: %s" % e)
             return
 
-        # Força não-streaming (resposta completa de uma vez, mais simples
-        # de sanitizar de forma determinística na borda)
-        req["stream"] = False
-        if "options" not in req:
-            req["options"] = {}
-        req["options"].setdefault("num_ctx", 12288)
+        # Internamente SEMPRE stream=False ao Ollama: resposta completa de uma
+        # vez, mais simples de sanitizar de forma determinística na borda.
+        if eh_openai:
+            stream_pedido = bool(req.get("stream", False))
+            modelo = req.get("model", "")
+            corpo_up = traduz_oai_para_ollama(req)
+            url = "http://%s/api/chat" % self._upstream()
+        else:
+            stream_pedido = False
+            modelo = req.get("model", "")
+            corpo_up = req
+            corpo_up["stream"] = False
+            if "options" not in corpo_up:
+                corpo_up["options"] = {}
+            corpo_up["options"].setdefault("num_ctx", 12288)
+            url = "http://%s%s" % (self._upstream(), self.path)
 
-        url = "http://%s%s" % (self._upstream(), self.path)
-        data = json.dumps(req).encode("utf-8")
+        data = json.dumps(corpo_up).encode("utf-8")
         headers = {"Content-Type": "application/json"}
 
         try:
@@ -130,7 +190,21 @@ class _Handler(BaseHTTPRequestHandler):
             return
 
         resp = sanitize_stream_resposta(resp)
-        saida = json.dumps(resp, ensure_ascii=False).encode("utf-8")
+        if eh_openai:
+            if stream_pedido:
+                corpo = traduz_ollama_para_oai(resp, modelo, True).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Cache-Control", "no-cache")
+                self.send_header("Content-Length", str(len(corpo)))
+                self.end_headers()
+                self.wfile.write(corpo)
+                return
+            saida = json.dumps(
+                traduz_ollama_para_oai(resp, modelo, False), ensure_ascii=False
+            ).encode("utf-8")
+        else:
+            saida = json.dumps(resp, ensure_ascii=False).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(saida)))
@@ -169,12 +243,53 @@ def _self_test():
     msg4 = saida4.get("message", {})
     ok4 = ("thinking" not in msg4) and ("thinking_duration" not in msg4) and (msg4["content"] == "resposta limpa")
 
+    # cenário do endpoint /v1/chat/completions: request OpenAI vira corpo
+    # Ollama nativo (stream sempre False dentro do proxy)
+    req_oai = {
+        "model": "qwen3-local",
+        "messages": [{"role": "user", "content": "ola"}],
+        "stream": True,
+        "temperature": 0.2,
+        "max_tokens": 40,
+    }
+    corpo_up = traduz_oai_para_ollama(req_oai)
+    ok5 = (
+        corpo_up["model"] == "qwen3-local"
+        and corpo_up["stream"] is False
+        and len(corpo_up["messages"]) == 1
+        and corpo_up["options"]["num_ctx"] == 12288
+        and corpo_up["options"]["temperature"] == 0.2
+        and corpo_up["options"]["num_predict"] == 40
+    )
+
+    # resposta do Ollama (com thinking) vira chat.completion OpenAI SEM thinking;
+    # o modo stream devolve SSE com [DONE] no fim
+    resp_ollama = {
+        "model": "qwen3-local",
+        "message": {"role": "assistant", "content": "resposta ok %s" % cjk, "thinking": "rascunho %s" % cjk},
+        "done": True,
+    }
+    resp_sanitizada = sanitize_stream_resposta(resp_ollama)
+    resp_oai = traduz_ollama_para_oai(resp_sanitizada, "qwen3-local", False)
+    msg_oai = resp_oai["choices"][0]["message"]
+    ok6 = (
+        resp_oai["object"] == "chat.completion"
+        and msg_oai["content"] == "resposta ok"
+        and "thinking" not in msg_oai
+        and resp_oai["choices"][0]["finish_reason"] == "stop"
+    )
+    sse = traduz_ollama_para_oai(resp_sanitizada, "qwen3-local", True)
+    ok7 = sse.startswith("data: ") and sse.rstrip().endswith("data: [DONE]") and cjk not in sse
+
     print("self-test:")
     print("  corta rascunho + rede charset :", "PASS" if ok1 else "FAIL")
     print("  texto limpo segue intacto      :", "PASS" if ok2 else "FAIL")
     print("  cira/ideograma removidos       :", "PASS" if ok3 else "FAIL")
     print("  campo thinking removido        :", "PASS" if ok4 else "FAIL")
-    return ok1 and ok2 and ok3 and ok4
+    print("  oai -> ollama (corpo nativo)   :", "PASS" if ok5 else "FAIL")
+    print("  ollama -> oai (sem thinking)   :", "PASS" if ok6 else "FAIL")
+    print("  SSE com [DONE] e sem rascunho  :", "PASS" if ok7 else "FAIL")
+    return ok1 and ok2 and ok3 and ok4 and ok5 and ok6 and ok7
 
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
