@@ -11,10 +11,12 @@
 > devolve o raciocínio em campo separado (`message.thinking`); o proxy o remove na
 > fonte. **Achado r14:** o package `@ai-sdk/ollama` não existe no npm (404); o proxy
 > agora fala o formato OpenAI (`/v1/chat/completions` + SSE) e o plug usa o mesmo
-> `@ai-sdk/openai-compatible` já comprovado. **B02 plug APLICADO e validado** (6/6
-> passos, `opencode run` limpo). B01 ✅ (smoke dos 18 agentes). Próximos: **apontar
-> os agentes com thinking para `ollama-nothink`** (rota final do corte na fonte) e
-> depois **M1/M2**.
+> `@ai-sdk/openai-compatible` já comprovado. **B02 APLICADO E FECHADO** (r14 + r15):
+> plug validado 6/6 e **rota final executada — os 18 agentes locais apontam para
+> `ollama-nothink`** e o corte na fonte vale para as rotas reais (bateria B02:
+> 4 modelos via SDK + agente com thinking de ponta a ponta + log do proxy sem
+> `thinking`). B01 ✅ (smoke dos 18 agentes). Próximos: **M1** (camada 7B) ou
+> **M2** (profiling).
 
 ## Fluxograma do sistema
 
@@ -28,11 +30,11 @@
 │      opencode · AGENTS.md (rotas T00–T19) + config     │
 │      Primário: big-pickle │ subagentes via Ollama      │
 └───────────┬───────────────────────────────────────────┘
-            ▼  ⏳ B02: provider aponta p/ proxy local
+            ▼  ✅ B02: 18 agentes locais -> ollama-nothink (proxy)
 ┌──────────────────────────────────────────────────────┐
-│  PROXY corte-na-fonte   ✅ parser 3/3 · proxy 4/4      │
-│  11436 → 11434  (⏳ plug pendente — backup + rollback  │
-│  prontos em benchmarks/rollback/)                      │
+│  PROXY corte-na-fonte   ✅ parser 3/3 · proxy 7/7      │
+│  11436 → 11434  ✅ plug (r14) e rota final dos agentes  │
+│  (r15) aplicados — rollback em 1 comando por script    │
 │  · corta <thinking>/RASCUNHO em content                │
 │  · remove message.thinking/rascunho na fonte (r13)     │
 │  · sanitiza charset → latino pt-BR                     │
@@ -56,7 +58,7 @@
   PASS/FAIL ──────────────────────────────┘
   LOOP: teste → falha → regra → regressão → próximo teste
 
-Legenda: ✅ pronto · ⏳ pendente (é o próximo passo — B02)
+Legenda: ✅ pronto (B02 fechado em r14/r15) · ⏳ pendente (próximo: M1/M2)
 ```
 
 ## Metas
@@ -110,17 +112,22 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 
 ## Próximo passo
 
-**B02 — plug do proxy na fonte** ✅ **APLICADO e validado** (2026-09-20, r14):
-o proxy (`benchmarks/nothink_proxy.py`) agora atende o formato OpenAI
-(`/v1/chat/completions`, JSON e SSE com `[DONE]`), self-test **7/7**, e o plug foi
-executado com o script seguro `benchmarks/b02_plug.sh`:
-backup ✅ → provider `ollama-nothink` (npm `@ai-sdk/openai-compatible`,
-baseURL `http://127.0.0.1:11436/v1`) ✅ → proxy de pé ✅ → validação `/api/chat`
-sem `thinking` ✅ → OpenAI JSON sem `thinking` ✅ → SSE com `[DONE]` ✅ →
-`opencode run --model ollama-nothink/qwen3-local` respondeu limpo ✅.
-Rollback em 1 comando (guardado no final da execução). Próximo passo da rota:
-**apontar os agentes com thinking para `ollama-nothink`** (hoje ainda usam
-`ollama` direto) — aí o corte na fonte vale para as rotas reais.
+**B02 — corte na fonte: APLICADO E FECHADO** (2026-09-20, r14 + r15):
+1. Plug do provider `ollama-nothink` (npm `@ai-sdk/openai-compatible`, baseURL
+   `http://127.0.0.1:11436/v1`) executado com `benchmarks/b02_plug.sh` (r14):
+   backup ✅ → provider ✅ → proxy de pé ✅ → `/api/chat` e OpenAI JSON/SSE sem
+   `thinking` ✅ → `opencode run --model ollama-nothink/qwen3-local` limpo ✅.
+2. **Rota final (r15)** com `benchmarks/b02_agents.sh`: os **18 agentes locais**
+   (`~/.config/opencode/agent/*.md`) apontam para `ollama-nothink/...` — corte na
+   fonte vale para as rotas reais. Validação (bateria B02): 4 modelos via SDK
+   (qwen3-local, vision, nothink-v2, megabrain-v2 27B thinking) limpos, subagente
+   `preciso` de ponta a ponta (36) e 0 ocorrências de `thinking` no log do proxy.
+   Achado: `opencode run --agent` não exercita o frontmatter de subagent (a sessão
+   run usa o modelo principal da config) — os subagentes se validam via task.
+3. Rollback em 1 comando por script (`b02_plug.sh --rollback` /
+   `b02_agents.sh --rollback`); backup dos agentes em
+   `~/.config/opencode/agent.bak-b02-20260920-073241`.
+
 Feito isso, os próximos são **M1** (camada 7B para T00/T01/T02 — bateria T02 ≥
 14/14 antes) ou **M2** (script de profiling por nível).
 Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em

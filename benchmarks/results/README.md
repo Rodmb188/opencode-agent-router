@@ -10,6 +10,7 @@ agentes sem acumular dezenas de conversas dispersas — o registro vive no repo.
 | # | Data | Arquivo | Resultado geral |
 |---|---|---|---|
 | B01 | 2026-09-17 | [`baterias/B01_smoke18_pos-endurecimento_2026-09-17.md`](baterias/B01_smoke18_pos-endurecimento_2026-09-17.md) | 16 PASS · 1 parcial · 1 FAIL |
+| B02 | 2026-09-20 | [`baterias/B02_rota-final-proxy_2026-09-20.md`](baterias/B02_rota-final-proxy_2026-09-20.md) | 6 PASS (rota final dos 18 agentes pelo proxy) · 1 descartado por achado |
 
 ## Legado (antes do formato padrão)
 

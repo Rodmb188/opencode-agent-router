@@ -8,6 +8,10 @@ description: Roteamento automático por níveis de tarefa. Use SEMPRE que recebe
 Classifique a pergunta e aplique a resposta ao nível correto. As pré-definições podem ser
 ajustadas aqui e valem para todo o opencode.
 
+> Nota de infraestrutura (B02, r14/r15): todos os subagentes abaixo rodam pelo
+> provider `ollama-nothink` (proxy corte-na-fonte em 11436 → Ollama 11434). O
+> raciocínio dos modelos com thinking é removido na fonte e não chega ao primário.
+
 ## Escada de níveis (orçamento de latência)
 
 | Nível | Categoria | Sinais na pergunta | Modelo/Agente | Latência |
@@ -42,7 +46,7 @@ ajustadas aqui e valem para todo o opencode.
 3. **`megabrain`/`profundo` apenas em T12** — nunca para cálculo rápido. Para cálculo, `qwen3-local`
    resolve passo a passo e conferindo (mais rápido E mais correto que o modo rápido do 27B).
 4. **Pesquisa web (T04): você busca, o subagente SÓ sintetiza.** `websearch` só existe no provider
-   `opencode`/`opencode-go` (ou com `OPENCODE_ENABLE_EXA`/`OPENCODE_ENABLE_PARALLEL`) — subagentes em `ollama` NÃO recebem
+   `opencode`/`opencode-go` (ou com `OPENCODE_ENABLE_EXA`/`OPENCODE_ENABLE_PARALLEL`) — subagentes locais (`ollama`/`ollama-nothink`) NÃO recebem
    a tool, mesmo com permission `allow` (prova: registry.ts `webSearchEnabled`, teste real seção 13). Então:
    - **Você** roda 2–3 buscas `websearch` (na camada T00/T01, no chat) e extrai os trechos essenciais.
    - **Embeba os trechos na mensagem** do agente `pesquisa` (nunca aponte arquivo) e peça: ranquear por relevância,
@@ -89,7 +93,7 @@ ajustadas aqui e valem para todo o opencode.
 3. Receba o resultado, confira se responde ao pedido e apresente ao usuário em pt-BR, em 1 linha que o agente certo foi usado.
 4. **Sanitize o resíduo CJK**: subagentes qwen3 emitem às vezes 1 caractere estrangeiro como PRIMEIRO token (ex.: `颗`, `起来`, `栋`, `緻`) — artefato de decodificação, NÃO capacidade. Ocorre mesmo com instrução "pense em pt-BR" no prompt (testado A/B, seção 11 do dogfood). Antes de mostrar ao usuário, remova qualquer prefixo não-latino da resposta do subagente.
 5. Se o agente devolver erro/timeout, repita 1x com formulário mais simples ou responda você mesmo com ressalva de incerteza.
-6. **T04 (pesquisa web): NÃO delegue junto com a busca.** Primeiro rode `websearch` você mesmo (2–3 buscas, termos complementares + ano atual), extraia os trechos mais relevantes (nomes, números, preços em faixa, datas) e só então chame o `pesquisa` com esse material embutido na mensagem. O subagente não tem a tool `websearch` (provider ollama) — delegar sem material faz ele cair em `webfetch` de sites bloqueados, lotar o contexto e voltar vazio (`reason: length`, medida real: 9.660 input tokens antes da resposta).
+6. **T04 (pesquisa web): NÃO delegue junto com a busca.** Primeiro rode `websearch` você mesmo (2–3 buscas, termos complementares + ano atual), extraia os trechos mais relevantes (nomes, números, preços em faixa, datas) e só então chame o `pesquisa` com esse material embutido na mensagem. O subagente não tem a tool `websearch` (provider local) — delegar sem material faz ele cair em `webfetch` de sites bloqueados, lotar o contexto e voltar vazio (`reason: length`, medida real: 9.660 input tokens antes da resposta).
 7. **T05 (imagem): repasse o caminho absoluto no prompt do `ver`, ou o diretório padrão quando não houver caminho**
    (veja regra 6 da seção de regras obrigatórias) — o anexo do usuário NÃO chega ao subagente sozinho, e
    explorar/"caçar" o arquivo é proibido: se o caminho não vier na mensagem, inclua

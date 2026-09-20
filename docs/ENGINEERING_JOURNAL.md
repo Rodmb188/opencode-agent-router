@@ -855,3 +855,57 @@ usam o `ollama` direto. Bateria completa do B02 registrada quando isso rodar.
 - benchmarks/nothink_proxy.py (endpoint OpenAI + SSE; self-test 7/7 — `b6810db`)
 - benchmarks/b02_plug.sh (novo; plug seguro com prévia/executar/rollback — `b6810db`)
 - docs/ROADMAP.md e docs/ENGINEERING_JOURNAL.md (registros)
+
+## r15 — B02 FECHADO: rota final dos 18 agentes pelo proxy (corte na fonte ativo)
+(2026-09-20 · sessão iniciada pelo handoff · commit a definir)
+
+**Objetivo**: o passo que faltava do B02 — apontar os agentes locais para
+`ollama-nothink` para o corte na fonte valer nas rotas reais. Decisão do usuário
+no arranque: **todos os 18 agentes** (não só os 8 com thinking), para consistência
+total do corte.
+
+**Execução (padrão r13/r14: script pronto com backup + rollback, sessão limpa):**
+- Escrito `benchmarks/b02_agents.sh` (prévia / `--executar` / `--rollback`),
+  espelhando o `b02_plug.sh`: pré-checagem (Ollama, proxy respondendo content sem
+  `thinking`, provider na config), backup do diretório de agentes, troca
+  `sed 's|^model: ollama/|model: ollama-nothink/|'` nos 18 `agent/*.md`,
+  validação estática e relatório com rollback em 1 comando.
+- **Prévia**: 18 arquivos listados com linha antiga → linha nova (nada alterado).
+- **--executar**: backup em `~/.config/opencode/agent.bak-b02-20260920-073241`,
+  troca aplicada; validação estática: 18 em `ollama-nothink/` · 0 em `ollama/`.
+- **Bug corrigido na hora**: o `grep | wc -l` com `pipefail` abortava o script
+  quando o grep não achava match (exit 1 do grep) — acrescentado `|| true`.
+
+**Validação real (bateria B02, `benchmarks/results/baterias/`):**
+- 4 modelos via SDK pelo provider novo: `qwen3-local`, `vision`, `nothink-v2`
+  (27B) e **`megabrain-v2` (27B com thinking ON)** → todos responderam "ok"
+  limpo. O megabrain-v2 é a prova do corte: pensa e não vaza nenhum rascunho.
+- Subagente real `preciso` via task (ponta a ponta pelo frontmatter trocado):
+  "Quanto é 15% de 240?" → `**Resposta: 36**` ✅.
+- Log do proxy: **0 ocorrências de `"thinking"`** após todos os testes.
+
+**Achado (registrado na bateria B02)**: `opencode run --agent <nome>` NÃO
+exercita o modelo do frontmatter de subagent — a sessão run usa o modelo
+principal da config (`opencode/big-pickle`); 14 dos 18 smokes via CLI deram
+"OpenCode's free tier can only be used from within OpenCode" (provider open-code
+fora da interface) e 4 responderam com título `> <agente> · big-pickle`. O
+caminho real do subagent é a chamada via task dentro de uma sessão (como no
+teste do `preciso`). Lição: **validação de rota de subagent = task em sessão,
+não `opencode run --agent`**.
+
+**Estado final do B02:** plug (r14) + rota final (r15) aplicados; corte na fonte
+ativo nas rotas reais; rollback em 1 comando para cada peça (config e agentes);
+bateria B02 no padrão do índice. Próximos blocos: **M1** (camada 7B) ou **M2**
+(profiling).
+
+**Arquivos tocados:**
+- benchmarks/b02_agents.sh (novo; troca de rotas com prévia/executar/rollback)
+- benchmarks/results/baterias/B02_rota-final-proxy_2026-09-20.md (novo)
+- benchmarks/results/README.md (índice com B02)
+- docs/ROADMAP.md (status, fluxograma e próximo passo atualizados)
+- docs/ENGINEERING_JOURNAL.md (este registro)
+- config/opencode.jsonc (provider `ollama-nothink` espelhado na doc do repo)
+- config/AGENTS.md e skills/roteador/SKILL.md (nota: rotas passam pelo proxy)
+- benchmarks/rollback/README.md (rollback dos agentes adicionado ao kit)
+- Fora do repo: `~/.config/opencode/agent/*.md` × 18 (rotas trocadas) + backup
+  `~/.config/opencode/agent.bak-b02-20260920-073241`
