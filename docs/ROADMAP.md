@@ -22,7 +22,13 @@
 > comparativa 7/7 PASS, vazamentos eliminados e FAILs históricos (financeiro,
 > revisor) corrigidos. **A config agora é 16 × nothink-v2 27B + profundo (megabrain)
 > + ver (vision) — stack 100% 27B/vision.**
-> Próximos: **M1** (camada 7B, recuperar velocidade) ou **M2** (profiling).
+> **B05 ✅ (r18):** calibração anti-isca dos 18 frontmatters (107→39 negações,
+> 0 "nunca", exemplos estrangeiros removidos, descriptions qwen3→nothink corrigidas)
+> — 18 PASS · 0 regressão. **B06 ✅ (r19):** ajustes de latência sem tocar no modelo —
+> keep_alive 30m (drop-in systemd, rollback em 1 comando) · timeout do proxy 600 s ·
+> profiling: GPU AMD RX 6750 XT 12 GB, 27B em split 43/57 CPU/GPU, ~4,2 tok/s (teto
+> físico da placa). **Decisão 2026-09-21:** **M1 (camada 7B) DESCARTADO** — precisão
+> > velocidade; 14B já reprovava (vazamento 4/7 na B03); 7B reabriria os FAILs.
 
 ## Fluxograma do sistema
 
@@ -34,7 +40,7 @@
             ▼
 ┌──────────────────────────────────────────────────────┐
 │      opencode · AGENTS.md (rotas T00–T19) + config     │
-│      Primário: big-pickle │ subagentes via Ollama      │
+│  Primário: nothink-v2 (local) │ subagentes via Ollama  │
 └───────────┬───────────────────────────────────────────┘
             ▼  ✅ B02: 18 agentes locais -> ollama-nothink (proxy)
 ┌──────────────────────────────────────────────────────┐
@@ -85,7 +91,7 @@ Legenda: ✅ pronto (B02 fechado em r14–r16; B04/r17 troca dos leves) · ⏳ p
 
 | # | Objetivo | Pronto quando… | Esforço | Prioridade | Dependências |
 |---|----------|----------------|---------|------------|--------------|
-| M1 | Camada 7B para T00/T01/T02 | ≥90% da acurácia do 14B com 60% do tempo | M | Média | C1 |
+| M1 | ~~Camada 7B para T00/T01/T02~~ **DESCARTADO (2026-09-21)** | Precisão > velocidade: 14B já reprovava (vazamento 4/7), 7B reabriria FAILs | — | — | — |
 | M2 | Profiling de latência por swap | 3 cenários medidos (atual / com 7B / tuning) | M | Média | M1 |
 | M3 | Onboarding (SETUP.md) | Configurar em <15 min sem erro | S | Média | C3 |
 | M4 | Bateria automática de A/Bs | CI falha se nível retrocede >0.5 pts | M | Baixa | C1, M1 |
@@ -151,9 +157,12 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
   3 na contagem (149 real vs 152 informado). A config agora é **16 × nothink-v2 +
   megabrain-v2 (profundo) + vision (ver) — stack 100% 27B/vision, qwen3 fora da rota**.
 
-Feito isso, os próximos são **M1** (camada 7B para T00/T01/T02 — bateria T02 ≥
-14/14 antes) ou **M2** (script de profiling por nível) — e, se a latência dos
-leves 27B incomodar, calibrar os prompts dos 7 para reduzir a verbosidade.
+Feito isso, os próximos eram **M1** (camada 7B) ou **M2** (profiling). 2026-09-21:
+**M1 descartado por decisão do usuário** (precisão > velocidade — 14B já reprovava,
+7B reabriria os FAILs) e **o profiling foi antecipado dentro da B06** (gargalo medido:
+eval ~4,2 tok/s no split 43/57 CPU/GPU — teto físico da RX 6750 XT 12 GB).
+Pendente: **push** dos commits locais (`0ac624a`, `37758d5`, `6f4fe1c`, `51e4cfa`,
+`cfca09d`).
 
 ## Registro de baterias de teste (novo, 2026-09-17)
 
