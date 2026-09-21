@@ -299,7 +299,7 @@ custo-benefício Brasil R$1.500–2.500") voltou **vazio**. Investigação no DB
 | Tool calls reais da sessão | `skill` ×2, `webfetch` ×14, **`websearch` ×0** |
 | Reasoning do subagente (verbatim) | "não tenho a ferramenta `websearch` disponível — só tenho `webfetch` e `skill`" |
 | `registry.ts:58` `webSearchEnabled()` | websearch só é exposto se provider = `opencode`/`opencode-go` OU env `OPENCODE_ENABLE_EXA` / `OPENCODE_ENABLE_PARALLEL` |
-| Provider da sessão | `ollama` (primário = `opencode/big-pickle`, subagentes = `ollama/*`) |
+| Provider da sessão | `ollama` (subagentes = `ollama/*`) |
 | Envs | nenhuma de EXA/PARALLEL presente no shell nem no systemd |
 | Desfecho | 14 webfetches acumularam `input 9.660` → `reason: length` (12.288) com `output 100` → resposta vazia |
 
@@ -319,7 +319,7 @@ custo-benefício Brasil R$1.500–2.500") voltou **vazio**. Investigação no DB
 ### Verificado junto
 
 - `websearch` REALMENTE funciona no primário deste ambiente (teste ao vivo com
-  resultado acima): porque o primário roda provider `opencode` (big-pickle).
+  resultado acima): porque o primário roda provider `opencode`.
 - Doc oficial confirma o gate de provider (tools page, seção `websearch`).
 
 ---
@@ -328,7 +328,7 @@ custo-benefício Brasil R$1.500–2.500") voltou **vazio**. Investigação no DB
 
 ### 14a. T05 (vision) cannot be smoked by the primary — no image input
 
-The primary model (`opencode`/big-pickle) is **not multimodal**: this session
+The primary model (`opencode`) is **not multimodal**: this session
 cannot attach/read an image, so a `task` to `ver` cannot carry the attachment.
 The `ver` agent (vision 8B VL) does support images, but the delegation link
 fails before it — the error is raised on the primary side ("ERROR: Cannot read
@@ -359,7 +359,7 @@ regression script now fails if any frontmatter fails to parse. 18/18 green.
 
 ## 15. T05 smoke test: the image never reached `ver` (and the "screenshots" hunt)
 
-Real session (`Revisão Teste.png`, 2026-09-15, primary `build` on `big-pickle`):
+Real session (`Revisão Teste.png`, 2026-09-15, primary `build`):
 
 1. User sent `@ver /home/rodmb188/Imagens/Capturas de tela/Teste.png "Me diga o que
    você vê"`. The primary spawned `ver` with a **text-only prompt** ("Analyze

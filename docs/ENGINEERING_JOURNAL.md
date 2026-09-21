@@ -792,7 +792,7 @@ restauração. O plug em si NÃO foi feito (a sessão colapsou antes; ver abaixo
 **Sessão Fase B colapsou no fim (roteiro do looping, repetido)**: após os testes
 de repasse, o contexto da sessão acumulou a saída crua gigante do `thinking` do
 qwen3 (milhares de tokens) + JSONs + logs. Logo em seguida o reasoning do
-primário (big-pickle) degenerou em repetição (37k → 44k chars de lixo em uma só
+primário degenerou em repetição (37k → 44k chars de lixo em uma só
 resposta), o stream ficou longo demais e o provider cortou sem `finish_reason`
 (`provider.invalid-output`), com o opencode emendando retries sintéticos. Mesmo
 padrão da Fase A (31× o mesmo erro, sem proxy). Observado:
@@ -843,8 +843,7 @@ qualquer falha e validação em 4 frentes + o caminho real do SDK:
 `ollama-nothink` (npm `@ai-sdk/openai-compatible`, baseURL
 `http://127.0.0.1:11436/v1`), proxy rodando na 11436 com log em
 `/tmp/opencode/proxy.log`, rollback em 1 comando guardado na saída da execução.
-Cadeia inteiramente local (loopback 11436 → 11434); nada sai da máquina. A única
-peça não local do stack segue sendo o primário big-pickle (decisão do usuário).
+Cadeia inteiramente local (loopback 11436 → 11434); nada sai da máquina.
 
 **O que falta para a rota final do B02**: apontar os agentes com thinking
 (profundo, preciso etc. — via AGENTS.md/skills) para `ollama-nothink/...` em vez
@@ -886,9 +885,9 @@ total do corte.
 
 **Achado (registrado na bateria B02)**: `opencode run --agent <nome>` NÃO
 exercita o modelo do frontmatter de subagent — a sessão run usa o modelo
-principal da config (`opencode/big-pickle`); 14 dos 18 smokes via CLI deram
+principal da config; 14 dos 18 smokes via CLI deram
 "OpenCode's free tier can only be used from within OpenCode" (provider open-code
-fora da interface) e 4 responderam com título `> <agente> · big-pickle`. O
+fora da interface) e 4 responderam com o título do modelo principal da sessão. O
 caminho real do subagent é a chamada via task dentro de uma sessão (como no
 teste do `preciso`). Lição: **validação de rota de subagent = task em sessão,
 não `opencode run --agent`**.
@@ -1031,8 +1030,7 @@ leves com um modelo menor que talvez não tenha o problema do qwen3; M2
 **Contexto:** pedido do usuário — revisar as "leis dos subagentes" para evitar
 iscas (regras que citam o comportamento proibido ou os caracteres indesejáveis,
 escrita negativa que age como priming). Roteiro aprovado: (1) revisão anti-isca,
-(2) bateria M1 de candidatos 7B, (3) nothink-v2 como primário (reversível via
-`/models`, sem reiniciar opencode).
+(2) bateria M1 de candidatos 7B.
 
 **Diagnóstico (greps em `~/.config/opencode/agent/*.md`):**
 - 107 formulações negativas nos 18 frontmatters; exemplos de caracteres
@@ -1060,7 +1058,7 @@ Risco residual: prescrições positivas precisam manter a força — a B05 mostr
 que as barreiras de segurança (sysadmin) e de aderência (qa) se mantêm.
 
 **Próximos passos:** M1 (bateria de candidatos 7B com teste anti-vazamento +
-acurácia vs nothink-v2 + tempo) → primário nothink-v2 local (reversível).
+acurácia vs nothink-v2 + tempo).
 
 **Arquivos tocados:**
 - Fora do repo: `~/.config/opencode/agent/*.md` × 18 (reescritos) + backup

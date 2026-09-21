@@ -19,8 +19,9 @@
 
 O smoke inicial tentou `opencode run --agent <nome>` para os 18 agentes. **O
 `--agent` da CLI NÃO exercita o modelo do frontmatter do subagent**: a sessão run
-usou o modelo principal da config (`opencode/big-pickle`), não
-`ollama-nothink/<modelo>`. Prova: saída "> dados · big-pickle" e erro do provider
+usou o modelo principal da config, não
+`ollama-nothink/<modelo>`. Prova: título de sessão com o modelo principal e erro
+do provider
 open-code para 14 dos 18. O caminho real dos subagentes é a chamada via task
 dentro de uma sessão (usada no T05). **O smoke via CLI foi descartado** — os
 tests de rota que valem são T01–T06 abaixo.
@@ -36,7 +37,7 @@ tests de rota que valem são T01–T06 abaixo.
 | T05 | Subagent real `preciso` (frontmatter novo) | 36 | **Resposta: 36** | ✅ limpo — ponta a ponta |
 | T06 | Log do proxy (`/tmp/opencode/proxy.log`) | 0x `"thinking"` | 0 ocorrências | ✅ limpo |
 | T07 | Estática das rotas (grep) | 18 em `ollama-nothink/` · 0 em `ollama/` | 18 · 0 | ✅ limpo |
-| ~~T08~~ | Smoke via `opencode run --agent` ×18 | — | rodou em big-pickle | ❌ descartado (achado acima) |
+| ~~T08~~ | Smoke via `opencode run --agent` ×18 | — | rodou no modelo principal | ❌ descartado (achado acima) |
 
 ## Detalhes
 
@@ -99,8 +100,8 @@ tests de rota que valem são T01–T06 abaixo.
 
 - Comando tentado: `opencode run --agent <nome> "Responda apenas com a palavra ok"` × 18.
 - Resultado: 14 × `Error from provider (Console): OpenCode's free tier can only
-  be used from within OpenCode`; 4 responderam "ok" mas com título de sessão
-  `> <agente> · big-pickle` (modelo principal da config, não o do frontmatter).
+  be used from within OpenCode`; 4 responderam "ok" mas com título de sessão do
+  modelo principal da config (não o do frontmatter).
 - Conclusão: não serve para validar rota de subagent (a CLI run usa o modelo
   principal da config quando o agente é subagent).
 
