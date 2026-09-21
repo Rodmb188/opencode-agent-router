@@ -949,20 +949,21 @@ que persistia mesmo com o corte na fonte.
 **Execução da B03** (`benchmarks/results/baterias/B03_smoke18_rota-nothink-r16_2026-09-21.md`):
 - Onda 1 (qwen3-local): preciso ✅ limpo (corte inline funcionou) · financeiro ❌
   (vazou inline — regressão da B01) · revisor ❌ (vazou + não corrigiu) · qa ✅
-  com artefato (retry) · importador ✅ (retry após 502) · dados ✅ limpo · pesquisa
-  ✅ limpo · codigo ✅ limpo · redator ⚠ (7 palavras, limite 6) · seo ⚠ (contagem
-  155 informada, real 129).
-- Onda 2 (nothink-v2, sequencial): sumarizador ✅ · tutor ✅ (2 typos) · tradutor
-  ✅ · sysadmin ✅ · entrevistador ✅ · planner ✅ — TODOS limpos, sem tail
-  "Resumo:" (na B01 aparecia em 6 agentes).
+  com artefato (retry) · importador ✅ (retry após 502) · dados ✅ limpo · seo ⚠
+  (contagem 155 informada, real 129).
+- Onda 2 (nothink-v2, sequencial): pesquisa ✅ · codigo ✅ · redator ⚠ (7 palavras,
+  limite 6) · sumarizador ✅ · tutor ✅ (2 typos) · tradutor ✅ · sysadmin ✅ ·
+  entrevistador ✅ · planner ✅ — TODOS limpos, sem tail "Resumo:" (na B01
+  aparecia em 6 agentes).
 - Onda 3 (megabrain-v2, sequencial): profundo ✅ — sem vazamento (B01 tinha 1
   palavra em inglês); 1 typo ("1620 GB" = 16–20).
 - Onda 4 (vision, sequencial): ver ✅ — identificou a pessoa (fix r16b); 2× 502
   antes, corrigido na própria bateria.
 
 **Estado:** proxy com os fix r16 (tools) + r16b (imagens/tool_calls) e self-test
-14/14; B03 registrada; índice e docs atualizados. Único ponto em aberto: mitigação
-dos agentes qwen3-local (decisão do usuário).
+14/14; B03 registrada; índice e docs atualizados. Mitigação dos agentes
+qwen3-local: **decisão do usuário → trocar tudo para nothink-v2, executada e
+validada na B04 (r17 abaixo)**.
 
 **Arquivos tocados:**
 - benchmarks/nothink_proxy.py (fix r16: tools/tool_calls/corte inline; fix r16b:
@@ -971,3 +972,52 @@ dos agentes qwen3-local (decisão do usuário).
 - benchmarks/results/README.md (índice com B03)
 - docs/ROADMAP.md (status e próximo passo)
 - docs/ENGINEERING_JOURNAL.md (este registro)
+
+## r17 — B04: troca dos 7 leves qwen3-local → nothink-v2 validada (7/7 PASS)
+
+(2026-09-21 · sessão do usuário · commit a definir)
+
+**Objetivo**: decisão do usuário (após a B03): trocar TODOS os leves para
+nothink-v2 e rodar uma bateria SÓ com os trocados para comparar com o
+qwen3-local; se algo falhasse, identificar o porquê.
+
+**Execução:**
+- `benchmarks/b04_leves_nothink.sh` (novo, padrão b02: prévia/executar/rollback)
+  trocou os 7 agentes em `qwen3-local` (dados, financeiro, importador, preciso,
+  qa, revisor, seo) para `nothink-v2`. Backup: `agent.bak-b04-20260921-005131`;
+  validação pós-troca: 0 restantes em qwen3-local · 16 totais em nothink-v2.
+- Estado final dos 18: 16 × nothink-v2 · 1 × megabrain-v2 (profundo) · 1 ×
+  vision (ver). **A configuração agora é 100% 27B/vision — nada mais roda no
+  14B**, o que encerra o problema de raciocínio inline do qwen3 na fonte.
+
+**Bateria B04 (7/7 PASS, sem vazamento):**
+- preciso ✅ 391 · **financeiro ✅ R$ 224,00 (FAIL da B03 corrigido)** ·
+  **revisor ✅ corrigiu tudo (FAIL desde a B01 corrigido)** · qa ✅ "Sim" ·
+  importador ✅ campo vazio (verboso, ressalva) · dados ✅ 25 (1ª tentativa sem
+  resposta — ConnectionResetError no log do proxy; retry OK) · seo ✅ meta 149
+  reais vs 152 informados (erro de 3, dentro do limite; contagem ainda não
+  exata — regra de bom senso mantida).
+
+**Lições registradas:**
+- Vazamento de raciocínio na saída: de 4/7 (B03) para 0/7 (B04). O custo é
+  latência: cada leve agora demora como um 27B (~1–6 min; na 1ª carga pode
+  estourar o timeout do SDK se o modelo descarregar — ver dados T06).
+- `seo`/`redator`: a contagem de caracteres/palavras segue não confiável mesmo
+  no 27B — o primário reconfere (regra de bom senso).
+- Verbosidade do 27B (aumento real de tokens na resposta) é o novo trade-off —
+  prompts dos agentes podem exigir achatamento futuro se incomodar.
+
+**Próximos passos possíveis:** M1 (camada 7B) para recuperar velocidade nos
+leves com um modelo menor que talvez não tenha o problema do qwen3; M2
+(profiling); ou calibrar os prompts dos 7 para reduzir a verbosidade.
+
+**Arquivos tocados:**
+- benchmarks/b04_leves_nothink.sh (novo; troca dos leves com prévia/executar/rollback)
+- benchmarks/results/baterias/B04_comparativo_leves-nothink_2026-09-21.md (novo)
+- benchmarks/results/README.md (índice com B04)
+- benchmarks/results/baterias/B03_smoke18_rota-nothink-r16_2026-09-21.md
+  (correção: pesquisa/codigo/redator já eram nothink-v2 — não são leves)
+- docs/ROADMAP.md (status e próximo passo)
+- docs/ENGINEERING_JOURNAL.md (este registro)
+- Fora do repo: `~/.config/opencode/agent/*.md` × 7 (modelo trocado) + backup
+  `~/.config/opencode/agent.bak-b04-20260921-005131`

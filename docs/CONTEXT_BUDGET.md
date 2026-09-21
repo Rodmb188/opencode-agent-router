@@ -9,10 +9,15 @@
 
 | Modelo | Família | num_ctx | Tamanho | Cap embed por chamada | Comportamento ao estourar |
 |---|---|---|---|---|---|
-| `qwen3-local` (14B) | matemática/finanças/dados/QA/conversão | **8192** | 9.0 GB (Q4) | ~5.000 tokens (folga p/ resposta) | Não medido empiricamente — risco `exceed_context_size_error`/vazio; mitigado pelo cap (medir no M2 profiling) |
-| `nothink-v2` (27B) | redação/tutoria/resumo/tradução/etc. | **12288** | 16 GB (Q4) | ~4.000 tokens | Vazio (`reason: length`) — **nunca retry**, reduzir escopo/chunk |
+| `nothink-v2` (27B) | **todos os agentes de texto** (leves T02/T03/T07/T13/T18/T19 e onda 2 — desde a B04/r17; 16 agentes) | **12288** | 16 GB (Q4) | ~4.000 tokens | Vazio (`reason: length`) — **nunca retry**, reduzir escopo/chunk |
 | `megabrain-v2` (27B) | análise profunda T12 | **12288** (herda de nothink-v2) | 16 GB (Q4) | ~4.000 tokens | Vazio (`reason: length`, medido: 8.675 input + 3.613 output = 12.288) — **nunca retry**, chunking |
 | `vision` (8B VL) | imagens/OCR T05 | **16384** | 6.1 GB (Q4) | 1 imagem por turno (12 MP ≈ 8.520 tokens de imagem) + texto ≤ ~2k | Com 8192: `exceed_context_size_error` (medido). Com 16384: folga ~2×; cabe follow-up no mesmo turno |
+
+> **Nota (r17/B04):** `qwen3-local` (14B) **saiu da rota** — vazava raciocínio
+> inline (o corte do proxy não alcança inline sem o marcador); os 7 agentes que
+> o usavam (dados, financeiro, importador, preciso, qa, revisor, seo) passaram
+> para `nothink-v2` (27B, num_ctx 12288, cap ~4k). Linha de referência histórica:
+> 14B = 8192 / ~5k embed / 9.0 GB.
 
 ## Custo de memória (KV cache)
 

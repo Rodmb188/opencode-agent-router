@@ -17,9 +17,12 @@
 > do vazamento residual corrigida (tools/tool_calls repassados + corte inline) e
 > **r16b:** proxy passou a traduzir imagens e tool_calls de histórico (o `ver`
 > identificou a pessoa). **B03 ✅** (smoke dos 18 pela rota final: 14 PASS · 2 parcial
-> · 2 FAIL — 27B e vision 100% limpos; qwen3-local instável, mitigação em aberto).
-> Próximos: **M1** (camada 7B) ou **M2** (profiling) ou **decisão da mitigação dos
-> agentes qwen3-local**.
+> · 2 FAIL — 27B e vision 100% limpos; qwen3-local instável). **r17/B04 ✅:** decisão
+> do usuário executada — **os 7 leves foram trocados para nothink-v2**; bateria
+> comparativa 7/7 PASS, vazamentos eliminados e FAILs históricos (financeiro,
+> revisor) corrigidos. **A config agora é 16 × nothink-v2 27B + profundo (megabrain)
+> + ver (vision) — stack 100% 27B/vision.**
+> Próximos: **M1** (camada 7B, recuperar velocidade) ou **M2** (profiling).
 
 ## Fluxograma do sistema
 
@@ -46,9 +49,10 @@
 └───────────┬───────────────────────────────────────────┘
             ▼
 ┌──────────────────────────────────────────────────────┐
-│            OLLAMA local (32GB RAM, sequencial)         │
-│   27B thinking: T12 │ 27B no-think: T06/T09/T10        │
-│   14B: T02/T03/T13/T18/T19 │ 8B vision: T05            │
+│     OLLAMA local (32GB RAM, SEQUENCIAL obrigatório)   │
+│     ✅ r17/B04: 16 × nothink-v2 27B (leves + Onda 2)  │
+│     1 × megabrain-v2 27B (profundo) · 1 × vision      │
+│     qwen3-local 14B AUSENTE (só em backup b04)        │
 └───────────┬───────────────────────────────────────────┘
             │ resposta / erro / timeout
 ┌───────────▼───────────┐   ┌─────────────────────────┐
@@ -63,7 +67,7 @@
   PASS/FAIL ──────────────────────────────┘
   LOOP: teste → falha → regra → regressão → próximo teste
 
-Legenda: ✅ pronto (B02 fechado em r14/r15/r16) · ⏳ pendente (próximo: M1/M2/decisão qwen3)
+Legenda: ✅ pronto (B02 fechado em r14–r16; B04/r17 troca dos leves) · ⏳ pendente (próximo: M1/M2)
 ```
 
 ## Metas
@@ -111,7 +115,7 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
 | Swap thrash entre 27B | `ollama stop` entre sessões pesadas; fallback para 14B em timeout |
 | Estouro de contexto → vazio | Cap ~4k tokens embedados; nunca retry; C4 formaliza |
 | T05 sem imagem na pasta padrão | Fluxo "avisa e pede caminho" já implementado (r5); teste C2 |
-| Matemática silenciosa no 27B | T02 → 14B é ferro; asserts no CI |
+| Matemática silenciosa no 27B | B04: nothink-v2 acertou T02 (R$ 224,00) e T04/qa; manter asserts no CI e baterias de conferência (preciso/financeiro) |
 | Hardware estacionário | 7B nas rotas leves (M1); monitoramento de acurácia (M4) |
 | Primário degenera em sessão longa/contexto poluído (r13) | Executar mudanças de runtime (B02) em sessão curta e escopo mínimo; inspecionar saída bruta com truncamento; kit de rollback pronto |
 
@@ -133,10 +137,23 @@ Ordem recomendada: **A → D → B → C**. Publicar antes de consolidar = dívi
    `b02_agents.sh --rollback`); backup dos agentes em
    `~/.config/opencode/agent.bak-b02-20260920-073241`.
 
+**B03 + B04 — smoke final e troca dos leves: FECHADOS** (2026-09-21, r16 + r17):
+- B03: smoke dos 18 pela rota final (mesmos prompts da B01). Achados corrigidos
+  no proxy na própria rodada: r16 (repassar `tools`/`tool_calls`, cortar raciocínio
+  inline pelo marcador ` response`) e r16b (traduzir imagens `image_url` → campo
+  `images` nativo + `arguments` string → objeto — o `ver` voltou a funcionar e
+  identificou a pessoa). Resultado: 14 PASS · 2 parcial · 2 FAIL — 27B/vision 100%
+  limpos; falhas todas do qwen3-local (financeiro vazou, revisor não corrigiu).
+- B04/r17: decisão do usuário — os 7 leves (dados, financeiro, importador, preciso,
+  qa, revisor, seo) trocados para `nothink-v2` com `benchmarks/b04_leves_nothink.sh`
+  (backup `agent.bak-b04-20260921-005131`). Bateria comparativa: **7/7 PASS, 0
+  vazamento** — financeiro e revisor (FAILs históricos) corrigidos; seo com erro de
+  3 na contagem (149 real vs 152 informado). A config agora é **16 × nothink-v2 +
+  megabrain-v2 (profundo) + vision (ver) — stack 100% 27B/vision, qwen3 fora da rota**.
+
 Feito isso, os próximos são **M1** (camada 7B para T00/T01/T02 — bateria T02 ≥
-14/14 antes) ou **M2** (script de profiling por nível).
-Achado do C1b a resolver no futuro: `nothink-v2` vaza o raciocínio em inglês em
-chamadas cruas (sem parser qwen3) — JOURNAL T16 r4.
+14/14 antes) ou **M2** (script de profiling por nível) — e, se a latência dos
+leves 27B incomodar, calibrar os prompts dos 7 para reduzir a verbosidade.
 
 ## Registro de baterias de teste (novo, 2026-09-17)
 

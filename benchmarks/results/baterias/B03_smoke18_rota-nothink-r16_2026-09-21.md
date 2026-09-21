@@ -9,9 +9,10 @@
 - **Modelos:** qwen3-local 14B (7 agentes, Onda 1) · nothink-v2 27B (9 agentes,
   Onda 2) · megabrain-v2 27B (profundo, Onda 3) · vision 8B (ver, Onda 4).
 - **Resultado geral:** **14 PASS · 2 PARCIAL (seo, redator) · 2 FAIL (financeiro,
-  revisor)** — pior que a B01 (16/1/1) **apenas por causa do qwen3-local**:
-  `financeiro` saiu limpo na B01 e vazou inline nesta. Os 27B e o vision saíram
-  TODOS limpos, e o `ver` desta vez **nomeou a pessoa** (melhora sobre a B01).
+  revisor)**. Por modelo: **qwen3-local = 5 PASS (preciso, qa, importador, dados,
+  pesquisa na B03 não) · 1 parcial (seo) · 2 FAIL (financeiro, revisor)**;
+  **nothink-v2 27B = 8 PASS + 1 parcial (redator)**; megabrain-v2 e vision limpos.
+  O `ver` desta vez **nomeou a pessoa** (melhora sobre a B01).
 
 ## Vereditos
 
@@ -23,9 +24,9 @@
 | T04 | qa | "sim" | "10%...150,00 response sim" (retry) | ✅ com artefato |
 | T05 | importador | CSV campo vazio | correto (retry após 502) | ✅ (ressalva arquivo) |
 | T06 | dados | 25 | 25 | ✅ limpo |
-| T07 | pesquisa | B > A > C | correto, ranqueado | ✅ limpo |
-| T08 | codigo | `a + b` | `return a + b` | ✅ limpo |
-| T09 | redator | slogan ≤ 6 palavras | 7 palavras | ⚠ PARCIAL (contagem) |
+| T07 | pesquisa | B > A > C | correto, ranqueado | ✅ limpo (nothink-v2) |
+| T08 | codigo | `a + b` | `return a + b` | ✅ limpo (nothink-v2) |
+| T09 | redator | slogan ≤ 6 palavras | 7 palavras | ⚠ PARCIAL (contagem; nothink-v2) |
 | T10 | sumarizador | 1 frase fiel | 1 frase fiel | ✅ limpo |
 | T11 | tutor | analogia didática | analogia boa | ✅ (2 typos menores) |
 | T12 | tradutor | The black cat slept. | correto | ✅ limpo |
@@ -47,8 +48,7 @@
   com artefatos (mas resposta final correta). Confirma o achado r16: o qwen3 no
   contexto de agente nem sempre separa o raciocínio no campo `thinking`; quando
   emite inline sem o marcador ` response`, o corte do proxy não pega. **Mitigação
-  continua pendente de decisão** (trocar leves por nothink-v2 vs. aceitar
-  sanitização do primário vs. mexer no Modelfile).
+  executada na B04** (troca dos 7 leves para nothink-v2 — ver bateria seguinte).
 - **Achado novo no proxy (fix r16b, testado nesta bateria)**: o fluxo REAL do
   `ver` quebrava em 502 no 2º turno (imagem voltando via tool result). Duas
   causas no `traduz_oai_para_ollama`: (1) o SDK manda imagens como `content` em
@@ -167,7 +167,7 @@
 
 ## T07 — pesquisa (síntese ranqueada)
 
-- **Modelo:** qwen3-local · **Onda 1**
+- **Modelo:** nothink-v2 27B · **Onda 2 (sequencial)**
 - **Prompt (verbatim):**
   > Material de busca embutido: (1) "Produto A custa R$ 1.800,00 e tem 64 GB";
   > (2) "Produto B custa R$ 2.300,00 e tem 128 GB"; (3) "Produto C custa
@@ -179,7 +179,7 @@
 
 ## T08 — codigo (função)
 
-- **Modelo:** qwen3-local · **Onda 1**
+- **Modelo:** nothink-v2 27B · **Onda 2 (sequencial)**
 - **Prompt (verbatim):**
   > Escreva uma função JavaScript que soma dois números e retorna o resultado.
   > Responda apenas o código.
@@ -192,7 +192,7 @@
 
 ## T09 — redator (slogan)
 
-- **Modelo:** qwen3-local · **Onda 1**
+- **Modelo:** nothink-v2 27B · **Onda 2 (sequencial)**
 - **Prompt (verbatim):**
   > Crie um slogan para uma padaria de bairro. Máximo 6 palavras, em pt-BR.
 - **Esperado:** slogan ≤ 6 palavras
@@ -325,10 +325,9 @@
 ## Registro de execução
 
 - Onda 1 (qwen3-local, paralela): preciso, financeiro, revisor, qa, importador,
-  dados, seo, pesquisa, codigo, redator — 2× 502 no primeiro tiro (qa,
-  importador), retries individuais OK.
-- Onda 2 (nothink-v2 27B, sequencial): sumarizador, tutor, tradutor, sysadmin,
-  entrevistador, planner.
+  dados, seo — 2× 502 no primeiro tiro (qa, importador), retries individuais OK.
+- Onda 2 (nothink-v2 27B, sequencial): pesquisa, codigo, redator, sumarizador,
+  tutor, tradutor, sysadmin, entrevistador, planner.
 - Onda 3 (megabrain-v2 27B, sequencial): profundo.
 - Onda 4 (vision 8B, sequencial): ver — 2× 502 antes do fix r16b (diagnóstico e
   correção na própria bateria).
