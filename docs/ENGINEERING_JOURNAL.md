@@ -909,3 +909,65 @@ bateria B02 no padrão do índice. Próximos blocos: **M1** (camada 7B) ou **M2*
 - benchmarks/rollback/README.md (rollback dos agentes adicionado ao kit)
 - Fora do repo: `~/.config/opencode/agent/*.md` × 18 (rotas trocadas) + backup
   `~/.config/opencode/agent.bak-b02-20260920-073241`
+
+## r16 — achado raiz do vazamento residual + B03 (proxy com tools, tool_calls e imagens)
+
+(2026-09-20 → 2026-09-21 · sessão iniciada pelo handoff do r15 · commit a definir)
+
+**Objetivo**: executar a B03 (smoke dos 18 pela rota final do B02, mesmos prompts
+da B01) e, ao comparar, descobrir e corrigir a causa raiz do vazamento residual
+que persistia mesmo com o corte na fonte.
+
+**Causa raiz do vazamento (achado principal):**
+- `traduz_oai_para_ollama` **descartava os `tools` do request do SDK**. Sem
+  tools, o qwen3 emite o raciocínio **inline no content** (inglês/chinese) em vez
+  do campo `thinking` — e o corte do `thinking` na fonte não pega inline.
+- Evidências: pior caso system grande + sem tools = inline em 4/4; com tools =
+  inline em 4/10; user-only = 8/8 limpo; `think: true` forçado sem efeito;
+  alucinações CJK do dataset (resíduos U+9897, U+0308, diacríticos no content).
+- Fix: repassar `tools`/`tool_choice` na ida, normalizar `tool_calls` no formato
+  OpenAI na volta (id/type/arguments string, SSE com chunk dedicado), remover
+  `<tool_call>` não-parseado do content e cortar raciocínio inline pelo marcador
+  ` response` (regex `(?:^|[ \t\r\n])response[\r\n]`). Self-test 11/11.
+- **Limite confirmado**: o corte na fonte funciona para modelos que separam o
+  thinking (nothink-v2, megabrain-v2). O qwen3-local (14B) **não separa de forma
+  confiável no contexto de agente** — quando emite inline sem o marcador, nada
+  corta (evidência na B03: `financeiro` vazou). Mitigação (trocar leves por
+  nothink-v2 / aceitar sanitização do primário / mexer no Modelfile) fica para
+  decisão do usuário.
+
+**Fix novo descoberto DURANTE a B03 (r16b):**
+- O subagent `ver` quebrava em 502 no 2º turno (imagem voltando via tool result).
+  Duas causas em `traduz_oai_para_ollama`: (1) o SDK manda imagens como
+  `content` em LISTA de parts `image_url` e o `/api/chat` nativo só aceita
+  content string + campo `images` (base64 sem prefixo data:); (2) `tool_calls`
+  de histórico chegam com `arguments` em string JSON (formato OpenAI) e o Ollama
+  nativo só aceita OBJETO. Corrigido com `_converte_content_parts` + `json.loads`
+  nos arguments; self-test 12/12 → 14/14. Depois do fix, o `ver` identificou
+  "Luiz Inácio Lula da Silva" (na B01 só descrevia sem nomear).
+
+**Execução da B03** (`benchmarks/results/baterias/B03_smoke18_rota-nothink-r16_2026-09-21.md`):
+- Onda 1 (qwen3-local): preciso ✅ limpo (corte inline funcionou) · financeiro ❌
+  (vazou inline — regressão da B01) · revisor ❌ (vazou + não corrigiu) · qa ✅
+  com artefato (retry) · importador ✅ (retry após 502) · dados ✅ limpo · pesquisa
+  ✅ limpo · codigo ✅ limpo · redator ⚠ (7 palavras, limite 6) · seo ⚠ (contagem
+  155 informada, real 129).
+- Onda 2 (nothink-v2, sequencial): sumarizador ✅ · tutor ✅ (2 typos) · tradutor
+  ✅ · sysadmin ✅ · entrevistador ✅ · planner ✅ — TODOS limpos, sem tail
+  "Resumo:" (na B01 aparecia em 6 agentes).
+- Onda 3 (megabrain-v2, sequencial): profundo ✅ — sem vazamento (B01 tinha 1
+  palavra em inglês); 1 typo ("1620 GB" = 16–20).
+- Onda 4 (vision, sequencial): ver ✅ — identificou a pessoa (fix r16b); 2× 502
+  antes, corrigido na própria bateria.
+
+**Estado:** proxy com os fix r16 (tools) + r16b (imagens/tool_calls) e self-test
+14/14; B03 registrada; índice e docs atualizados. Único ponto em aberto: mitigação
+dos agentes qwen3-local (decisão do usuário).
+
+**Arquivos tocados:**
+- benchmarks/nothink_proxy.py (fix r16: tools/tool_calls/corte inline; fix r16b:
+  content parts → images nativo + arguments string → objeto; self-test 14/14)
+- benchmarks/results/baterias/B03_smoke18_rota-nothink-r16_2026-09-21.md (novo)
+- benchmarks/results/README.md (índice com B03)
+- docs/ROADMAP.md (status e próximo passo)
+- docs/ENGINEERING_JOURNAL.md (este registro)

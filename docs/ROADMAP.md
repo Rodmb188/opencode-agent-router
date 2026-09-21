@@ -5,18 +5,21 @@
 > O diário técnico completo (medidas, falhas, decisões) vive em
 > [ENGINEERING_JOURNAL.md](ENGINEERING_JOURNAL.md).
 >
-> **Status em 2026-09-20:** FASE A (consolidação) concluída — C1 ✅ · C2 ✅ · C3 ✅ · C4 ✅.
-> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte 7/7** (self-tests,
-> commits `3e9d038` r12 + `6ebd77f` r13 + `b6810db` r14). **Achado r13:** o Ollama
+> **Status em 2026-09-21:** FASE A (consolidação) concluída — C1 ✅ · C2 ✅ · C3 ✅ · C4 ✅.
+> Linha de corte do rascunho: **parser 3/3** + **proxy corte-na-fonte self-test 14/14**
+> (commits `3e9d038` r12 + `6ebd77f` r13 + `b6810db` r14). **Achado r13:** o Ollama
 > devolve o raciocínio em campo separado (`message.thinking`); o proxy o remove na
 > fonte. **Achado r14:** o package `@ai-sdk/ollama` não existe no npm (404); o proxy
 > agora fala o formato OpenAI (`/v1/chat/completions` + SSE) e o plug usa o mesmo
 > `@ai-sdk/openai-compatible` já comprovado. **B02 APLICADO E FECHADO** (r14 + r15):
 > plug validado 6/6 e **rota final executada — os 18 agentes locais apontam para
-> `ollama-nothink`** e o corte na fonte vale para as rotas reais (bateria B02:
-> 4 modelos via SDK + agente com thinking de ponta a ponta + log do proxy sem
-> `thinking`). B01 ✅ (smoke dos 18 agentes). Próximos: **M1** (camada 7B) ou
-> **M2** (profiling).
+> `ollama-nothink`** e o corte na fonte vale para as rotas reais. **r16:** causa raiz
+> do vazamento residual corrigida (tools/tool_calls repassados + corte inline) e
+> **r16b:** proxy passou a traduzir imagens e tool_calls de histórico (o `ver`
+> identificou a pessoa). **B03 ✅** (smoke dos 18 pela rota final: 14 PASS · 2 parcial
+> · 2 FAIL — 27B e vision 100% limpos; qwen3-local instável, mitigação em aberto).
+> Próximos: **M1** (camada 7B) ou **M2** (profiling) ou **decisão da mitigação dos
+> agentes qwen3-local**.
 
 ## Fluxograma do sistema
 
@@ -32,11 +35,13 @@
 └───────────┬───────────────────────────────────────────┘
             ▼  ✅ B02: 18 agentes locais -> ollama-nothink (proxy)
 ┌──────────────────────────────────────────────────────┐
-│  PROXY corte-na-fonte   ✅ parser 3/3 · proxy 7/7      │
+│  PROXY corte-na-fonte  ✅ parser 3/3 · proxy 14/14      │
 │  11436 → 11434  ✅ plug (r14) e rota final dos agentes  │
 │  (r15) aplicados — rollback em 1 comando por script    │
 │  · corta <thinking>/RASCUNHO em content                │
 │  · remove message.thinking/rascunho na fonte (r13)     │
+│  · repassa tools + corta inline (r16)                  │
+│  · traduz imagens/tool_calls historico (r16b)          │
 │  · sanitiza charset → latino pt-BR                     │
 └───────────┬───────────────────────────────────────────┘
             ▼
@@ -58,7 +63,7 @@
   PASS/FAIL ──────────────────────────────┘
   LOOP: teste → falha → regra → regressão → próximo teste
 
-Legenda: ✅ pronto (B02 fechado em r14/r15) · ⏳ pendente (próximo: M1/M2)
+Legenda: ✅ pronto (B02 fechado em r14/r15/r16) · ⏳ pendente (próximo: M1/M2/decisão qwen3)
 ```
 
 ## Metas
