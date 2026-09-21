@@ -287,7 +287,7 @@ class _Handler(BaseHTTPRequestHandler):
         try:
             r = urllib.request.urlopen(
                 urllib.request.Request(url, data=data, headers=headers),
-                timeout=300,
+                timeout=600,
             )
             cru = r.read().decode("utf-8")
         except Exception as e:

@@ -1067,3 +1067,43 @@ acurácia vs nothink-v2 + tempo) → primário nothink-v2 local (reversível).
   `~/.config/opencode/agent.bak-b05-antiisca-20260921-014627`
 - benchmarks/results/baterias/B05_antiisca_2026-09-21.md (novo)
 - benchmarks/results/README.md (índice com B05)
+
+---
+
+## r19 — Ajustes de latência sem tocar no modelo (B06)
+
+**Data:** 2026-09-21 · **Decisão do usuário:** manter 27B (precisão > velocidade);
+descartar 7B/M1 como downgrade; otimizar os arredores sem tocar em modelo/agente.
+
+**Contexto descoberto durante o profiling (o que mudou o entendimento):**
+- O PC TEM GPU: **AMD Radeon RX 6750 XT 12 GB VRAM** (Vulkan/RADV; `nvidia-smi` não
+  existe porque é AMD). O `ollama ps` mostrava "100% GPU" do vision — era a AMD.
+- O `nothink-v2` (17 GB) roda em **split 43% CPU / 57% GPU** — não cabe inteiro na
+  VRAM de 12 GB; quase metade do modelo calcula na CPU (tráfego PCIe por token).
+- Medição: carga fria = **7,2 s** (NVMe rápido, barato); geração quente =
+  **~4,2 tok/s** (21 s p/ 88 tokens, 47 s p/ 164). **O gargalo é o eval pelo split,
+  não a recarga.**
+
+**O que foi aplicado (com backup + rollback, padrão do projeto):**
+1. **keep_alive 15m → 1h**: drop-in systemd user
+   (`~/.config/systemd/user/ollama.service.d/override.conf`, script
+   `benchmarks/b06_keepalive.sh` com prévia/executar/rollback). Elimina o pior
+   caso das B04/B05 (1ª chamada após descarga pagava a recarga de 17 GB).
+2. **Timeout do SDK**: já era 1.200.000 ms (20 min) na config do opencode — não
+   era o vilão. Subi o `timeout` do proxy 300 → **600 s** (margem para o
+   megabrain-v2 com thinking longo; backup em `/tmp/opencode/nothink_proxy.py.bak-b06`).
+   Proxy reiniciado (novo pid 73481, pid file corrigido; `__pycache__` limpo).
+3. **Profiling** (este registro): carga barata, eval é o teto.
+
+**Leitura honesta:** o keep_alive corta o padrão "1–6 min no pior caso", mas a
+geração quente segue ~4,2 tok/s — limite físico da placa para um modelo de 17 GB
+em 12 GB de VRAM. Acelerar a geração exigiria outra GPU (ex.: 24 GB) ou um modelo
+que caiba inteiro na VRAM (ex.: 14B ~9 GB — opção arquivada por decisão do usuário).
+Isso NÃO é erro de config: é o teto do hardware atual.
+
+**Arquivos tocados:**
+- benchmarks/b06_keepalive.sh (novo)
+- benchmarks/nothink_proxy.py (`timeout=600`; backup em /tmp/opencode)
+- docs/ENGINEERING_JOURNAL.md (este registro)
+- Fora do repo: drop-in `~/.config/systemd/user/ollama.service.d/override.conf`
+  (rollback: `bash benchmarks/b06_keepalive.sh --rollback`)
