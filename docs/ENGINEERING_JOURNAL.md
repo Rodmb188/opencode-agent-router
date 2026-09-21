@@ -1021,3 +1021,49 @@ leves com um modelo menor que talvez não tenha o problema do qwen3; M2
 - docs/ENGINEERING_JOURNAL.md (este registro)
 - Fora do repo: `~/.config/opencode/agent/*.md` × 7 (modelo trocado) + backup
   `~/.config/opencode/agent.bak-b04-20260921-005131`
+
+---
+
+## r18 — Calibração anti-isca dos 18 agentes (B05)
+
+**Data:** 2026-09-21 · **Bateria:** B05 (18 PASS · 0 FAIL · 0 regressão)
+
+**Contexto:** pedido do usuário — revisar as "leis dos subagentes" para evitar
+iscas (regras que citam o comportamento proibido ou os caracteres indesejáveis,
+escrita negativa que age como priming). Roteiro aprovado: (1) revisão anti-isca,
+(2) bateria M1 de candidatos 7B, (3) nothink-v2 como primário (reversível via
+`/models`, sem reiniciar opencode).
+
+**Diagnóstico (greps em `~/.config/opencode/agent/*.md`):**
+- 107 formulações negativas nos 18 frontmatters; exemplos de caracteres
+  estrangeiros citados nas regras (preciso, revisor, profundo); bloco "Tom e
+  energia" repetia frases proibidas ("Não.", "Não dá", "Não posso") — ensinava o
+  que se queria evitar; 7 descriptions diziam "qwen3-local" (falso desde a B04).
+
+**O que foi feito:**
+- Reescritos os 18 frontmatters em forma positiva, preservando frontmatter e
+  permissions; backup em `~/.config/opencode/agent.bak-b05-antiisca-20260921-014627`.
+- Métricas: negações 107 → 39 (todas neutras/fáticas); "nunca/jamais/proibido" → 0;
+  caracteres estrangeiros nas regras → 0; "qwen3-local" → 0.
+- B05 rodou os MESMOS prompts da B04 (7 leves) e da B03 (demais 11): 18/18 PASS,
+  nenhum veredito piorou; 3 melhoraram (redator slogan 7→5 palavras; tutor sem
+  typos; planner sem typo "1015"). Teste extra de segurança no sysadmin com a
+  regra positiva: entregou o comando destrutivo pedido MAS com dry-run, aviso de
+  irreversibilidade e caminho seguro — barreira mantida.
+- Contagem de caracteres continua não confiável (seo informou 146, real 141) —
+  primário reconfere. 1ª chamada de 27B após descarga segue podendo voltar vazia
+  (tradutor) — retry individual resolve.
+
+**Lição:** instrução negativa ("não faça X") coloca X no contexto do modelo;
+prescrição positiva ("faça Y mantendo Z") alcança o mesmo controle sem o priming.
+Risco residual: prescrições positivas precisam manter a força — a B05 mostrou
+que as barreiras de segurança (sysadmin) e de aderência (qa) se mantêm.
+
+**Próximos passos:** M1 (bateria de candidatos 7B com teste anti-vazamento +
+acurácia vs nothink-v2 + tempo) → primário nothink-v2 local (reversível).
+
+**Arquivos tocados:**
+- Fora do repo: `~/.config/opencode/agent/*.md` × 18 (reescritos) + backup
+  `~/.config/opencode/agent.bak-b05-antiisca-20260921-014627`
+- benchmarks/results/baterias/B05_antiisca_2026-09-21.md (novo)
+- benchmarks/results/README.md (índice com B05)

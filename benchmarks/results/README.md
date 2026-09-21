@@ -13,6 +13,7 @@ agentes sem acumular dezenas de conversas dispersas — o registro vive no repo.
 | B02 | 2026-09-20 | [`baterias/B02_rota-final-proxy_2026-09-20.md`](baterias/B02_rota-final-proxy_2026-09-20.md) | 6 PASS (rota final dos 18 agentes pelo proxy) · 1 descartado por achado |
 | B03 | 2026-09-21 | [`baterias/B03_smoke18_rota-nothink-r16_2026-09-21.md`](baterias/B03_smoke18_rota-nothink-r16_2026-09-21.md) | 14 PASS · 2 parcial · 2 FAIL (27B e vision todos limpos; qwen3-local instável) |
 | B04 | 2026-09-21 | [`baterias/B04_comparativo_leves-nothink_2026-09-21.md`](baterias/B04_comparativo_leves-nothink_2026-09-21.md) | **7 PASS · 0 FAIL** — 7 leves trocados qwen3→nothink-v2; vazamentos eliminados, FAILs históricos corrigidos |
+| B05 | 2026-09-21 | [`baterias/B05_antiisca_2026-09-21.md`](baterias/B05_antiisca_2026-09-21.md) | **18 PASS · 0 FAIL · 0 regressão** — calibração anti-isca dos 18 frontmatters (107→39 negações, 0 "nunca", exemplos estrangeiros removidos) |
 
 ## Legado (antes do formato padrão)
 
