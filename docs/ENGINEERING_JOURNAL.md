@@ -1085,7 +1085,11 @@ descartar 7B/M1 como downgrade; otimizar os arredores sem tocar em modelo/agente
   não a recarga.**
 
 **O que foi aplicado (com backup + rollback, padrão do projeto):**
-1. **keep_alive 15m → 1h**: drop-in systemd user
+1. **keep_alive 15m → 30m** (decisão do usuário: após confirmar que fechar o
+   opencode NÃO desliga o keep_alive — ele vive no servidor Ollama, serviço
+   systemd do usuário, independente do opencode — o usuário pediu 30m em vez de
+   1h por economia de memória ociosa; modelo residente usa ~17 GB parados
+   (12 VRAM + ~5 RAM), zero CPU até chamada). Drop-in systemd user
    (`~/.config/systemd/user/ollama.service.d/override.conf`, script
    `benchmarks/b06_keepalive.sh` com prévia/executar/rollback). Elimina o pior
    caso das B04/B05 (1ª chamada após descarga pagava a recarga de 17 GB).
