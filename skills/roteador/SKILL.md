@@ -45,12 +45,14 @@ ajustadas aqui e valem para todo o opencode.
    Qualquer conta com mais de 1 operação → nível T02 (`preciso`) ou T03 (`financeiro`).
 3. **`megabrain`/`profundo` apenas em T12** — nunca para cálculo rápido. Para cálculo, `qwen3-local`
    resolve passo a passo e conferindo (mais rápido E mais correto que o modo rápido do 27B).
-4. **Pesquisa web (T04): você busca, o subagente SÓ sintetiza.** `websearch` só existe no provider
-   `opencode`/`opencode-go` (ou com `OPENCODE_ENABLE_EXA`/`OPENCODE_ENABLE_PARALLEL`) — subagentes locais (`ollama`/`ollama-nothink`) NÃO recebem
-   a tool, mesmo com permission `allow` (prova: registry.ts `webSearchEnabled`, teste real seção 13). Então:
+4. **Pesquisa web (T04): o primário busca primeiro; o `pesquisa` sintetiza e PODE buscar se faltar material.**
+   O `websearch` chega a TODOS os 18 subagentes desde 25/09/2026 (`websearch`/`webfetch: allow` no frontmatter;
+   o filtro de registry por provider do dogfood sec. 13 não existe mais — verificado). O provider é por sessão e é herdado:
+   sessões locais (`ollama`/`ollama-nothink`) usam **Exa** (`websearch.provider: exa` no config GLOBAL, key local);
+   o Big Pickle/provider `opencode` usa a infra padrão e nunca toca a Exa do usuário. Então:
    - **Você** roda 2–3 buscas `websearch` (na camada T00/T01, no chat) e extrai os trechos essenciais.
    - **Embeba os trechos na mensagem** do agente `pesquisa` (nunca aponte arquivo) e peça: ranquear por relevância,
-     justificar, dar veredicto. O `pesquisa` NÃO usa ferramenta — material já vem pronto.
+     justificar, dar veredicto. Se o material embutido não bastar, o `pesquisa` pode fazer 1–2 buscas próprias.
    - `webfetch` em sites .com.br bloqueia bots (erro de transporte) — use só em domínio confirmado.
 5. **Versões curtas dos níveis T07–T11** (ex.: "traduza essa frase", "resuma 1 parágrafo") ficam na camada T00/T01; só delega quando a tarefa for substancial ("revise este e-mail de 2 páginas", "resuma o artigo de 10 páginas").
 6. **T05 (imagem): o anexo NÃO chega sozinho ao `ver`; repasse o caminho absoluto, VERBATIM.** O primário não repassa a
