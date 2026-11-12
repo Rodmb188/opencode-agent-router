@@ -1,12 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "ollama/nothink-v2",
+  "model": "ollama-nothink/nothink-v2",
   "compaction": {
     "auto": true,
-    "prune": true,
-    "tail_turns": 5,
-    "preserve_recent_tokens": 6000,
-    "reserved": 2048
+    "keep": {
+      "tokens": 4000
+    },
+    "buffer": 1000
   },
   "provider": {
     "ollama": {
@@ -18,24 +18,48 @@
       },
       "models": {
         "qwen3-local": {
-          "name": "Qwen 3 14B Abliterate (sem censura)"
+          "name": "Qwen 3 14B Abliterate (sem censura)",
+          "limit": {
+            "context": 8192,
+            "output": 1536
+          }
         },
         "nothink-v2": {
           "name": "Qwen3.6 27B Abliterate v2 (template corrigido, sem pensar)",
+          "limit": {
+            "context": 16384,
+            "output": 2500
+          },
           "options": { "body": { "think": false } }
         },
         "megabrain-v2": {
-          "name": "Qwen3.6 27B Abliterate v2 (template corrigido)"
+          "name": "Qwen3.6 27B Abliterate v2 (template corrigido)",
+          "limit": {
+            "context": 16384,
+            "output": 3072
+          }
         },
         "nothink": {
           "name": "Qwen3.6 27B Abliterate (sem pensar) [template antigo]",
+          "limit": {
+            "context": 16384,
+            "output": 2500
+          },
           "options": { "body": { "think": false } }
         },
         "megabrain": {
-          "name": "Qwen3.6 27B Abliterate (mega brain) [template antigo]"
+          "name": "Qwen3.6 27B Abliterate (mega brain) [template antigo]",
+          "limit": {
+            "context": 16384,
+            "output": 3072
+          }
         },
         "vision": {
           "name": "Qwen3-VL 8B (visão)",
+          "limit": {
+            "context": 16384,
+            "output": 1536
+          },
           "attachment": true,
           "modalities": {
             "input": ["text", "image"],
@@ -54,24 +78,48 @@
       },
       "models": {
         "qwen3-local": {
-          "name": "Qwen 3 14B Abliterate (sem censura)"
+          "name": "Qwen 3 14B Abliterate (sem censura)",
+          "limit": {
+            "context": 8192,
+            "output": 1536
+          }
         },
         "nothink-v2": {
           "name": "Qwen3.6 27B Abliterate v2 (template corrigido, sem pensar)",
+          "limit": {
+            "context": 16384,
+            "output": 2500
+          },
           "options": { "body": { "think": false } }
         },
         "megabrain-v2": {
-          "name": "Qwen3.6 27B Abliterate v2 (template corrigido)"
+          "name": "Qwen3.6 27B Abliterate v2 (template corrigido)",
+          "limit": {
+            "context": 16384,
+            "output": 3072
+          }
         },
         "nothink": {
           "name": "Qwen3.6 27B Abliterate (sem pensar) [template antigo]",
+          "limit": {
+            "context": 16384,
+            "output": 2500
+          },
           "options": { "body": { "think": false } }
         },
         "megabrain": {
-          "name": "Qwen3.6 27B Abliterate (mega brain) [template antigo]"
+          "name": "Qwen3.6 27B Abliterate (mega brain) [template antigo]",
+          "limit": {
+            "context": 16384,
+            "output": 3072
+          }
         },
         "vision": {
           "name": "Qwen3-VL 8B (visão)",
+          "limit": {
+            "context": 16384,
+            "output": 1536
+          },
           "attachment": true,
           "modalities": {
             "input": ["text", "image"],

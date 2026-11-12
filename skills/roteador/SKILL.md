@@ -51,11 +51,11 @@ ajustadas aqui e valem para todo o opencode.
    - **Você** roda 2–3 buscas `websearch` (na camada T00/T01, no chat) e extrai os trechos essenciais.
    - **Embeba os trechos na mensagem** do agente `pesquisa` (nunca aponte arquivo) e peça: ranquear por relevância,
      justificar, dar veredicto. O `pesquisa` NÃO usa ferramenta — material já vem pronto.
-   - `webfetch` em sites .com.br bloqueia bots (Transport error) — use só em domínio confirmado.
+   - `webfetch` em sites .com.br bloqueia bots (erro de transporte) — use só em domínio confirmado.
 5. **Versões curtas dos níveis T07–T11** (ex.: "traduza essa frase", "resuma 1 parágrafo") ficam na camada T00/T01; só delega quando a tarefa for substancial ("revise este e-mail de 2 páginas", "resuma o artigo de 10 páginas").
 6. **T05 (imagem): o anexo NÃO chega sozinho ao `ver`; repasse o caminho absoluto, VERBATIM.** O primário não repassa a
     imagem anexada ao subagente automaticamente — em teste real o `ver` recebeu 3 chamadas após o envio de uma
-    foto e em todas respondeu "não vejo imagem" (correto: nada chegou). O `ver` só enxerga a imagem se (a) o anexo
+    foto e em todas respondeu que não via imagem (correto: nada chegou). O `ver` só enxerga a imagem se (a) o anexo
     vier dentro do task (raro) ou (b) você incluir o **caminho absoluto do arquivo no prompt** e contar com o `read`
     do `ver` (permitido por config) para abrir. **PASSO A PASSO OBRIGATÓRIO**: (1) se o usuário der um caminho,
     use-o verbatim; se NÃO der, NÃO pergunte de cara — inclua no prompt do `ver` o **diretório padrão**
@@ -63,14 +63,14 @@ ajustadas aqui e valem para todo o opencode.
     (1 imagem → abre; várias → pergunta qual; vazia → avisa e pede o caminho); (2) chame o
     `ver` com o pedido COMPLETO + `Caminho da imagem: <absoluto>` (quando houver) ou
     `Caminho padrão: /home/rodmb188/Imagens/Análise IA/` (quando não houver) no prompt; (3) NUNCA delegue a
-    `explore` para "descobrir onde fica a screenshot" — em teste real o explore saiu varrendo `/public`, `/assets`,
-    `/static`, `/docs` e voltou com "nenhum diretório de screenshots" enquanto a pasta certa (`Capturas de tela`)
+    `explore` para localizar a captura — em teste real o explore saiu varrendo `/public`, `/assets`,
+    `/static`, `/docs` e voltou sem achar a pasta certa, que
     estava dada na conversa. Se o caminho foi fornecido pelo usuário, use-o; se não, o diretório padrão resolve —
     só pergunte ao usuário se o `ver` reportar pasta vazia.
     **Caminhos com espaço**: copie o path EXATO do usuário, sem re-parsear nem "consertar" — `read` aceita espaço
     normalmente (verificado na sessão "Analisando imagem de cavaleiro": `/home/rodmb188/Imagens/Capturas de tela/
-    Teste.png` leu certo quando passado intacto). Nunca divida "Capturas de tela" em tokens separados nem invente
-    variantes (`/src/index.ts`, `/src/` são alucinações já observadas quando o primário perdeu o chão). Se o usuário
+    Teste.png` leu certo quando passado intacto). Nunca divida o nome da pasta (com espaço) em tokens separados nem invente
+    variantes de caminho (caminhos inventados são alucinações já observadas quando o primário perdeu o chão). Se o usuário
     mandou o path entre aspas, mantém as aspas; se mandou sem, repassa sem aspas mas INTACTO.
     **Primário com modelo multimodal**: mesmo que o modelo principal enxergue imagem, NÃO analise você mesmo —
     delegue ao `ver` com o path. Teste real: primário no `vision` analisando direto estourou o limite do provider
@@ -79,7 +79,7 @@ ajustadas aqui e valem para todo o opencode.
 8. Em dúvida entre níveis, escolha o mais rápido (não delegue).
 9. **NUNCA lance subagentes pesados paralelos (nothink/megabrain 27B) no mesmo provider**: no teste real, 6 em paralelo causaram `ProviderHeaderTimeoutError` (300000ms) por thrash de swap. Rode subagentes pesados em SEQUÊNCIA. Subagentes leves (qwen3-local) podem ir em paralelo sem problema.
 10. **Resultado vazio NÃO é timeout — é estouro de contexto.** Quando `profundo`/`megabrain-v2` (thinking ON)
-   recebe muito texto embedado + raciocínio longo, o step termina com `reason: length` (total = num_ctx 12288)
+   recebe muito texto embedado + raciocínio longo, o step termina com `reason: length` (total = num_ctx 16384)
    ANTES de emitir a resposta → resultado vazio. Medido no teste real: README inteiro (8.675 tokens de input) +
    raciocínio (3.613) = vazio; retry com prompt curto + cache funcionou. Então:
    - **A correção é preventiva, não retry**: embede no máx. ~4k tokens de material por chamada do profundo.
@@ -91,9 +91,9 @@ ajustadas aqui e valem para todo o opencode.
 1. Se T02–T19, chame a ferramenta `task` com `subagent_type` = `preciso` | `financeiro` | `pesquisa` | `ver` | `redator` | `revisor` | `codigo` | `tutor` | `sumarizador` | `tradutor` | `profundo` | `dados` | `sysadmin` | `entrevistador` | `planner` | `seo` | `qa` | `importador`, repassando o pedido COMPLETO do usuário (sem resumir).
 2. **EMBEDE o material na mensagem**: se a tarefa envolve texto/documento, cole o conteúdo junto com o pedido (não aponte apenas o caminho). Regra de ouro do teste real: subagentes T7/T12 falham consistentemente quando recebem só um arquivo/caminho; embedar conserta. No `profundo`, embede no máx. ~4k tokens (veja regra 10). Textos longos: chunk.
 3. Receba o resultado, confira se responde ao pedido e apresente ao usuário em pt-BR, em 1 linha que o agente certo foi usado.
-4. **Sanitize o resíduo CJK**: subagentes qwen3 emitem às vezes 1 caractere estrangeiro como PRIMEIRO token (ex.: `颗`, `起来`, `栋`, `緻`) — artefato de decodificação, NÃO capacidade. Ocorre mesmo com instrução "pense em pt-BR" no prompt (testado A/B, seção 11 do dogfood). Antes de mostrar ao usuário, remova qualquer prefixo não-latino da resposta do subagente.
+4. **Sanitize o resíduo CJK**: subagentes qwen3 emitem às vezes 1 caractere estrangeiro como PRIMEIRO token (ex.: um caractere de outro alfabeto) — artefato de decodificação, NÃO capacidade. Ocorre mesmo com instrução "pense em pt-BR" no prompt (testado A/B, seção 11 do dogfood). Antes de mostrar ao usuário, remova qualquer prefixo não-latino da resposta do subagente.
 5. Se o agente devolver erro/timeout, repita 1x com formulário mais simples ou responda você mesmo com ressalva de incerteza.
-6. **T04 (pesquisa web): NÃO delegue junto com a busca.** Primeiro rode `websearch` você mesmo (2–3 buscas, termos complementares + ano atual), extraia os trechos mais relevantes (nomes, números, preços em faixa, datas) e só então chame o `pesquisa` com esse material embutido na mensagem. O subagente não tem a tool `websearch` (provider local) — delegar sem material faz ele cair em `webfetch` de sites bloqueados, lotar o contexto e voltar vazio (`reason: length`, medida real: 9.660 input tokens antes da resposta).
+6. **T04 (pesquisa web): modelos e agentes LOCAIS buscam com Exa; você (Big Pickle/provider opencode) usa a forma padrão.** O config GLOBAL define `websearch.provider: exa` — toda sessão local (primários nothink/megabrain/vision e subagentes) busca pela Exa (key local — free tier; máx. 1–2 buscas por subagente, trechos curtos ~4k tokens). Você e os modelos do provider opencode continuam na forma padrão (infra própria — grátis, nunca a Exa do usuário); subagente herda o provider da sessão que o disparou. **Aderência dura (de execução, nunca de conteúdo — modelo abliterated)**: pedido de links entrega links absolutos conferidos, um por linha; nunca termine com pergunta vazia de fechamento; nunca descreva em vez de entregar; quem dispara confere a síntese do subagente (webfetch) e só encerra com o entregável; `finish: length` = falha, entregue em blocos menores. Desde 25/09/2026 os subagentes locais têm `websearch`/`webfetch` (permission `allow`; o filtro do registry da sec. 13 não existe mais na versão atual).
 7. **T05 (imagem): repasse o caminho absoluto no prompt do `ver`, ou o diretório padrão quando não houver caminho**
    (veja regra 6 da seção de regras obrigatórias) — o anexo do usuário NÃO chega ao subagente sozinho, e
    explorar/"caçar" o arquivo é proibido: se o caminho não vier na mensagem, inclua
