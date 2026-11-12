@@ -1109,3 +1109,53 @@ Isso NÃO é erro de config: é o teto do hardware atual.
 - docs/ENGINEERING_JOURNAL.md (este registro)
 - Fora do repo: drop-in `~/.config/systemd/user/ollama.service.d/override.conf`
   (rollback: `bash benchmarks/b06_keepalive.sh --rollback`)
+
+---
+
+## r20 — Negativas residuais do `pesquisa` + espelho do repo corrigido (B07)
+
+**Data:** 2026-11-12 · **Bateria:** B07 (4 PASS · 0 FAIL · 1 ⚠ controle)
+
+**Contexto:** revisão linha por linha das 21 linhas com negativa nos 18 agentes
+(28 ocorrências). 15 são falso positivo (oração subordinada, condicional,
+adjetivo, citação do usuário); 6 são reais, todas no `pesquisa.md` (14 das 28
+ocorrências).
+
+**Achado colateral (grave):** o espelho `agent/` do repo estava 18/18 divergente
+do global — ainda continha as iscas que a B05 removeu (`NUNCA abra a resposta` em
+18 arquivos, `Nãosó` em 18, exemplos CJK em 3) e apontava `model: ollama/...` em
+vez de `ollama-nothink/...`. O commit `3148894` ("iscas removidas") só alterou
+permissions no `agent/`. Negativas: global 28 vs repo 300.
+
+**O que foi feito:**
+1. Espelho sincronizado (`25e6a2b`): 18/18 idênticos, iscas → 0, provider
+   corrigido, +154/−346 linhas.
+2. `pesquisa.md` reescrito em forma positiva: 14 → 3 ocorrências, todas benignas
+   (condicional na `description` e strings de saída "não confirmei X" / "não
+   encontrei fonte de X"). Guardrails preservados: teto de 2 buscas por família
+   ("a 2ª é a última"), filtro de homônimo, entrega com material parcial;
+   duplicatas fundidas (32→31, 34→31/32) e "Nunca invente" absorvido pela linha
+   45, ampliada para "mensagem e resultados de busca".
+3. B07 — 4 casos, sequenciais via proxy 11436:
+   - material suficiente → 0 buscas, veredito correto;
+   - homônimo (livro × filme × música) → separou e respondeu só o livro;
+   - material parcial com item real → buscou 1x e trouxe dados reais
+     (⚠ inconclusivo: a busca "salva" o caso);
+   - material parcial com item fictício → parou em 2 buscas, entregou autor +
+     editora, marcou ano/páginas/ISBN como não confirmados e descartou dois
+     homônimos reais (Jojo Moyes, Dionesio);
+   - link 404 → total R$ 484 vs R$ 499, duas fontes citadas com ressalva.
+
+**Lição:** a reescrita positiva não perdeu guardrail. Para testar "entregar com o
+que há", o item precisa ser **fictício** — com item real o modelo pode buscar
+legitimamente e acertar, mascarando o comportamento. E espelho de repo não é
+backup: divergiu em silêncio por 18 arquivos enquanto o commit dizia "iscas
+removidas".
+
+**Arquivos tocados:**
+- Fora do repo: `~/.config/opencode/agent/pesquisa.md` (backup em
+  `/tmp/opencode/ab-pesquisa/`)
+- agent/*.md × 18 (espelho) + agent/pesquisa.md
+- benchmarks/results/baterias/B07_pesquisa_negativas_2026-11-12.md (novo)
+- benchmarks/results/README.md (índice com B07)
+- docs/ENGINEERING_JOURNAL.md (este registro)
