@@ -5,13 +5,13 @@ description: Use quando o usuário pedir qualquer tipo de pesquisa, busca, consu
 
 # Pesquisa web confiável
 
-Objetivo: obter resultados de pesquisa confiáveis e atuais sem cair em erros de transporte ("Transport error") do `webfetch`.
+Objetivo: obter resultados de pesquisa confiáveis e atuais sem cair em erros de transporte do `webfetch`.
 
 ## Regra principal
 
 Sempre que a tarefa envolver **pesquisar, buscar, consultar ou comparar informações na web** — de qualquer tipo (produtos, notícias, fatos, tutoriais, preços, specs, eventos atuais, etc.) — **prefira a ferramenta `websearch`** em vez do `webfetch`.
 
-Motivo: vários sites (especialmente os `.com.br`) retornam "Transport error" ou bloqueiam o fetch direto. A ferramenta `websearch` retorna títulos, links, datas de publicação e trechos relevantes mesmo para esses sites.
+Motivo: vários sites (especialmente os `.com.br`) bloqueiam o fetch direto ou retornam erro de transporte. A ferramenta `websearch` retorna títulos, links, datas de publicação e trechos relevantes mesmo para esses sites.
 
 ## Fluxo sugerido
 
@@ -28,3 +28,10 @@ Motivo: vários sites (especialmente os `.com.br`) retornam "Transport error" ou
 - Justifique cada item em 1 linha.
 - Quando apropriado, finalize com um "Veredicto"/conclusão escolhendo a opção principal e alternativas.
 - Em pesquisas de mercado/compras, ressalte que preços flutuam e que vale conferir antes de fechar.
+
+## Regra de entrega (aderência dura)
+
+- Quando o pedido envolver **links/URLs concretos** (baixar, abrir, acessar, fontes), a resposta **termina com a lista de URLs absolutos** — um por linha, extraídos diretamente das respostas do `websearch` (o campo `content` traz os links com título). Nunca descreva a página no lugar dos links.
+- **É proibido terminar o turno com pergunta vazia de fechamento** quando o pedido foi claro. Se faltou algo, diga explicitamente o que faltou e por quê — não devolva a bola.
+- Não termine com resumo/resenha quando o que foi pedido é uma lista de opções com link.
+- Se o turno for cortado (`finish: length`), o próximo turno retoma e entrega os itens restantes — corte de geração nunca é desculpa para não entregar.

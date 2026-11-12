@@ -21,13 +21,14 @@ post-mortems — not vibes. The chronicle and raw results live in
 - **T04 (pesquisa web) é a exceção deliberada.** Buscar "melhor celular até
   R$2.000 em 2026" exige dados vivos da internet — não existem no modelo local,
   por mais brilhante que ele seja. O fetch é feito pela tool `websearch` do
-  opencode (backend Exa/Parallel), uma chamada HTTP curta por query. O que o
-  `pesquisa` (nothink-v2 local) recebe são trechos de texto já coletados; **a
-  síntese, o julgamento e a resposta final são 100% locais.**
-- **Por que não o subagente busca sozinho:** subagentes rodam no provider
-  `ollama`, e o opencode só expõe `websearch` em providers `opencode` para este
-  binário (filtro em `registry.ts`, provado no dogfood sec. 13). Quem busca é o
-  primário; quem pensa é o subagente local.
+  opencode (backend Exa), uma chamada HTTP curta por query. Por padrão quem
+  busca é o primário, e o `pesquisa` (nothink-v2 local) sintetiza trechos já
+  coletados; **a síntese, o julgamento e a resposta final são 100% locais.**
+- **Subagentes locais têm `websearch` desde 25/09/2026:** os 18 frontmatters
+  passaram a `websearch: allow` (verificado na versão atual: a tool chega e
+  responde; o filtro do registry do dogfood sec. 13 não existe mais). O
+  `pesquisa` pode buscar 1–2x quando o material embutido não bastar; o padrão
+  continua sendo o primário buscar e embedar.
 - **Se você quer T04 offline de verdade**, a troca é aceitar dados de hoje em
   vez de dados ao vivo — ou plugar um backend de busca próprio no `websearch`.
   Não há como ter um dado de hoje *e* 100% offline: a internet é a fonte.
@@ -260,14 +261,18 @@ JSON config**.
 
 Every agent declares an explicit `permission:` block in its frontmatter (15
 tool keys) — the default is **deny**, and each agent opens only what its role
-needs. Text/vocal agents (including `pesquisa`) are pure readers of embedded
-material with all tools denied; only `codigo`, `dados`, `importador` and
-`sysadmin` keep file/shell tools. `task` is denied on every sub-agent
+needs. Text/vocal agents keep every tool denied except `websearch`/`webfetch`
+(allowed on all 18 agents since 25/09/2026); `codigo`, `dados`, `importador`
+and `sysadmin` also keep file/shell tools. `task` is denied on every sub-agent
 (nested delegation is cut off by design). One lesson from real failures
 (dogfood sec. 10 and 13): `permission` frontmatter is necessary but not
-sufficient — opencode's registry can still gate a tool by provider (e.g.
-`websearch` never reaches sub-agents running on `ollama`), so the T04 flow is
-"primary searches, sub-agent synthesizes".
+sufficient — the registry used to gate a tool by provider (e.g. `websearch`
+never reached sub-agents on `ollama`), but that filter is gone (verified
+25/09/2026: with `allow` the tool arrives and answers). The websearch
+**provider** is session-level (sub-agents inherit it) and all **local** models
+and agents use **Exa** from the global config (`websearch.provider: exa` +
+local key, free tier); only the primary on the `opencode` provider (Big Pickle)
+keeps OpenCode's standard websearch infra — it never touches the user's Exa.
 
 ---
 

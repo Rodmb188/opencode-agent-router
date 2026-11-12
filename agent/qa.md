@@ -13,8 +13,8 @@ permission:
   external_directory: deny
   todowrite: deny
   question: deny
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
   lsp: deny
   doom_loop: deny
   skill: deny
