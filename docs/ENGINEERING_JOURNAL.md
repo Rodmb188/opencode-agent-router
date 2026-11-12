@@ -1159,3 +1159,35 @@ removidas".
 - benchmarks/results/baterias/B07_pesquisa_negativas_2026-11-12.md (novo)
 - benchmarks/results/README.md (índice com B07)
 - docs/ENGINEERING_JOURNAL.md (este registro)
+
+---
+
+## r21 — CI vermelho: regressão desatualizada + `ver.md` sem `list`
+
+**Data:** 2026-11-12 · **Sintoma:** `benchmarks/regressao.py` exit 1 com 34
+problemas; workflow `rota-ci` vermelho.
+
+**Causa (quatro camadas):**
+1. **Conteúdo real** — `ver.md` estava com `list: deny` e sem o bloco do
+   diretório padrão `/home/rodmb188/Imagens/Análise IA/`: o fluxo T05 "sem
+   caminho" não conseguia listar a pasta, contrariando o AGENTS.md e o roteador.
+   Restaurados `list: allow` e o passo 3 do comportamento (1 imagem → abre;
+   várias → pergunta; vazia → avisa e pede o caminho).
+2. **Teste desatualizado (permissions)** — desde 2026-09-25 os 18 têm
+   `webfetch/websearch: allow` (Exa); o script ainda exigia deny-all nos agentes
+   de texto e só `question` no entrevistador.
+3. **Teste desatualizado (idioma)** — exigia o bloco "## Regras reforçadas de
+   idioma", removido na B05; agora aceita o marcador positivo ("alfabeto latino"
+   / "100% em pt-BR").
+4. **Teste desatualizado (contexto)** — comparava `num_ctx` com o Modelfile
+   (12288) e ignorava o override do proxy (16384); agora usa
+   `_num_ctx_padrao()` do `nothink_proxy.py` como valor efetivo.
+5. **Higiene** — `benchmarks/__pycache__/*.pyc` estava versionado;
+   `__pycache__/` e `*.pyc` entraram no `.gitignore`.
+
+**Resultado:** regressão **PASS (0 problemas)**, etapa de frontmatter do CI OK
+(18 agentes × 15 permissions), espelho 18/18 idêntico ao global.
+
+**Lição:** teste estático que codifica o estado de uma era vira falso negativo
+quando o sistema evolui — cada mudança de contrato (Exa, B05, 16384) precisa
+atualizar a regressão no mesmo commit.

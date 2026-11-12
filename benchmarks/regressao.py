@@ -7,8 +7,8 @@ Duas camadas, separadas honestamente:
 1. ESTÁTICA (automática, rápida, determinística)
    - Valida os frontmatters YAML dos 18 agentes (parse, description, mode, model,
      15 chaves de permission).
-   - Confere que a permission reflete o papel do agente (leves são "deny-all";
-     codigo/dados/importador/sysadmin têm ferramentas; ver tem só read para abrir
+   - Confere que a permission reflete o papel do agente (texto: só web/question;
+     codigo/dados/importador/sysadmin têm ferramentas; ver tem list+read para abrir
      a imagem via caminho — T05 fix; task sempre deny).
 - Cruzamento: cada nível T02–T19 do roteador aponta para um agente existente.
     - Integridade de links internos do README (arquivos citados existem).
@@ -89,8 +89,11 @@ TOOL_KEYS = [
 ]
 
 TOOLED_AGENTS = {"codigo", "dados", "importador", "sysadmin"}
-READ_TOOLED_AGENTS = {"ver"}  # visão: só list (diretório padrão) + read (abre via caminho — T05 fix)
+READ_TOOLED_AGENTS = {"ver"}  # visão: list (diretório padrão) + read (abre via caminho — T05 fix)
 QUESTION_OK = {"entrevistador"}
+# Desde 2026-09-25 todos os subagentes locais recebem websearch/webfetch allow
+# (Exa herdada da sessão); a checagem de papel compara o que sobra disso.
+WEB_TOOLS = {"webfetch", "websearch"}
 
 
 def static_checks():
@@ -137,16 +140,16 @@ def static_checks():
         elif name in READ_TOOLED_AGENTS:
             if perm.get("task") != "deny":
                 problems.append(f"{name}: tooled agent deve ter task deny")
-            allow = [k for k, v in perm.items() if v == "allow"]
-            if sorted(allow) != ["list", "read"]:
-                problems.append(f"{name}: visão deveria ter SÓ list+read allow (tem {allow})")
+            allow = {k for k, v in perm.items() if v == "allow"}
+            if allow != {"list", "read"} | WEB_TOOLS:
+                problems.append(f"{name}: visão deveria ter SÓ list+read+web allow (tem {sorted(allow)})")
         else:
-            allow = [k for k, v in perm.items() if v == "allow"]
+            allow = {k for k, v in perm.items() if v == "allow"}
+            extra = allow - WEB_TOOLS
             if name in QUESTION_OK:
-                if allow not in ([], ["question"]) and allow != ["question"]:
-                    problems.append(f"{name}: permitiu {allow} (esperado só question)")
-            elif allow:
-                problems.append(f"{name}: agente de texto não deveria ter tools ({allow})")
+                extra -= {"question"}
+            if extra:
+                problems.append(f"{name}: agente de texto com tools além de web/question ({sorted(extra)})")
 
         # Bloco tom/energia (T9)
         if "## Tom e energia" not in text:
@@ -227,18 +230,27 @@ def static_checks():
             parent = re.search(r"FROM ([\w.-]+)", src)
             if parent and parent.group(1) in ctx_by_model:
                 ctx_by_model[mname] = ctx_by_model[parent.group(1)]
+    # O proxy força num_ctx por família a cada request (override desde 2026-09-29);
+    # o valor EFETIVO é o do proxy, não o do Modelfile.
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "benchmarks"))
+        from nothink_proxy import _num_ctx_padrao
+    except Exception:
+        _num_ctx_padrao = None
     for model, ctx in sorted(ctx_by_model.items()):
+        effective = _num_ctx_padrao(model) if _num_ctx_padrao else ctx
         if budget_doc and f"`{model}`" not in budget_doc:
             problems.append(f"CONTEXT_BUDGET.md: falta o modelo `{model}` na tabela")
-        elif budget_doc and f"**{ctx}**" not in budget_doc:
-            problems.append(f"CONTEXT_BUDGET.md: `{model}` deveria citar num_ctx {ctx}")
+        elif budget_doc and f"**{effective}**" not in budget_doc:
+            problems.append(f"CONTEXT_BUDGET.md: `{model}` deveria citar num_ctx {effective} (efetivo via proxy)")
 
-    # 7) Regra de idioma em TODOS os agentes (T16 r6): sem o bloco de rigor de
-    #    pt-BR, os vazamentos CJK voltam — a regra é obrigatória por arquivo.
-    lang_rule = "## Regras reforçadas de idioma"
+    # 7) Regra de idioma em TODOS os agentes (T16 r6; forma positiva desde a B05):
+    #    aceita o bloco antigo ou o marcador positivo equivalente.
+    lang_markers = ("## Regras reforçadas de idioma", "alfabeto latino", "100% em pt-BR")
     for agent_path in sorted(glob.glob(os.path.join(AGENTS_DIR, "*.md"))):
-        if lang_rule not in open(agent_path, encoding="utf-8").read():
-            problems.append(f"{os.path.basename(agent_path)}: falta o bloco de regras de idioma (## Regras reforçadas de idioma)")
+        text = open(agent_path, encoding="utf-8").read()
+        if not any(m in text for m in lang_markers):
+            problems.append(f"{os.path.basename(agent_path)}: falta regra de idioma (bloco antigo ou marcador positivo)")
 
     return (len(problems) == 0, problems)
 

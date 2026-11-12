@@ -7,3 +7,6 @@ blobs/
 thumbs.db
 # Ollama transient data
 .ollama/
+# Python bytecode (gerado localmente)
+__pycache__/
+*.pyc
