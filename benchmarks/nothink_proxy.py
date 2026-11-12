@@ -102,6 +102,32 @@ def sanitize_stream_resposta(resposta_json):
 
 # ---- bloco 1b: tradução OpenAI <-> Ollama (endpoint /v1/chat/completions) ----
 
+def _num_predict_padrao(modelo):
+    """Cap anti-loop por modelo. Sem max_tokens o Ollama gera ate o fim dos
+    tempos e segura o unico slot (tasks 3968/1522/3081/4539 em 2026-09-28:
+    8-10 min por tentativa em loop de repeticao). Subido em 2026-09-29 de
+    1536/2500 para 2500/3072: o passo de COMPACTACAO do opencode gera um
+    resumo do contexto e era truncado em 1536 (StepFailedError 'Compaction
+    summary reached the output token limit', sessao O Pescador 04:10)."""
+    if modelo and "megabrain" in modelo:
+        return 3072
+    return 2500
+
+
+def _num_ctx_padrao(modelo):
+    """Janela de contexto por familia, alinhada ao CONTEXT_BUDGET.md. Os 27B
+    subiram de 12288 para 16384 em 2026-09-29: com o prompt fixo do opencode
+    v2 (system + tools) a janela estreita estourava a geracao de resposta
+    (400 'exceeds the available context size', 03:48) e truncava o resumo da
+    compactacao (04:15-04:17). Custo: +1.5 GB RAM de KV (384 KB/token) na
+    folga medida (31 Gi total, ~17 Gi disponiveis)."""
+    m = (modelo or "").lower()
+    if "qwen3" in m:
+        return 8192
+    if any(x in m for x in ("nothink", "megabrain", "vision")):
+        return 16384
+    return 12288
+
 def traduz_oai_para_ollama(req):
     """Converte um request do formato OpenAI (openai-compatible SDK) para o
     corpo nativo do Ollama (/api/chat). Sempre pede stream=False ao Ollama;
@@ -141,13 +167,17 @@ def traduz_oai_para_ollama(req):
                             pass  # deixa como esta; o Ollama devolve o erro
     if req.get("tool_choice") is not None:
         corpo["tool_choice"] = req["tool_choice"]
-    opts = {"num_ctx": 12288}
+    opts = {"num_ctx": _num_ctx_padrao(req.get("model", ""))}
     if "temperature" in req:
         opts["temperature"] = req["temperature"]
     if "max_tokens" in req:
         opts["num_predict"] = req["max_tokens"]
     if req.get("options") and isinstance(req["options"], dict):
         opts.update(req["options"])
+    # cap anti-loop por modelo (ver _num_predict_padrao): SEM max_tokens o
+    # Ollama gera ate o fim dos tempos e segura o unico slot (casos reais
+    # 2026-09-28, tasks 3968/1522/3081/4539). Entra nos DOIS caminhos.
+    opts.setdefault("num_predict", _num_predict_padrao(req.get("model", "")))
     corpo["options"] = opts
     return corpo
 
@@ -205,6 +235,9 @@ def traduz_ollama_para_oai(resposta_ollama, model, stream_pedido):
     msg_oai = {"role": "assistant", "content": conteudo}
     if tool_calls:
         msg_oai["tool_calls"] = tool_calls
+    # sinal honesto: geracao cortada pelo limite (num_predict/contexto) nao e
+    # um "stop" normal — o cliente precisa saber que a resposta veio truncada
+    fim = "length" if resposta_ollama.get("done_reason") == "length" else "stop"
     if not stream_pedido:
         return {
             **base,
@@ -212,7 +245,7 @@ def traduz_ollama_para_oai(resposta_ollama, model, stream_pedido):
             "choices": [{
                 "index": 0,
                 "message": msg_oai,
-                "finish_reason": "stop",
+                "finish_reason": fim,
             }],
         }
     chunks = []
@@ -228,7 +261,7 @@ def traduz_ollama_para_oai(resposta_ollama, model, stream_pedido):
         )
     chunks.append(
         {**base, "object": "chat.completion.chunk",
-         "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]}
+         "choices": [{"index": 0, "delta": {}, "finish_reason": fim}]}
     )
     corpo_sse = "".join("data: %s\n\n" % json.dumps(c, ensure_ascii=False) for c in chunks)
     return corpo_sse + "data: [DONE]\n\n"
@@ -278,7 +311,10 @@ class _Handler(BaseHTTPRequestHandler):
             corpo_up["stream"] = False
             if "options" not in corpo_up:
                 corpo_up["options"] = {}
-            corpo_up["options"].setdefault("num_ctx", 12288)
+            corpo_up["options"].setdefault("num_ctx", _num_ctx_padrao(modelo))
+            corpo_up["options"].setdefault(  # cap anti-loop (por modelo)
+                "num_predict", _num_predict_padrao(modelo)
+            )
             url = "http://%s%s" % (self._upstream(), self.path)
 
         data = json.dumps(corpo_up).encode("utf-8")
@@ -373,10 +409,16 @@ def _self_test():
         corpo_up["model"] == "qwen3-local"
         and corpo_up["stream"] is False
         and len(corpo_up["messages"]) == 1
-        and corpo_up["options"]["num_ctx"] == 12288
+        and corpo_up["options"]["num_ctx"] == 8192
         and corpo_up["options"]["temperature"] == 0.2
         and corpo_up["options"]["num_predict"] == 40
     )
+    # 27B (nothink/megabrain) e vision: janela 16384 (subiu de 12288 em
+    # 2026-09-29; ver _num_ctx_padrao e CONTEXT_BUDGET.md)
+    corpo_27 = traduz_oai_para_ollama(
+        {"model": "nothink-v2", "messages": [{"role": "user", "content": "oi"}]}
+    )
+    ok5c = corpo_27["options"].get("num_ctx") == 16384
 
     # resposta do Ollama (com thinking) vira chat.completion OpenAI SEM thinking;
     # o modo stream devolve SSE com [DONE] no fim
@@ -471,6 +513,28 @@ def _self_test():
     tc_hist = (corpo_hist["messages"][0].get("tool_calls") or [{}])[0]
     ok5b = tc_hist.get("function", {}).get("arguments") == {"a": 1}
 
+    # achado 2026-09-28: sem max_tokens o Ollama gera infinitamente e segura
+    # o slot. O cap padrao entra por modelo (nothink=2500, megabrain=3072 —
+    # subidos em 2026-09-29) quando o SDK nao manda max_tokens, nos DOIS
+    # caminhos (openai e nativo).
+    corpo_sem_max = traduz_oai_para_ollama(
+        {"model": "qwen3-local", "messages": [{"role": "user", "content": "oi"}]}
+    )
+    ok13 = corpo_sem_max["options"].get("num_predict") == 2500
+    corpo_mega = traduz_oai_para_ollama(
+        {"model": "megabrain-v2", "messages": [{"role": "user", "content": "oi"}]}
+    )
+    ok13b = corpo_mega["options"].get("num_predict") == 3072
+    # geracao cortada pelo limite chega ao cliente com finish "length" (nao
+    # "stop"): truncamento nao fica mascarado como resposta completa
+    resp_len = {
+        "model": "x", "done_reason": "length",
+        "message": {"role": "assistant", "content": "corte aqui"},
+    }
+    ok14 = traduz_ollama_para_oai(resp_len, "x", False)["choices"][0]["finish_reason"] == "length"
+    sse_len = traduz_ollama_para_oai(resp_len, "x", True)
+    ok14b = any('"finish_reason": "length"' in l for l in sse_len.splitlines())
+
     print("self-test:")
     print("  corta rascunho + rede charset :", "PASS" if ok1 else "FAIL")
     print("  texto limpo segue intacto      :", "PASS" if ok2 else "FAIL")
@@ -485,7 +549,11 @@ def _self_test():
     print("  remove tool_call nao-parseada  :", "PASS" if ok11 else "FAIL")
     print("  content parts imagem -> nativo  :", "PASS" if ok12 else "FAIL")
     print("  tool_calls historico -> objeto  :", "PASS" if ok5b else "FAIL")
-    return ok1 and ok2 and ok3 and ok4 and ok5 and ok6 and ok7 and ok8 and ok9 and ok10 and ok10b and ok11 and ok12 and ok5b
+    print("  cap num_predict nothink (2500)  :", "PASS" if ok13 else "FAIL")
+    print("  cap num_predict megabrain (3072):", "PASS" if ok13b else "FAIL")
+    print("  num_ctx 27B/vision (16384)      :", "PASS" if ok5c else "FAIL")
+    print("  truncamento vira finish length  :", "PASS" if (ok14 and ok14b) else "FAIL")
+    return ok1 and ok2 and ok3 and ok4 and ok5 and ok6 and ok7 and ok8 and ok9 and ok10 and ok10b and ok11 and ok12 and ok5b and ok13 and ok13b and ok14 and ok14b and ok5c
 
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
